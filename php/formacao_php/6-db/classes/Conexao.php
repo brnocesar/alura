@@ -1,7 +1,5 @@
 <?php
 
-// require_once 'config.php';
-
 class Conexao
 {
     public static function pegarConexao(){

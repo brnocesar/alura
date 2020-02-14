@@ -1,7 +1,5 @@
 <?php
 
-// require_once 'classes/Conexao.php';
-
 class Categoria
 {
 
@@ -18,7 +16,6 @@ class Categoria
 
     public function listar()
     {
-        throw new Exception('Erro ao listar categorias');
         $query = "SELECT id, nome FROM categorias";
 
         $conexao = Conexao::pegarConexao();

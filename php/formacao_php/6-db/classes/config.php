@@ -1,6 +1,6 @@
 <?php
 
-define('DEBUG', true);
+define('DEBUG', false);
 
 define('DB_DRIVE', 'mysql');
 define('DB_HOSTNAME', 'localhost');

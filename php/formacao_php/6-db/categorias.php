@@ -6,15 +6,7 @@
         $lista = $categoria->listar();
 
     } catch (Exception $erro) {
-        if (DEBUG) {
-            echo '<pre>';
-            print_r( $erro );
-            echo '</pre>';
-        }
-        else {
-            echo $erro->getMessage();
-        }
-        exit;
+        Erro::trataErro($erro);
     }
 ?>
 
