@@ -1,8 +1,21 @@
 <?php require_once 'global.php'; ?>
 
 <?php
-    $categoria = new Categoria();
-    $lista = $categoria->listar();
+    try {
+        $categoria = new Categoria();
+        $lista = $categoria->listar();
+
+    } catch (Exception $erro) {
+        if (DEBUG) {
+            echo '<pre>';
+            print_r( $erro );
+            echo '</pre>';
+        }
+        else {
+            echo $erro->getMessage();
+        }
+        exit;
+    }
 ?>
 
 <?php require_once 'cabecalho.php' ?>
