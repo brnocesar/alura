@@ -1,6 +1,6 @@
 <?php
 
-require_once 'classes/Conexao.php';
+// require_once 'classes/Conexao.php';
 
 class Categoria
 {

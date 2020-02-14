@@ -1,6 +1,6 @@
 <?php
 
-require_once 'classes/Categoria.php';
+require_once 'global.php';
 
 $id = $_POST['id'];
 $nome = $_POST['nome'];

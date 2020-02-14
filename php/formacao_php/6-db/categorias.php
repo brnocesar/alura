@@ -1,12 +1,8 @@
-<?php require_once 'classes/Categoria.php'; ?>
+<?php require_once 'global.php'; ?>
 
 <?php
     $categoria = new Categoria();
     $lista = $categoria->listar();
-
-    // echo "<pre>";
-    // print_r($lista);
-    // echo "</pre>";
 ?>
 
 <?php require_once 'cabecalho.php' ?>
