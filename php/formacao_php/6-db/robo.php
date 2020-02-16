@@ -24,6 +24,8 @@ function createProdutos($numero_pordutos, $categoria_id)
             rand(1, 50),
             $categoria_id
         );
+        
+        echo "Item criado\n";
     }
 }
 
