@@ -22,7 +22,7 @@ class Categoria
         $resultado = $conexao->query($query);
         $lista = $resultado->fetchAll();
 
-        return $lista;
+        return $lista; //o retorno nao eh uma coleçao de objetos
     }
 
 

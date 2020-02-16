@@ -2,6 +2,7 @@
 
 <?php
     try {
+        
         $categoria = new Categoria( $_GET['id'] );
 
     } catch (Exception $erro) {
