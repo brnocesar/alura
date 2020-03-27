@@ -4,6 +4,7 @@ namespace Alura\Doctrine\Entity;
 
 /**
  * @Entity
+ * @Table(name="alunos")
  */
 class Aluno
 {
