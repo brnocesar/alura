@@ -43,7 +43,7 @@ final class Versions
   'symfony/polyfill-php73' => 'v1.15.0@0f27e9f464ea3da33cbe7ca3bdf4eb66def9d0f7',
   'symfony/service-contracts' => 'v2.0.1@144c5e51266b281231e947b51223ba14acf1a749',
   'symfony/yaml' => 'v2.8.52@02c1859112aa779d9ab394ae4f3381911d84052b',
-  '__root__' => 'dev-master@ee1d072e4f1738b5e21fed5d581c5a686c1f6771',
+  '__root__' => 'dev-master@6e79b6f4386b39a03977a2faaa35f92becc20507',
 );
 
     private function __construct()

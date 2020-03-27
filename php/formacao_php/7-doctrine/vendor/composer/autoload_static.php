@@ -40,6 +40,10 @@ class ComposerStaticInit010738ce27f7c41cc5b1ecd178405c53
             'Doctrine\\Common\\Annotations\\' => 28,
             'Doctrine\\Common\\' => 16,
         ),
+        'A' => 
+        array (
+            'Alura\\Doctrine\\' => 15,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -118,10 +122,10 @@ class ComposerStaticInit010738ce27f7c41cc5b1ecd178405c53
             2 => __DIR__ . '/..' . '/doctrine/persistence/lib/Doctrine/Common',
             3 => __DIR__ . '/..' . '/doctrine/reflection/lib/Doctrine/Common',
         ),
-    );
-
-    public static $fallbackDirsPsr0 = array (
-        0 => __DIR__ . '/../..' . '/src',
+        'Alura\\Doctrine\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src',
+        ),
     );
 
     public static $classMap = array (
@@ -133,7 +137,6 @@ class ComposerStaticInit010738ce27f7c41cc5b1ecd178405c53
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit010738ce27f7c41cc5b1ecd178405c53::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit010738ce27f7c41cc5b1ecd178405c53::$prefixDirsPsr4;
-            $loader->fallbackDirsPsr0 = ComposerStaticInit010738ce27f7c41cc5b1ecd178405c53::$fallbackDirsPsr0;
             $loader->classMap = ComposerStaticInit010738ce27f7c41cc5b1ecd178405c53::$classMap;
 
         }, null, ClassLoader::class);
