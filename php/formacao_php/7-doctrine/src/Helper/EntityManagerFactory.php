@@ -21,7 +21,7 @@ class EntityManagerFactory
 
         $connection = [
             'driver' => 'pdo_sqlite',
-            'path' => $rootDir . '/var/banco.sqlite'
+            'path' => $rootDir . '/var/data/banco.sqlite'
         ];
 
         return EntityManager::create($connection, $config);
