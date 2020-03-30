@@ -16,11 +16,11 @@ if ( isset($argv[1]) ) {
     if ( is_numeric($argv[1]) ) {
 
         if ( $alunoEspecifico = $repositorioDeAlunos->find($argv[1]) ) {
-            echo "\n{$alunoEspecifico->getId()}. {$alunoEspecifico->getNome()}\n";
+            echo "{$alunoEspecifico->getId()}. {$alunoEspecifico->getNome()}\n";
             return;
         }
         else {
-            echo "\nAluno não encontrado pelo ID\n";
+            echo "Aluno não encontrado pelo ID\n";
         }
     }
     else {
@@ -37,7 +37,7 @@ if ( isset($argv[1]) ) {
             return;
         }
         else {
-            echo "\nNenhum aluno encontrado pelo Nome\n";
+            echo "Nenhum aluno encontrado pelo Nome\n";
         }
     }    
 }
