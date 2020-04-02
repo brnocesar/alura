@@ -18,30 +18,36 @@ class Telefone
      * @Column(type="string", nullable=false, length=19)
      */
     private $numero;
+    /**
+     * @ManyToOne(targetEntity="Aluno")
+     */
+    private $aluno;
 
-    /** 
-     * @return mixed
-    */
+
     public function getId(): int
     {
         return $this->id;
     }
 
-    /** 
-     * @return mixed
-    */
     public function getNumero(): string
     {
         return $this->numero;
     }
 
-    /**
-     * @param mixed $numero
-     * @return Telefone
-     */ 
     public function setNumero(string $numero): self
     {
         $this->numero = $numero;
+        return $this;
+    }
+
+    public function getAluno(): Aluno
+    {
+        return $this->aluno;
+    }
+
+    public function setAluno(Aluno $aluno): self
+    {
+        $this->aluno = $aluno;
         return $this;
     }
 }
