@@ -1,6 +1,7 @@
 <?php
 
 use Alura\Doctrine\Entity\Aluno;
+use Alura\Doctrine\Entity\Telefone;
 use Alura\Doctrine\Helper\EntityManagerFactory;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -11,12 +12,22 @@ $entityManager = $entityManagerFactory->getEntityManager();
 $repositorioDeAlunos = $entityManager->getRepository(Aluno::class);
 
 
+function printAluno(Aluno $aluno)
+{
+    $telefones = $aluno->getTelefones()->map(function(Telefone $telefone){
+        return $telefone->getNumero();
+    })->toArray();
+
+    echo "{$aluno->getId()} \tAluno(a): \t{$aluno->getNome()}" . PHP_EOL;
+    echo "\tTelefone(s): \t" . implode(', ', $telefones) . PHP_EOL . PHP_EOL;
+}
+
 if ( isset($argv[1]) ) {
 
     if ( is_numeric($argv[1]) ) {
 
-        if ( $alunoEspecifico = $repositorioDeAlunos->find($argv[1]) ) {
-            echo "{$alunoEspecifico->getId()}. {$alunoEspecifico->getNome()}\n";
+        if ( $aluno = $repositorioDeAlunos->find($argv[1]) ) {
+            printAluno($aluno);
             return;
         }
         else {
@@ -32,7 +43,7 @@ if ( isset($argv[1]) ) {
         if ( $alunosEspecificos ) {
 
             foreach ($alunosEspecificos as $aluno) {
-                echo "{$aluno->getId()}. {$aluno->getNome()}\n";
+                printAluno($aluno);
             }
             return;
         }
@@ -48,5 +59,5 @@ if ( isset($argv[1]) ) {
 $listaDeAlunos = $repositorioDeAlunos->findAll();
 
 foreach ($listaDeAlunos as $aluno) {
-    echo "{$aluno->getId()}. {$aluno->getNome()}\n";
+    printAluno($aluno);
 }
