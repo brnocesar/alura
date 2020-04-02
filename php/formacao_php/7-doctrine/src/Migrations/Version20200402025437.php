@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20200402024400 extends AbstractMigration
+final class Version20200402025437 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -24,6 +24,7 @@ final class Version20200402024400 extends AbstractMigration
 
         $this->addSql('CREATE TABLE telefones (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, aluno_id INTEGER DEFAULT NULL, numero VARCHAR(19) NOT NULL)');
         $this->addSql('CREATE INDEX IDX_219AAC26B2DDF7F4 ON telefones (aluno_id)');
+        $this->addSql('CREATE TABLE alunos (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, nome VARCHAR(255) NOT NULL)');
     }
 
     public function down(Schema $schema) : void
@@ -32,5 +33,6 @@ final class Version20200402024400 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'sqlite', 'Migration can only be executed safely on \'sqlite\'.');
 
         $this->addSql('DROP TABLE telefones');
+        $this->addSql('DROP TABLE alunos');
     }
 }
