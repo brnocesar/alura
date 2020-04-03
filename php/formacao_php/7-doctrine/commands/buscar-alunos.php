@@ -53,10 +53,8 @@ if ( isset($argv[1]) ) {
     }    
 }
 
-/**
- * @var Aluno[] $listaDeAlunos
-*/
-$listaDeAlunos = $repositorioDeAlunos->findAll();
+$query = $entityManager->createQuery('SELECT aluno FROM Alura\\Doctrine\\Entity\\Aluno aluno');
+$listaDeAlunos = $query->getResult();
 
 foreach ($listaDeAlunos as $aluno) {
     printAluno($aluno);
