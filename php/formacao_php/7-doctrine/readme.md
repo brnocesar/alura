@@ -176,3 +176,33 @@ $ dmic migrations:migrate
 ```
 
 A criação da _migration_ que mapeou todas as classes implementadas até agora e sua execução esta no _commit_ [06c16f](https://github.com/brnocesar/alura/commit/06c16fc73e40edb6c074475ee4f582b7979aa22d).
+
+## 7. Atualizando o CRUD de Alunos
+### 7.1. `store()`
+Os passos necessários para implementar a capacidade de associar telefones aos estudantes, são basicamente os mesmos do item 4.1.:
+4. Instânciar um objeto
+5. Monitorar este objeto com o GE
+6. Realizar a persistência
+
+A única diferença aqui é que devemos usar um estrutura de repetição para realizar esta ação com todos os telefones passados.
+
+O passo 5 pode ser omitido se adicionarmos uma anotação `cascade` no atributo `$telefones` da classe Aluno. Dessa forma, sempre que indicarmos ao GE que uma entidade da classe Aluno deve ser monitorada (chamar o `persist()`) suas entidades "filhas" (da classe Telefone) também o serão, em cascata.
+
+### 7.2. `index()` e `show()`
+Por conveniência, criamos uma função para printar o nome do aluno, já que isso era feito em mais de um lugar com código muito parecido. Dessa forma, basta adicionar os telefones recuperados em apenas um lugar.
+
+Com o intuito de facilitar a apresentação dos telefones, aplicamos a função `map()` na coleção de telefones que é recuperada. Isso vai mapear a coleção de objetos do tipo Telefone para um "contentor" do tipo _ArrayCollection_ (não tenho certeza se a palavra contentor é usada em PHP).  
+Além disso, usamos _built in function_ `toArray()` para obtermos um simples _array_ com todos os números de telefone.
+
+A implementação da atualização do CRUD foi feita no _commit_ [9e20c00](https://github.com/brnocesar/alura/commit/9e20c0007371ff208dc254c09589f48bf0de6ec7).
+
+## 8. Entidade 'Curso' e relacionamento "muitos para muitos"
+Se temos a classe Aluno, faz sentido termos uma classe Curso. Neste caso vamos ter a situação de que cada aluno pode frequentar mais de um curso e cada curso pode ter vários alunos. Este é o relacionamento do tipo _"ManyToMany"_.
+
+O processo é praticamente idêntico ao descrito no item 5, diferindo nas anotações e outros pequenos detalhes. 
+
+Se definimos o atributo mapeado em uma, na outra definimos a relação inversa.
+
+Nos métodos para adicionar um aluno a curso (e vice-versa) devemos verificar se a relação já existe, para não cairmos num _loop_ infinito.
+
+A implementação dessa entidade e definição de seu relacionamento com Aluno foi feita no _commit_ [](https://github.com/brnocesar/alura/commit/).
