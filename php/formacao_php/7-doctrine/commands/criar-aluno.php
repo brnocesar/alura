@@ -18,7 +18,7 @@ for ($i=2; $i < $argc; $i++) {
 
     $telefone = new Telefone();                                 // passo 4
     $telefone->setNumero($argv[$i]);
-    // $entityManager->persist($telefone);                         // passo 5 
+    // $entityManager->persist($telefone);                      // passo 5 
 
     $aluno->addTelefone($telefone);                             // passo 6
 }

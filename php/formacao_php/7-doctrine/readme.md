@@ -196,13 +196,19 @@ Além disso, usamos _built in function_ `toArray()` para obtermos um simples _ar
 
 A implementação da atualização do CRUD foi feita no _commit_ [9e20c00](https://github.com/brnocesar/alura/commit/9e20c0007371ff208dc254c09589f48bf0de6ec7).
 
-## 8. Entidade 'Curso' e relacionamento "muitos para muitos"
+## 8. 'Curso' e "muitos para muitos"
+### 8.1. Criando a entidade e definindo o relacionamento
 Se temos a classe Aluno, faz sentido termos uma classe Curso. Neste caso vamos ter a situação de que cada aluno pode frequentar mais de um curso e cada curso pode ter vários alunos. Este é o relacionamento do tipo _"ManyToMany"_.
 
 O processo é praticamente idêntico ao descrito no item 5, diferindo nas anotações e outros pequenos detalhes. 
 
-Se definimos o atributo mapeado em uma, na outra definimos a relação inversa.
+Quando temos uma relação bidirecional como essa devemos especificar qual dos lados é o _owner_ e qual é o _inversed_. Neste caso as intidades são independentes, portanto não há lado inverso e inverter os lados influencia apenas no nome da tabela. Por isso, tanto faz onde colocamos o atributo _mappedBy_ e o _inversedBy_.  
+Para maiores detalhes sobre quando é importante definir os lados desse tipo de relacionamento acesse a [documentação](https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/unitofwork-associations.html#association-updates-owning-side-and-inverse-side).  
+Também no que não há necessidade de usarmos o atributo _cascade_ pois necessáriamente quando formos tratar um relacionamento deste tipo o doctrine ja estará monitorando as entidades envolvidas.
 
 Nos métodos para adicionar um aluno a curso (e vice-versa) devemos verificar se a relação já existe, para não cairmos num _loop_ infinito.
 
-A implementação dessa entidade e definição de seu relacionamento com Aluno foi feita no _commit_ [](https://github.com/brnocesar/alura/commit/).
+A implementação dessa entidade e definição de seu relacionamento com Aluno foi feita no _commit_ [20a9e22](https://github.com/brnocesar/alura/commit/20a9e2220b3ab148117ec96beab35fc40cf8c8cb).
+
+### 8.2. CRUD de Cursos
+Já foram escritos os CRUDS de duas entidades, portanto, _"só vai"_.
