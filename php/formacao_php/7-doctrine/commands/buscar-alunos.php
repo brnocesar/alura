@@ -9,7 +9,10 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $entityManagerFactory = new EntityManagerFactory();
 $entityManager = $entityManagerFactory->getEntityManager();
 
-$repositorioDeAlunos = $entityManager->getRepository(Aluno::class);
+$dql = "SELECT aluno FROM Alura\\Doctrine\\Entity\\Aluno aluno";
+$order = " ORDER BY aluno.nome";
+$dqlId = $dql . " WHERE aluno.id=";
+$dqlNome = $dql . " WHERE aluno.nome LIKE ";
 
 
 function printAluno(Aluno $aluno)
@@ -22,12 +25,16 @@ function printAluno(Aluno $aluno)
     echo "\tTelefone(s): \t" . implode(', ', $telefones) . PHP_EOL . PHP_EOL;
 }
 
+
 if ( isset($argv[1]) ) {
 
     if ( is_numeric($argv[1]) ) {
 
-        if ( $aluno = $repositorioDeAlunos->find($argv[1]) ) {
-            printAluno($aluno);
+        $query = $entityManager->createQuery($dqlId . $argv[1]);
+
+        if ( !empty($query->getResult()) ) {
+
+            printAluno( $query->getResult()[0] );
             return;
         }
         else {
@@ -36,13 +43,12 @@ if ( isset($argv[1]) ) {
     }
     else {
 
-        $alunosEspecificos = $repositorioDeAlunos->findBy([
-            'nome' => $argv[1]
-        ]);
+        $query = $entityManager->createQuery("{$dqlNome} '%{$argv[1]}%' {$order}");
+        $alunos = $query->getResult();
 
-        if ( $alunosEspecificos ) {
+        if ( !empty($alunos) ) {
 
-            foreach ($alunosEspecificos as $aluno) {
+            foreach ( $alunos as $aluno ) {
                 printAluno($aluno);
             }
             return;
@@ -53,9 +59,8 @@ if ( isset($argv[1]) ) {
     }    
 }
 
-$query = $entityManager->createQuery('SELECT aluno FROM Alura\\Doctrine\\Entity\\Aluno aluno');
-$listaDeAlunos = $query->getResult();
+$query = $entityManager->createQuery($dql . $order);
 
-foreach ($listaDeAlunos as $aluno) {
+foreach ( $query->getResult() as $aluno ) {
     printAluno($aluno);
 }
