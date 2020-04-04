@@ -9,7 +9,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $entityManagerFactory = new EntityManagerFactory();
 $entityManager = $entityManagerFactory->getEntityManager();
 
-$dql = "SELECT aluno FROM Alura\\Doctrine\\Entity\\Aluno aluno";
+$classe = Aluno::class;
+$dql = "SELECT aluno FROM $classe aluno";
 $order = " ORDER BY aluno.nome";
 $dqlId = $dql . " WHERE aluno.id=";
 $dqlNome = $dql . " WHERE aluno.nome LIKE ";
@@ -22,7 +23,13 @@ function printAluno(Aluno $aluno)
     })->toArray();
 
     echo "{$aluno->getId()} \tAluno(a): \t{$aluno->getNome()}" . PHP_EOL;
-    echo "\tTelefone(s): \t" . implode(', ', $telefones) . PHP_EOL . PHP_EOL;
+    echo "\tTelefone(s): \t" . implode(', ', $telefones) . PHP_EOL;
+
+    echo "\tCurso(s): \t";
+    foreach ( $aluno->getCursos() as $curso ) {
+        echo "{$curso->getNome()}; ";
+    }
+    echo PHP_EOL . PHP_EOL;
 }
 
 
