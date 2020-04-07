@@ -14,7 +14,7 @@ $repositorioDeAlunos = $entityManager->getRepository(Aluno::class);
 
 
 /** @var Aluno[] $alunos */
-$alunos = $repositorioDeAlunos->buscarCursosPorAluno();
+$alunos = $repositorioDeAlunos->buscarCursosPorAluno(true, true);
 
 foreach ( $alunos as $aluno ) {
     
