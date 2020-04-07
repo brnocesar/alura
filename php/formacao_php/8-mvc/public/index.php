@@ -9,6 +9,6 @@ switch ($_SERVER['PATH_INFO']) {
         require 'formulario-novo-curso.php';
         break;
     default:
-        echo "Erro 404";
+        echo "Erro 404 xD";
         break;
 }
