@@ -1,13 +1,26 @@
-#Doctrine - ORM
+# Doctrine - ORM
 
 O ORM (Object Relational Mapping) é o componente do Doctrine responsável por mapear instâncias de uma classe no código orientado a objetos para uma tabela/relacionamento no Banco de Dados.
 
 O mapeamento é feito por um [**gerenciador de entidades**](https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/tutorials/getting-started.html#obtaining-the-entitymanager) (_entityManager_) por meio de [**anotações**](https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/basic-mapping.html) (_annotations_). Existem outros meios além das anotações, mas aqui usaremos apenas este.
 
-## 1. Instalação do Doctrine
+#### Índice
+1. <a href='#1'>Instalação do Doctrine</a>
+2. <a href='#2'>Linha de comando</a>
+3. <a href='#3'>Gerenciador de Entidades</a>
+4. <a href='#4'>Persistindo registros no Banco</a>
+5. <a href='#5'>Relacionamentos (1:N)</a>
+6. <a href='#6'>_Migrations_</a>
+7. <a href='#7'>Atualizando o CRUD de Alunos</a>
+8. <a href='#8'>Uma nova entidade e mais sobre relacionamentos (N:N)</a>
+9. <a href='#9'>_Lazy Loading_ e DQL</a>
+10. <a href='#10'>Repositório</a>
+11. <a href='#11'>Configurando o MySQL</a> 
+
+## 1. Instalação do Doctrine<a name='1'></a>
 Para adicionar o Doctrine como uma dependência ao seu projeto...
 
-## 2. Linha de comando
+## 2. Linha de comando<a name='2'></a>
 O Doctrine possui uma interface de linha de comando que pode ser acessada em `vendor/bin/doctrine`. Em geral a pasta _vendor_ é criada na raiz do projeto (não tenho certeza se o motivo é que o composer.json está lá, mas enfim...), portanto, basta navegar até essa pasta e usar o comando abaixo para ter acesso a lista de comandos do Doctrine:
 ```sh
 $ php vendor/bin/doctrine
@@ -25,13 +38,13 @@ $ nano .bashrc
 alias pdoc="php vendor/bin/doctrine"
 ```
 
-### 2.2. Comandos mais utilizados
+### 2.2. Comandos mais utilizados<a name='2.2'></a>
 Os comandos mais utilizados (provavelmente) serão:
 - `$ pdoc orm:info`: procura por entidades mapeadas e indica se há algum problema
 - `$ pdoc orm:mapping:describe Batatinha`: apresenta informações da classe mapeada passada como argumento (Batatinha)
 - `$ pdoc orm:schema-tool:create`: processa o _schema_ e gera a Base de Dados
 
-## 3. Gerenciador de Entidades
+## 3. Gerenciador de Entidades<a name='3'></a>
 **Entidade** é termo usado pelo Doctrine para denominar objetos mapeados para o Banco.  
 Portanto, **Gerenciador de Entidades** (GE) é a interface reponsável por mapear as instâncias de Classes no código orientado a objetos (OO) para as tabelas no Banco de Dados, de acordo com as _anotações_ existentes.
 
@@ -53,7 +66,7 @@ Como as informações de conexão ao Banco de Dados já estão definidas na fáb
 $ pdoc orm:schema-tool:create
 ```
 
-## 4. Persistindo registros no Banco (CRUD)
+## 4. Persistindo registros no Banco (CRUD)<a name='4'></a>
 Os arquivos teste usados para ilustrar os conceitos discutidos nesta seção podem ser encontrados em `commands/`.
 
 ### 4.1. `store()`
@@ -64,7 +77,7 @@ Para criar um registro no Banco precisamos seguir alguns passos simples:
 
 A implementação teste dessa funcionalidade foi feita no _commit_ [f46e96b](https://github.com/brnocesar/alura/commit/f46e96b29059f3c5dc4dfbc625176595446b1b28).
 
-### 4.2. `index()` e `show()`
+### 4.2. `index()` e `show()`<a name='4.2'></a>
 Quando vamos buscar registros no Banco de Dados, precisamos fazer isso atráves de um "_Repositório_".  
 Um repositório permite monitorar objetos de uma classe específica e recuperá-los. Os métodos fornecidos por padrão por um repositório são:
 - `findAll()`: todos os objetos da classe
@@ -100,7 +113,7 @@ Em seguida usamos o método `remove()`, passando a referência ao registro, e po
 
 A implementação teste das últimas duas funcionalidades foi feita no _commit_ [72383e7](https://github.com/brnocesar/alura/commit/72383e768354c2682883b6e8acd1af354031cbb3).
 
-## 5. Relacionamentos
+## 5. Relacionamentos<a name='5'></a>
 Nesta seção vamos tratar sobre relacionamentos, que podem ser de diferentes tipos: _OneToMany_, _ManyToMany_, ...  
 Para ilustrar esse conceito vamos criar outra entidade, **Telefone**, e definir que cada **aluno** pode ter mais de um número de telefone associado a si.
 
@@ -135,7 +148,7 @@ Finalizamos esta etapa escrevendo o método que recupera os telefones associados
 
 A implementação do relacionamento entre as duas classes pode ser vista no _commit_ [769e412](https://github.com/brnocesar/alura/commit/769e412ca4280fcc2548a527ce37c1c7b7f0aa7a).
 
-## 6. _Migrations_
+## 6. _Migrations_<a name='6'></a>
 As _migrations_ servem para varsionamento do Banco de Dados.
 
 ### 6.1. Adicionando dependência
@@ -170,14 +183,14 @@ Além disso foi criada a tabela 'doctrine_migration_versions' no Banco de Dados.
 Note que este arquivo não possui nenhuma informação referente ao mapeamento inicial da classe Aluno.  
 Como o objetivo é versionar nosso Banco de Dados e estamos em um estágio inicial no desenvolvimento do projeto (estamos em treinamento na verdade né, mas enfim), podemos deletar o arquivo do Banco de Dados e a _migration_ gerada a pouco, assim, podemos gerar uma migration com todas as informações de mapeamento das classes que temos em nosso projeto neste momento.
 
-Após gerar a "verdadeira" _migration_ podemos executa-la com o comando abaixo, que na verdade executa todas que ainda não foram rodadas (ou não, executa tudão):
+Após gerar a "verdadeira" _migration_ podemos executa-la com o comando abaixo, que na verdade executa todas que ainda não foram rodadas:
 ```sh
 $ dmic migrations:migrate
 ```
 
 A criação da _migration_ que mapeou todas as classes implementadas até agora e sua execução esta no _commit_ [06c16f](https://github.com/brnocesar/alura/commit/06c16fc73e40edb6c074475ee4f582b7979aa22d).
 
-## 7. Atualizando o CRUD de Alunos
+## 7. Atualizando o CRUD de Alunos<a name='7'></a>
 ### 7.1. `store()`
 Os passos necessários para implementar a capacidade de associar telefones aos estudantes, são basicamente os mesmos do item 4.1.:
 4. Instânciar um objeto
@@ -196,7 +209,7 @@ Além disso, usamos _built in function_ `toArray()` para obtermos um simples _ar
 
 A implementação da atualização do CRUD foi feita no _commit_ [9e20c00](https://github.com/brnocesar/alura/commit/9e20c0007371ff208dc254c09589f48bf0de6ec7).
 
-## 8. 'Curso' e "muitos para muitos"
+## 8. 'Curso' e "muitos para muitos"<a name='8'></a>
 ### 8.1. Criando a entidade e definindo o relacionamento
 Se temos a classe Aluno, faz sentido termos uma classe Curso. Neste caso vamos ter a situação de que cada aluno pode frequentar mais de um curso e cada curso pode ter vários alunos. Este é o relacionamento do tipo _"ManyToMany"_.
 
@@ -212,3 +225,37 @@ A implementação dessa entidade e definição de seu relacionamento com Aluno f
 
 ### 8.2. CRUD de Cursos
 Já foram escritos os CRUDS de duas entidades, portanto, _"só vai"_.
+
+## 9. _Lazy Loading_ e DQL<a name='9'></a>
+No _commit_ [43d705e](https://github.com/brnocesar/alura/commit/43d705e4c7ff47136a4ddb07c04a6acd05b50170) realizamos consultas pelos cursos de cada aluno cadastrado e no _commit_ [35a31e2](https://github.com/brnocesar/alura/commit/35a31e28399d16fabc12995927bb2847ac5b896e) avaliamos quantas _queries_ eram feitas no Banco.  
+Verificamos que o Doctrine deixa para buscar os telefones e cursos de cada aluno somente quando os métodos `get...()``são chamados, isso significa que para cada aluno teremos mais duas _queries_. isso é chamado de busca preguiçosa ou _Lazy Loading_.
+
+Uma forma de contornar esse problema é usando DQL (Doctrine Query Language), que dessa forma nos permite informar ao Doctrine que queremos recuperar o conjunto completo de uma entidade. No _commit_ [a9be242](https://github.com/brnocesar/alura/commit/a9be242cd44c59e0ecae773c4d2fd5fb621648a1) foi feita uma implementação desse tipo de consulta. 
+
+Usando o `$entityManager` acessamos o método `createQuery()`. Note que a linguagem usado não é SQL, afinal não estamos selecionando colunas ou especificando a tabela a qual queremos consultar.  
+No _commit_ [d32b860](https://github.com/brnocesar/alura/commit/d32b860a6fc60015e2de1186dbfa5ad76fde8f16) o arquivo `buscar-aluno.php` foi refatorado, tendo todas as consultas feitas através de DQL.
+
+### 9.1. _Eager Loading_ e `JOIN`
+Podemos definir que quando for feita uma consulta por uma entidade no Banco, outras entidades relacionadas a esta também sejam recuperadas em cascata. Isso é feito passando o valor `EAGER` para o parâmetro `fetch` na anotação da entidade.  Na maioria das situações não é
+
+Se essa definição é feita no mapeado da entidade, essa busca em cascata vai ocorrer sempre. Se não for necessário que isso aconteça em todas as consultas da entidade, podemos especificar que entidades também devem ser buscadas através do `JOIN`.
+
+No _commit_ [006d43b](https://github.com/brnocesar/alura/commit/006d43b86753761722e632efd266b46f2e0c332d) foram implementadas consultas _"eager joins"_.
+
+## 10. Repositórios e _QueryBuilder_<a name='10'></a>
+Em geral não é bom termos códigos de DQL (ou SQL) explicítos em nossas aplicações, principalmente por que isso pode tornar o código inintendível para pessoas que tenham muita familiaridade com estas linguagens. 
+
+Voltando na <a href='#4.2'>Seção 4</a>, quando quisemos recuper registros do Banco utilizamos um repositório. Criamos um repositório para alunos através do GE e utilizamos todas as abstrações fornecidas por ele para acessar o Banco.
+
+Podemos criar uma classe para servir como repositório de uma entidade específica e fazê-la herdar funcionalidades básicas de um repositório de entidades que nos permite utilizar essas abstrações. Essa funcionalidade em especial é o _QueryBuilder_, que é "construtor de _queries_" que permite escrever códigos que façam consultas de forma muito mais simples e legível, principalmente quando temos _queries_ dinâmicas.    
+Para que o GE saiba que existe uma classe modelando o repositório de uma entidade, devemos indicar isso ao GE por meio das anotações.
+
+Esta implementação foi feita nos _commits_ seguintes: em [dc4baf7](https://github.com/brnocesar/alura/commit/dc4baf727b66534e297d4605e9571f878e095302) foi criada a classe do "repositório para alunos", no [6787975](https://github.com/brnocesar/alura/commit/6787975a569152535fe46277c1297dad7f22be33) foram utilizadas as abstrações fornecidas pelo "construtor de _queries_" para realizar a consulta estática por todos os alunos trazendo as entidades relacionadas e no [140dad0](https://github.com/brnocesar/alura/commit/140dad0174dae7c06459bd7eba8c73216e9e4064) foi feita a implementação de uma consulta dinâmica.
+
+## 11. Configurando o MySQL<a name='11'></a>
+Até este ponto foi utilizado o SQLite como Banco de Dados, mas isso pode ser facilmente alterado para o SGDB de sua prefeR6encia. Aqui será apresentado o procedimento de configuração do MYSQL.
+
+Após criar uma Base de Dados específica para esta aplicação, devemos alterar as informações de conexão que ficam na "Fábrica de Gerenciador de Entidades".  
+Após isso basta criar o banco usando o comando usado na <a href='#4.2'>Seção 2</a>: `$ pdoc orm:schema-tool:create`.
+
+A configuração deste Banco de Dados foi feita no _commit_ [c0b8f05](https://github.com/brnocesar/alura/commit/c0b8f0561f605f1f88c43184f5d0d66852f55a4e).
