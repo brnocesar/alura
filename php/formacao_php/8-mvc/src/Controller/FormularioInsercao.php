@@ -5,9 +5,9 @@ namespace Alura\Cursos\Controller;
 use Alura\Cursos\Entity\Curso;
 use Alura\Cursos\Infra\EntityManagerCreator;
 
-class FormularioInsercao
+class FormularioInsercao implements InterfaceControladorRequisicao
 {
-    public function processaRequisicao()
+    public function processaRequisicao(): void
     {
         ?>
 
