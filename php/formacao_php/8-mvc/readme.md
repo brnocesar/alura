@@ -53,4 +53,8 @@ Agora que separamos o HTML podemos observar que estes arquivos possuem código e
 
 ## 5. HTTP, Formulários e Validação<a name='5'></a>
 Para que seja possível adicionar novos cursos precisamos modificar a _view_ do formulário (`view/cursos/novo-curso.php`). Adicionamos a rota que queremos enviar a requisição no atributo `action` da tag HTML `<form>` e definimos o verbo da requisição como `POST`.  
-Agora precisamos criar um _controller_ para esta rota. Este _controller_ deverá pegar os dados enviados pela página do formulário, criar o modelo Curos e persistir no Banco de Dados o "novo curso". Além disso devemos definir um caso para esta rota no arquivo `public/index.php` (_commit_ [8301da3](https://github.com/brnocesar/alura/commit/8301da34af0e52c5665d1f58e2506acba8604fb6)).
+Agora precisamos criar um _controller_ para esta rota. Este _controller_ deverá pegar os dados enviados pela página do formulário, criar o modelo Curos e persistir no Banco de Dados o "novo curso". Além disso devemos definir um caso para esta rota no arquivo `public/index.php` (_commit_ [8301da3](https://github.com/brnocesar/alura/commit/8301da34af0e52c5665d1f58e2506acba8604fb6)).  
+Podemos também definir filtros para os dados vindos na requisição (_commit_ [c80005b](https://github.com/brnocesar/alura/commit/c80005b1fc0213d5b579f545281ecbe8c472c5c5)).
+
+### 5.1. Redirecionamento
+Podemos indicar redirecionamentos para nossa aplicação através de cabeçalhos HTTP (_commit_ [c80005b](https://github.com/brnocesar/alura/commit/c80005b1fc0213d5b579f545281ecbe8c472c5c5)).
