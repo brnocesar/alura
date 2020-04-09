@@ -4,12 +4,12 @@
 1. <a href='#1'>Configurando o ambiente</a>
 2. <a href='#2'>Ponto único de entrada</a>
 3. <a href='#3'>_Controllers_</a>
-3. <a href='#'></a>
-3. <a href='#'></a>
-3. <a href='#'></a>
-3. <a href='#'></a>
-3. <a href='#'></a>
-3. <a href='#'></a>
+4. <a href='#4'>Isolando HTML</a>
+5. <a href='#5'>HTTP, Formulários e Validação</a>
+6. <a href='#'></a>
+7. <a href='#'></a>
+8. <a href='#'></a>
+9. <a href='#'></a>
 
 ## 1. Configurando o ambiente<a name='1'></a>
 O primeiro passo após baixar este projeto no ponto inicial (_commit_ [9eee948](https://github.com/brnocesar/alura/commit/9eee94837035508897476438d073c382d20cafb3)) é mandar o _composer_ instalar as dependências, isso é feito com o comando:
@@ -44,9 +44,13 @@ O progresso até aqui pode ser visto no _commit_ [461dfe4](https://github.com/br
 ## 3.1. Interfaces
 Como os dois _controllers_ criados até o momento são bem parecidos, possuem uma função com mesmo nome e assinatura, faz sentido implementar uma interface com essas informações. Assim teremos uma espécie de "contrato" que os _controllers_ "assinaram" definindo o que cada um deles precisa implementar de forma obrigatória, trazendo um pouco mais de segurança para nosso código (_commit_ [7c7c772](https://github.com/brnocesar/alura/commit/7c7c7728902ac612e0f99e29ef51803e16b6aea3)).
 
-## 4. Isolando HTML
+## 4. Isolando HTML<a name='4'></a>
 Por questão de organização e para facilitar a manutenção do nosso código podemos (devemos) separar o HTML do código referente às regras de negócio.
 
 Para isso, criamos os devidos diretórios na pasta `public` e arquivos específicos para cada uma das páginas. Após isso basta mover o código HTML dos _controllers_ para seus respectivos arquivos e dar um `require` nos _controllers_ (_commit_ [9d8bafa](https://github.com/brnocesar/alura/commit/9d8bafa37ef3d74c2f9cc92e2e0f00902c15d9b4)).
 
-Agora que separamos o HTML podemos observar que estes arquivos possuem código em comum, então faz sentido separá-los em arquivos menores (_commit_ [](https://github.com/brnocesar/alura/commit/))
+Agora que separamos o HTML podemos observar que estes arquivos possuem código em comum, então faz sentido separá-los em arquivos menores (_commit_ [448084d](https://github.com/brnocesar/alura/commit/448084d7ed5c2198745f27a37a7307f28b9e69f5)).
+
+## 5. HTTP, Formulários e Validação<a name='5'></a>
+Para que seja possível adicionar novos cursos precisamos modificar a _view_ do formulário (`view/cursos/novo-curso.php`). Adicionamos a rota que queremos enviar a requisição no atributo `action` da tag HTML `<form>` e definimos o verbo da requisição como `POST`.  
+Agora precisamos criar um _controller_ para esta rota. Este _controller_ deverá pegar os dados enviados pela página do formulário, criar o modelo Curos e persistir no Banco de Dados o "novo curso". Além disso devemos definir um caso para esta rota no arquivo `public/index.php`.
