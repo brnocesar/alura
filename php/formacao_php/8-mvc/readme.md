@@ -42,9 +42,11 @@ Em seguida fazemos o mesmo para a página de "criar um novo curso".
 O progresso até aqui pode ser visto no _commit_ [461dfe4](https://github.com/brnocesar/alura/commit/461dfe488ece6fac52a56a311cbcee9a4e7428ae)
 
 ## 3.1. Interfaces
-Como os dois _controllers_ criados até o momento são bem parecidos, possuem uma função com mesmo nome e assinatura, faz sentido implementar uma interface com essas informações. Assim teremos uma espécie de "contrato" que os _controllers_ "assinaram" definindo o que cada um deles precisa implementar de forma obrigatória, trazendo um pouco mais de segurança para nosso código.
+Como os dois _controllers_ criados até o momento são bem parecidos, possuem uma função com mesmo nome e assinatura, faz sentido implementar uma interface com essas informações. Assim teremos uma espécie de "contrato" que os _controllers_ "assinaram" definindo o que cada um deles precisa implementar de forma obrigatória, trazendo um pouco mais de segurança para nosso código (_commit_ [7c7c772](https://github.com/brnocesar/alura/commit/7c7c7728902ac612e0f99e29ef51803e16b6aea3)).
 
 ## 4. Isolando HTML
 Por questão de organização e para facilitar a manutenção do nosso código podemos (devemos) separar o HTML do código referente às regras de negócio.
 
-Para isso, criamos os devidos diretórios na pasta `public` e arquivos específicos para cada uma das páginas. Após isso basta apenas mover o código HTML dos _controllers_ para seus respectivos arquivos
+Para isso, criamos os devidos diretórios na pasta `public` e arquivos específicos para cada uma das páginas. Após isso basta mover o código HTML dos _controllers_ para seus respectivos arquivos e dar um `require` nos _controllers_ (_commit_ [9d8bafa](https://github.com/brnocesar/alura/commit/9d8bafa37ef3d74c2f9cc92e2e0f00902c15d9b4)).
+
+Agora que separamos o HTML podemos observar que estes arquivos possuem código em comum, então faz sentido separá-los em arquivos menores (_commit_ [](https://github.com/brnocesar/alura/commit/))
