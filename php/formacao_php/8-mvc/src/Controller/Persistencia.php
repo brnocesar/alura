@@ -23,14 +23,27 @@ class Persistencia implements InterfaceControladorRequisicao
             'descricao',
             FILTER_SANITIZE_STRING
         );
+        $id = filter_input(
+            INPUT_GET,
+            'id',
+            FILTER_VALIDATE_INT
+        );
 
         // 2) montar modelo Curso
         $curso = new Curso();
         $curso->setDescricao($descricao);
 
-        // 3) Inserir no Banco
-        $this->entityManager->persist($curso);
-        $this->entityManager->flush();
+        if ( $id) {
+            // 3.1) atualiza
+            $curso->setId($id);
+            $this->entityManager->merge($curso);
+        }
+        else {
+            // 3.2) cria
+            $this->entityManager->persist($curso);
+        }
+
+        $this->entityManager->flush(); // persiste no Banco
 
         header('Location: /listar-cursos', false, 302);
     }
