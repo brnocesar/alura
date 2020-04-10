@@ -57,4 +57,7 @@ Agora precisamos criar um _controller_ para esta rota. Este _controller_ deverá
 Podemos também definir filtros para os dados vindos na requisição (_commit_ [c80005b](https://github.com/brnocesar/alura/commit/c80005b1fc0213d5b579f545281ecbe8c472c5c5)).
 
 ### 5.1. Redirecionamento
-Podemos indicar redirecionamentos para nossa aplicação através de cabeçalhos HTTP (_commit_ [c80005b](https://github.com/brnocesar/alura/commit/c80005b1fc0213d5b579f545281ecbe8c472c5c5)).
+Podemos indicar redirecionamentos para nossa aplicação através de cabeçalhos HTTP (_commit_ [52b3bd5](https://github.com/brnocesar/alura/commit/52b3bd5c382511ce37c039503c221ba1731fc0e9)).
+
+### 5.2. Rotas
+Vamos separar as rotas da aplicação em arquivo próprio e implementar uma lógica no arquivo `public/index.php` para que, ele apenas faça a intermediação entre o arquivo de rotas e os _controller_ (_commit_ [8c1de9f7](https://github.com/brnocesar/alura/commit/8c1de9f722866c5d355943c1d1e3616d2fcd4bdf)).
