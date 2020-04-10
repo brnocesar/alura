@@ -12,6 +12,12 @@ if ( !array_key_exists($caminho, $rotas) ) {
     exit();
 }
 
+session_start();
+
+if ( !$_SESSION['logado'] and (strpos($caminho, 'login') === false) ) {
+    header('Location: /login');
+}
+
 $classeControladora = $rotas[$caminho];
 /** @var InterfaceControladorRequisicao $controlador */
 $controlador = new $classeControladora();
