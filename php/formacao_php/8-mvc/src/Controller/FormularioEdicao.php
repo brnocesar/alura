@@ -30,8 +30,8 @@ class FormularioEdicao extends ControllerComHtml implements InterfaceControlador
         
         $curso = $this->repositorioCursos->find($id);
         echo $this->renderizaHtml('cursos/formulario-curso', [
-            'curso' => $curso,
-            'titulo' => "Editar curso '{$curso->getDescricao()}'"
+            'curso'     => $curso,
+            'titulo'    => "Editar curso '{$curso->getDescricao()}'"
         ]);
     }
 }

@@ -21,8 +21,6 @@ class Exclusao implements InterfaceControladorRequisicao
             'id',
             FILTER_VALIDATE_INT
         );
-        // se id nao foi passado, retorna 'null'
-        // se o filtro falhar, retorna 'false'
 
         if ( is_null($id) or ($id === false) ) {
             header('Location: /listar-cursos');

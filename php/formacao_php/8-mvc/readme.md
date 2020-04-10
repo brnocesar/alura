@@ -6,10 +6,10 @@
 3. <a href='#3'>_Controllers_</a>
 4. <a href='#4'>Isolando HTML</a>
 5. <a href='#5'>HTTP, Formulários e Validação</a>
-6. <a href='#'></a>
-7. <a href='#'></a>
-8. <a href='#'></a>
-9. <a href='#'></a>
+6. <a href='#6'></a>
+7. <a href='#7'></a>
+8. <a href='#8'></a>
+9. <a href='#9'></a>
 
 ## 1. Configurando o ambiente<a name='1'></a>
 O primeiro passo após baixar este projeto no ponto inicial (_commit_ [9eee948](https://github.com/brnocesar/alura/commit/9eee94837035508897476438d073c382d20cafb3)) é mandar o _composer_ instalar as dependências, isso é feito com o comando:
@@ -61,3 +61,69 @@ Podemos indicar redirecionamentos para nossa aplicação através de cabeçalhos
 
 ### 5.2. Rotas
 Vamos separar as rotas da aplicação em arquivo próprio e implementar uma lógica no arquivo `public/index.php` para que, ele apenas faça a intermediação entre o arquivo de rotas e os _controller_ (_commit_ [8c1de9f7](https://github.com/brnocesar/alura/commit/8c1de9f722866c5d355943c1d1e3616d2fcd4bdf)).
+
+## 6. Finalizando o CRUD de Cursos<a name='6'></a>
+### 6.1. Remover Curso
+Vamos adicionar a funcionalidade que permitirá excluir um curso que ja foi cadastrado.
+
+Primeiro adicionamos um botão na _view_ "listar cursos" para executar esta ação: definimos o estilo do botão, a rota e passamos o identificador único do curso pela rota.
+
+Em seguida criamos o _controller_ que irá processar essa requisição: tratamos o dado que vem no _input_, recuperamos a referência ao registro correspondente ao `id` passado, executamos a ação no Banco e redirecionamos para a _view_ "listar cursos".
+
+Adicionamos a nova rota no arquivo de rotas `config/routes.php` e podemos testar.
+
+Caso ocorra algum erro do tipo:
+```sh
+Warning: require(C:\Users\sadasd\AppData\Local\Temp\__CG__AluraCursosEntityCurso.php): failed to open stream: No such file or directory in C:\Users\rodrigo\Desktop\gerenciador-de-cursos\vendor\doctrine\common\lib\Doctrine\Common\Proxy\AbstractProxyFactory.php on line 206
+
+Fatal error: require(): Failed opening required 'C:\Users\sadasd\AppData\Local\Temp\__CG__AluraCursosEntityCurso.php' (include_path='.;C:\php\pear') in C:\Users\rodrigo\Desktop\gerenciador-de-cursos\vendor\doctrine\common\lib\Doctrine\Common\Proxy\AbstractProxyFactory.php on line 206
+```
+ou
+```sh
+PHP Warning:  require(/tmp/__CG__AluraCursosEntityCurso.php): failed to open stream: No such file or directory in /home/bruno/repositorios/alura/php/formacao_php/8-mvc/vendor/doctrine/common/lib/Doctrine/Common/Proxy/AbstractProxyFactory.php on line 206
+
+PHP Fatal error:  require(): Failed opening required '/tmp/__CG__AluraCursosEntityCurso.php' (include_path='.:/usr/share/php') in /home/bruno/repositorios/alura/php/formacao_php/8-mvc/vendor/doctrine/common/lib/Doctrine/Common/Proxy/AbstractProxyFactory.php on line 206
+
+127.0.0.1:59816 [500]: GET /excluir-curso?id=8 - require(): Failed opening required '/tmp/__CG__AluraCursosEntityCurso.php' (include_path='.:/usr/share/php') in /home/bruno/repositorios/alura/php/formacao_php/8-mvc/vendor/doctrine/common/lib/Doctrine/Common/Proxy/AbstractProxyFactory.php on line 206
+```
+talvez seja necessário rodar o comando abaixo:
+```sh
+$ php vendor/bin/doctrine orm:generate-proxies
+```
+o motivo:  
+> _"Em alguns momentos o Doctrine não utiliza a nossa própria classe (por exemplo, `Curso::class`), mas a "embrulha" em uma classe gerada por ele, chamada `Proxy`, o que permite algumas manipulações. Depois, ele envia para o banco os dados da classe `Proxy` que está "embrulhando" a nossa._  
+_Quando esse tipo de erro acontece, pode ser um problema de permissão na pasta "Temp" (e nosso instrutor nunca viu esse erro acontecer em outras plataformas, apenas no Windows). Para consertarmos isso, no terminal, executaremos o comando `vendor\bin\doctrine orm:generate-proxies`. Isso fará com que o Doctrine processe as nossas entidades e gere as classes `Proxy`."_
+
+A implementação dessa funcionalidade esta no _commit_ [f6aa236](https://github.com/brnocesar/alura/commit/f6aa23696d9d661d2c218f85941ab450a065969e).
+
+### 6.2. Editar Curso
+Vamos adicionar a funcionalidade que permitirá modificar um curso que já foi cadastrado.
+
+Primeiro adicionamos um botão na _view_ "listar cursos" para executar esta ação: definimos o estilo do botão, a rota e passamos o identificador único do curso pela rota.
+
+Em seguida criamos o _controller_ que irá retornar a _view_ de edição. Apenas tratamos o parâmetro `'id'` que deve vir na URL, e passando na validação, recuperamos a referência ao registro correspondente ao `id` passado. 
+
+Podemos aproveitar a mesma _view_ usada para cadastrar um curso e assim faremos. Note que o nome do arquivo que contem todo HTML foi modificado de `public/novo-curso.php` para `public/formulario-curso.php` de modo que fique mais genérico e foram feitas as devidas alterações no código.
+Além disso precisamos apresentar na _view_ a atual descrição do curso, mas apenas se existe um curso, para que não ocorram erros quando a intenção for criar um novo curso.  
+As modificações feitas até este ponto podem ser encontradas no _commit_ [7a4f1de](https://github.com/brnocesar/alura/commit/7a4f1de0767279341ebc611c919776aca5f7aa19).
+
+A persistência no Banco é feita pelo _controller_ de persistência quando clicamos no botão 'Salvar', portanto é lá que devemos avaliar se estamos criando um novo registro ou alterando um já existente.  
+Quando estamos editando um registro que já existe enviamos o parâmetro `'id'` pela URL, o que não acontece quando estamos criando um novo registro. Então é isso que iremos avaliar.  
+Primeiro montamos o modelo `Curso` (instânciamos um objeto dessa classe); avaliamos se recebemos o parâmetro `'id'`, se sim: setamos o `'id'` e atualizamos o registro no Banco; do contrário, criamos um novo registro.
+
+Precisamos adicionar uma tratativa na rota do botão 'Salvar' na _view_ para o parâmetro `'id'` que será ou não enviado pela URL. A finalização do CRUD de cursos está no _commit_ [bffe435](https://github.com/brnocesar/alura/commit/bffe4356f0d5f77cfc014d25fedb20c3e440a110).
+
+### 6.3. Isolando (ainda mais) o HTML
+Até o momento, em todos os locais de nossa aplicação quando queremos "chamar" o código HTML das _views_ precisamos fazer um `require` passando todo o caminho. Isso não é bom pois existe a possibilidade acabarmos digitando errado este caminho e também, da forma como isso é feito, o HTML acaba tendo acesso a todas as variáveis definidas no _controller_ onde esse `require` é feito.
+
+Vamos isolar ainda mais o HTML criando um _controller_ base que terá a única reposnabilidade de chamar o HTML e definir quais variávei ele terá acesso, e ele será então herdado pelos "controladores de _views_". Como esta classe terá a única reponsibilidade de retornar o código HTML necessário para renderizar uma página e será herdada pelos _controllers_ que necessitem utilizar esta função, faz sentido defini-la como uma classe abstrata, dessa forma impedimos que ela seja instânciada.
+
+Em nosso _controller_ base teremos um método que recebe o caminho relativo para o arquivo com código HTML e um _array_ com os dados que este código precisa/pode ter acesso. Dentro do método usamos a _built in function_ `extract()` que extrai o valor de cada elemento de um vetor para uma variável com o mesmo nome da chave deste elemento. Por fim damos `require` no arquivo da _view_ usando a variável que recebe o caminho relativo (montando o caminho completo é claro). Esta implementação pode ser encontrada no _commit_ [d6a23ee](https://github.com/brnocesar/alura/commit/d6a23ee58fe16b62c3869c83d72b0c5087bebd9f).
+
+No _commit_ [3312ed4](https://github.com/brnocesar/alura/commit/3312ed4d42579d94b3b3a22b41f147ba85de830c) modificamos o método `renderizaHtml()` para retornar o conteúdo HTML que seria exibido em formato de _string_. O PHP permite manipular o conteúdo de um arquivo que está sendo exibido (_Output Buffer_), para isso precisamos "inicializar a saída do _buffer_" antes do `require` com o método `ob_start()` (_"output buffer start"), dessa forma o PHP vai começar a guardar tudo que é exibido. 
+
+Quando quisermos pegar o conteúdo do _buffer_ usamos a função `ob_get_contents()` que retorna o conteúdo como _string_, após isso devemos limpar o _buffer_ com `ob_clean()`. Ou podemos simplesmente usar `ob_get_clean()`, que retorna o conteúdo do _buffer_ e após isso o limpa.
+
+Após isso ainda temos que atualizar os controladores de _views_, mandando-os imprimir na tela o conteúdo HTML retornado.
+
+## 7. Autenticação<a name='7'></a>
