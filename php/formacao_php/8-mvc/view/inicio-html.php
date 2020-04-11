@@ -10,7 +10,7 @@
         <nav class="navbar navbar-dark bg-dark">
             <a class="navbar-brand" href="/listar-cursos">Home</a>
             
-            <?php if (isset($_SESSION['logado'])) : ?>
+            <?php if (isset($_SESSION['logado'])): ?>
 
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item active">
@@ -24,3 +24,13 @@
             <div class="jumbotron">
                 <h1><?= $titulo; ?></h1>
             </div>
+
+            <?php if (isset($_SESSION['mensagem']) and isset($_SESSION['tipo_mensagem'])): ?>
+            <div class="alert alert-<?= $_SESSION['tipo_mensagem']; ?>">
+                <?= $_SESSION['mensagem']; ?>
+            </div>
+            <?php
+                unset($_SESSION['mensagem']);
+                unset($_SESSION['tipo_mensagem']);
+                endif;
+            ?>

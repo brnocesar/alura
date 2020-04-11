@@ -37,13 +37,16 @@ class Persistencia implements InterfaceControladorRequisicao
             // 3.1) atualiza
             $curso->setId($id);
             $this->entityManager->merge($curso);
+            $_SESSION['mensagem'] = "Curso atualizado!";
         }
         else {
             // 3.2) cria
             $this->entityManager->persist($curso);
+            $_SESSION['mensagem'] = "Novo Curso adicionado!";
         }
 
         $this->entityManager->flush(); // persiste no Banco
+        $_SESSION['tipo_mensagem'] = 'success';
 
         header('Location: /listar-cursos', false, 302);
     }

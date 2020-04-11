@@ -30,6 +30,9 @@ class Exclusao implements InterfaceControladorRequisicao
         $curso = $this->entityManager->getReference(Curso::class, $id);
         $this->entityManager->remove($curso);
         $this->entityManager->flush();
+        $_SESSION['tipo_mensagem'] = 'success';
+        $_SESSION['mensagem'] = "Curso removido!";
+
         header('Location: /listar-cursos');
     }
 }
