@@ -17,9 +17,10 @@ if ( !array_key_exists($caminho, $rotas) ) {
 
 session_start();
 
-// if ( !$_SESSION['logado'] and (strpos($caminho, 'login') === false) ) {
-//     header('Location: /login');
-// }
+if ( !$_SESSION['logado'] and (strpos($caminho, 'login') === false) ) {
+    header('Location: /login');
+    exit();
+}
 
 // fabrica de requisições, usa as globais do PHP
 $psr17Factory = new Psr17Factory();
@@ -35,12 +36,11 @@ $classeControladora = $rotas[$caminho];
 
 /** @var ContainerInterface $container */
 $container = require __DIR__ . '/../config/dependencies.php';
-
 /** @var RequestHandlerInterface $controlador */
 $controlador = $container->get($classeControladora);
 $resposta = $controlador->handle($request);
 
-// envia os cabeçalhos HTTP
+// cabeçalhos HTTP
 foreach ($resposta->getHeaders() as $name => $values) {
     foreach ($values as $value) {
         header(sprintf('%s: %s', $name, $value), false);

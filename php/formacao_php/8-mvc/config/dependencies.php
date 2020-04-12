@@ -2,7 +2,6 @@
 
 use Alura\Cursos\Infra\EntityManagerCreator;
 use DI\ContainerBuilder;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 
 $containerBuilder = new ContainerBuilder();

@@ -4,41 +4,32 @@ namespace Alura\Cursos\Controller;
 
 use Alura\Cursos\Entity\Usuario;
 use Alura\Cursos\Helper\FlashMessageTrait;
-use Alura\Cursos\Infra\EntityManagerCreator;
+use Doctrine\ORM\EntityManagerInterface;
+use Nyholm\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-class RealizarLogin implements InterfaceControladorRequisicao
+class RealizarLogin implements RequestHandlerInterface
 {
     use FlashMessageTrait;
 
     /** @var ObjectRepository $repositorioUsuarios */
     private $repositorioUsuarios;
 
-    public function __construct()
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->repositorioUsuarios = (new EntityManagerCreator())
-            ->getEntityManager()
-            ->getRepository(Usuario::class);
+        $this->repositorioUsuarios = $entityManager->getRepository(Usuario::class);
     }
 
-    public function processaRequisicao(): void
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $email = filter_input(
-            INPUT_POST,
-            'email',
-            FILTER_VALIDATE_EMAIL
-        );
-        $senha = filter_input(
-            INPUT_POST,
-            'senha',
-            FILTER_SANITIZE_STRING
-        );
+        extract($request->getParsedBody());
 
-        if ( !$email ) {
+        if ( !filter_var($email, FILTER_VALIDATE_EMAIL) ) {
 
             $this->defineMensagem('danger', 'O e-mail digitado não é válido!');
-            
-            header('Location: /login');
-            exit();
+            return new Response(302, ['Location' => '/login']);
         }
 
         /** @var Usuario $usuario */
@@ -47,14 +38,12 @@ class RealizarLogin implements InterfaceControladorRequisicao
         if ( !$usuario or !$usuario->senhaEstaCorreta($senha) ) {
             
             $this->defineMensagem('danger', 'E-mail ou senha inválidos!');
-            
-            header('Location: /login');
-            exit();
+            return new Response(302, ['Location' => '/login']);
         }
 
         $_SESSION['logado'] = true;
         $this->defineMensagem('success', 'Login efetuado!');
 
-        header('Location: /listar-cursos');
+        return new Response(302, ['Location' => '/listar-cursos']);
     }
 }
