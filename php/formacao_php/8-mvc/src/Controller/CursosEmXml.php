@@ -32,6 +32,10 @@ class CursosEmXml implements RequestHandlerInterface
             $cursoEmXml->addChild('descricao', $curso->getDescricao());
         }
 
-        return new Response(200, [], $cursosEmXml->asXML());
+        return new Response(
+            200, 
+            ['Content-Type' => 'application/xml'], 
+            $cursosEmXml->asXML()
+        );
     }
 }
