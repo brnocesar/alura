@@ -11,6 +11,18 @@
 |
 */
 
-Route::get('/ola', function () {
-    echo "Olá Mundo!";
+Route::get('/series', function () {
+    $series = [
+        'Terrace House',
+        'Peaky Blinders',
+        'Stranger Things'
+    ];
+
+    $html = "<ul>";
+    foreach ($series as $serie) {
+        $html .= "<li>$serie</li>";
+    }
+    $html .= "</ul>";
+
+    echo $html;
 });
