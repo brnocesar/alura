@@ -11,4 +11,4 @@
 |
 */
 
-Route::get('/series', 'SeriesController@listarSeries');
+Route::get('/series', 'SeriesController@index');

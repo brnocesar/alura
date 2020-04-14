@@ -6,11 +6,8 @@ use Illuminate\Http\Request;
 
 class SeriesController extends Controller
 {
-    public function listarSeries(Request $request)
+    public function index(Request $request)
     {
-        echo "URL: {$request->url()} ";
-        var_dump($request->query());
-
         $series = [
             'Terrace House',
             'Peaky Blinders',
