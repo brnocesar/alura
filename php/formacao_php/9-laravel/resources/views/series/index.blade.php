@@ -11,9 +11,9 @@ Séries
 </div>
 
 <ul class="list-group">
-    <?php foreach ($series as $serie): ?>
-    <li class="list-group-item"><?= $serie; ?></li>
-    <?php endforeach; ?>
+    @foreach ($series as $serie)
+        <li class="list-group-item">{{ $serie }}</li>
+    @endforeach
 </ul>
 
 @endsection
