@@ -11,18 +11,22 @@
     <body>
         <div class="container">
             <div class="jumbotron">
-                <h1>Séries</h1>
+                <h1>Adicionar Série</h1>
             </div>
 
             <div class="d-flex justify-content-end">
-                <a href="/series/criar" class="btn btn-dark mb-2">Adicionar</a>
+                <a href="/series" class="btn btn-dark mb-2">Voltar</a>
             </div>
 
-            <ul class="list-group">
-                <?php foreach ($series as $serie): ?>
-                <li class="list-group-item"><?= $serie; ?></li>
-                <?php endforeach; ?>
-            </ul>
+            <form method="post">
+                <div class="form-group">
+                    <label for="nome">Nome</label>
+                    <input id="nome" type="text" class="form-control" name="nome">
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-primary">Adicionar</button>
+                </div>
+            </form>
         </div>
     </body>
 </html>
