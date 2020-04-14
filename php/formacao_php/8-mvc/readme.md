@@ -234,7 +234,7 @@ $ composer require psr/http-server-handler
 ```
 Com isso podemos substituir a interface controladora de requisições que fizemos por uma que segue os padrões da PSR15. Além disso devemos modificar o nome dos métodos implemtandos nos devidos _controllers_ e no ponto único de entrada da aplicação (_commit_ [55056bc](https://github.com/brnocesar/alura/commit/55056bc0c95ccf52b7a75c819c21f3ba0961c42e)). 
 
-### 9.4. Injeção de dependência
+### 9.4. Injeção de dependência<a name='9-4'></a>
 Até o momento em todas as classes que precisamos usar um gerenciador de entidades, instânciamos ele no construtor, ou seja, isso é feito no _controller_. Mas se pudermos simplemesnte pedir que alguma classe seja passada como parâmetro ao construtor, isso deixaria de ser responsabilidade do _controller_.
 
 As coisas ficam um pouco complicados porque nem todos os _controllers_ vão utilizar as mesmas classes. Existem formas "avançadas" (puxa vida né, entendi nem a forma simple ainda...) de resolver esse problema, mas aqui vamos utilizar um pacote que implementa uma classe chamada de "contêiner de dependências" que _"a partir do nome de uma classe, irá descobrir tudo que ela precisa, criar, colocar no construtor dela e devolver um objeto da classe já instanciada"_. Este pacote externo é o `php-di/php-di` e os contêineres de dependências são tratados pela PSR11 (_commit_ [19b0a4e](https://github.com/brnocesar/alura/commit/19b0a4ea2503d09ab804567512b260192b3f6ef5)).
