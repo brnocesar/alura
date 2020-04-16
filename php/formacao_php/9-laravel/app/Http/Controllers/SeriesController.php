@@ -9,11 +9,7 @@ class SeriesController extends Controller
 {
     public function index(Request $request)
     {
-        $series = [
-            'Terrace House',
-            'Peaky Blinders',
-            'Stranger Things'
-        ];
+        $series = Serie::all();
 
         return view('series.index', compact('series'));
     }
