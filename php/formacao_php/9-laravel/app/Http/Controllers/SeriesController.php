@@ -25,10 +25,10 @@ class SeriesController extends Controller
 
     public function store(Request $request)
     {
-        $nome = $request->nome;
-
         $serie = new Serie();
-        $serie->nome = $nome;
+        $serie->nome = $request->nome;
         $serie->save();
+
+        echo "A série $serie->nome foi criada com sucesso!";
     }
 }
