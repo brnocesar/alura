@@ -10,7 +10,8 @@ Adicionar Série
     <a href="/series" class="btn btn-dark mb-2">Voltar</a>
 </div>
 
-<form method="post">
+<form method="post" action="/series/criar">
+    @csrf
     <div class="form-group">
         <label for="nome">Nome</label>
         <input id="nome" type="text" class="form-control" name="nome">
