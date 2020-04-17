@@ -5,9 +5,9 @@ O Laravel é um _framework full stack_ do PHP, ou seja, nos oferece ferramentas 
 1. <a href='#1'>Configurando o ambiente</a>
 2. <a href='#2'>_Controllers_</a>
 3. <a href='#3'>_Views_</a>
-4. <a href='#4'></a>
-5. <a href='#5'></a>
-6. <a href='#6'></a>
+4. <a href='#4'>Criando registros</a>
+5. <a href='#5'>Lapidando a aplicação</a>
+6. <a href='#6'>Destruindo registros</a>
 7. <a href='#7'></a>
 8. <a href='#8'></a>
 9. <a href='#9'></a>
@@ -36,7 +36,7 @@ Vamos começar falando sobre as rotas, que são o _"mapeamento de URLs para aç�
 
 Ao abrir este arquivo podemos ver a definição de uma rota, note que o verbo é GET, o primeiro parâmetro é `'/'` e o segunda uma função. Podemos assumir que o primeiro parâmetro se trata da rota, então vamos acessá-la para ver o que temos.
 
-Para levantar um servidor de desenvolvimento no Laravel podemos usar o Artisan, que é uyma ferramenta de linha de comando que nos oferece uma série de facilidades no desenvolvimento de projetos Laravel. O comando é:
+Para levantar um servidor de desenvolvimento no Laravel podemos usar o Artisan, que é uma ferramenta de linha de comando que nos oferece uma série de facilidades no desenvolvimento de projetos Laravel. O comando é:
 ```sh
 $ php artisan serve
 ```
@@ -100,9 +100,80 @@ Agora que temos um _layout_ Blade, podemos modificar nossas _views_ para utiliza
 
 Outra funcionalidade do Blade é permitir escrever PHP de uma forma mais amgável utilizando `@` ao invés de `tags` (_commit_ [4e0a1f0](https://github.com/brnocesar/alura/commit/4e0a1f0d4eb87fc5a7f705880e1d1a35694818c9)).
 
-## 4. <a name='4'></a>
-## 5. <a name='5'></a>
-## 6. <a name='6'></a>
+## 4. Criando registros<a name='4'></a>
+### 4.1. Configurando o Banco de Dados
+Até este ponto nossa aplicação possui duas páginas, uma para listagem das séries cadatradas e outra para cadastrar novas séries, então agora vamos implementar a funcionalidade que vai permitir adicioná-las.
+
+A primeira coisa a ser feita é criar o Banco de Dados onde os registros serão armazenados, então vamos entender como o Laravel lida com isso. Existem dois lugares onde inserimos as informações do Banco:
+- no arquivo das variáveis de ambiente: `.env`
+- e no arquivo de configurações da Base de Dados: `config/database.php`
+
+O arquivo de configurações retorna um _array_ associativo em que o primeiro elemento é a chave `'default'` e o valor é o nome da conexão da Base de Dados. Para retornar o nome da Base de Dados primeiro será verificado se existe algum valor na variável `DB_CONNECTION` do `.env` e se não encontrar retorna o segundo parâmetro passado.
+
+No nosso projeto vamos usar o SQLite então podemos definir o nome `'sqlite'` no arquivo das variáveis de ambiente e no de configurações (segundo parâmetro). No arquivo das variáveis de ambiente podemos comentar as outras linhas do bloco DB.
+```
+DB_CONNECTION=sqlite
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=laravel
+# DB_USERNAME=root
+# DB_PASSWORD=
+```
+
+Quando verificamos conexão `'sqlite'` no arquivo de configurações vemos que há um "database_path" que é o caminho da Base de Dados relativo a pasta `database`, então podemos criar nossa Base de Dados nesse local. Caso você esteja usando algum sistema de versionamento notará que este arquivo não está listado, o motivo é que o arquivo `database/.gitignore` possui a instrução `*.sqlite` em seu conteúdo, portanto, todos os arquivos com essa extensão serão ignorados pelo Git (_commit_ [d17c6f7](https://github.com/brnocesar/alura/commit/d17c6f71c3c4a15905553482d4b897f1199e9661)).
+
+### 4.2. _Migrations_
+Agora que temos um Banco podemos podemos começar a pensar na tabela que vai armazenar as séries. Para criar uma tabela vamos usar o Artisan, com o comando `make:migration`:
+```sh
+$ php artisan make:migration criar_tabela_series
+```
+Este comando cria uma _migration_ com o nome passado ao comando no diretório `database/migrations`. Dentro do arquivo criado temos duas funções: `upd()` e `down()` (_commit_ [9766b2c](https://github.com/brnocesar/alura/commit/9766b2ce4a11954847c8de111d5d585bbf73b898)).
+
+Como vamos criar a tabela usaremos a função `up()`. No corpo da função usaremos o método estático  `Schema::create()` passando como primeiro parâmetro uma _string_ com o nome da tabela e o segundo é uma função de _callback_ que irá conter informações sobre as colunas tais como: tipo do dado que será armazenado, nome da coluna, valor padrão, e etc (_commit_ [7c02d62](https://github.com/brnocesar/alura/commit/7c02d621f796d1289d9628b60d7a2a4cff2f0548)). Note que não foi necessário definir o tipo do dado de acordo com o SGDB usado, por exemplo, se a _string_ é `char`, `varchar` e tal, o Eloquent (ORM usado pelo Laravel por padrão) faz todas essas abstrações por você.
+
+Para rodar a _migration_ e de fato criar a tabela no Banco rodamos o comando abaixo:
+```sh
+$ php artisan make:migrate
+```
+
+Note que além da _migration_ `criar_tabela_series` foram rodadas outras duas, estas representam as tabelas de usuários e senhas resetadas e já são criadas por padrão no Laravel.
+
+### 4.3. _Model_
+Antes de começar-mos a criar registros na tabela 'series' devemos ter uma classe que "modele" esses registros. Para criamos um arquino na pasta `app` chamado `Classe.php` e dentro dele teremos a classe Serie herdando a classe Model do Eloquent. Essa herança vai permitir a classe Série usar vários métodos para operar no Banco.
+
+O Laravel assume o nome da tabela como o minúsculo plural em inglês de sua classe, se este não for o caso, devemos informar o nome da tabela usando o atributo `$table`.
+
+Como os campos do formulário são enviados pelo método POST, devemos criar uma rota com este verbo. Ainda no formulário precisamos adicionar a diretiva do Blade `@csrf` dentro da _tag_ `<form>`, isso é necessário pois o Laravel precisa receber um _token_ de verificação gerado por ele mesmo quando um POST com dados de um formulário chegar para ele.
+
+Como não criamos as coluans `updated_at` e `created_at` na tabela, precisamo informar que o Laravel não precisa preenchê-las, pois ele irá tentar fazer isso por padrão.
+
+Após isso (_commit_ [2e7fd3a](https://github.com/brnocesar/alura/commit/2e7fd3a18cc1998de0c6f982c1f92e356ee24f86)), é possível começar a inserir registros em nossa tabela de séries. Mas se fizermos isso no formulário não recebemos nenhum _feedback_ de nossa ação, na verdade nem somos redirecionados para alguma outra rota. Então vamos ao menos apresentar uma mensagem na tela informando o nome da série criada (_commit_ [5052030](https://github.com/brnocesar/alura/commit/50520302c0337e0cfc6aea68bcdf09be56ecd444)).
+
+### 4.4. Consultas no Banco
+Agora que temos séries cadastradas no Banco vamos começar a recuperá-las para apresentar na página de listagem de séries. Lembrando que nossa Classe modelo herda a classe Model, portanto, podemos usar o método estático `all()` que retorna todos os registros de uma classe. Além disso devemos especificar na _view_ que queremos apresentar o atributo `nome` dos objetos do tipo Serie, isso é necessário porque o Laravel identifica que estamos mandando uma coleção de objetos para a _view_ e envia os dados em formato JSON (_commit_ [5f76081](https://github.com/brnocesar/alura/commit/5f76081cd14fcf69cf3abad560afcbb1253dc19d)). 
+
+### 4.5. Atribuição em massa
+Podemos refinar o código que cria um registro usando o conceito de atribuição em massa. No método `store()` do _controller_ usamos o método estático `create()` de Model, e assim podemos criar um objeto e atribuir valores a seus atributos de uma vez só, passando um _array_ associativo com os atributos e valores. Isso elimina a necessidade de instânciar a classe e atribuir o valor de cada atributo individualemnte.
+
+Antes de usarmos esse recurso devemos indicar ao Laravel quais atributos serão permitidos na atribuição em massa. Isso é feito no Model Serie através do do atributo `$fillable`, passando um vetor com os campos que serão permitidos (_commit_ [c2f52dd](https://github.com/brnocesar/alura/commit/c2f52ddb07e413721f8700934a9c8a4321a19c26)). 
+
+Dependendo de como montamos o formulário da _view_ (se os nomes dos campos coincidem com os nomes dos atributos da classe) podemos ser ainda mais práticos e passar a _request_, que no fim das contas é um _array_ associativo (_commit_ [8f79508](https://github.com/brnocesar/alura/commit/8f7950805fbd7366a2b714d092f90dfc6e0a976e)).
+
+## 5. Lapidando a aplicação<a name='5'></a>
+Podemos realizar algumas alterações que tornem a aplicação mais agradável para os usuários como: redirecionamentos (_commit_ [48db541](https://github.com/brnocesar/alura/commit/48db5414591a70c44a9515e34d713a2a800b56a5)) ou apresentar de mensagens de _feeback_ (_commit_ [b8f551f](https://github.com/brnocesar/alura/commit/b8f551fc5022fe57f5576047c744510e8daf39b7)), após uma ação ser realizada.
+
+## 6. Destruindo registros<a name='6'></a>
+Vamos implementar a funcionalidade de excluir séries cadastradas e para isso vamos criar uma função que é acessada através do método POST, para evitar que _bots_ ou automações externas sejam capazes de excluir registros.
+
+Basta criar um botão dentro de uma _tag_ `<form>` e no atributo `action` passar a rota do método que exclue séries e o `ID` da série que deve ser excluída. O problema é que não temos este identificador em nossa tabela de séries.  
+Para adicionar esta coluna na tabela podemos simplesmente deletar o arquivo do Banco e recria-lo (já que é SQLite), adicionar a coluna na _migration_ criada e roda-la novamente (_commit_ [b8f551f](https://github.com/brnocesar/alura/commit/b8f551fc5022fe57f5576047c744510e8daf39b7)). Como sou preguiçoso vou pular o primeiro passo e após alterar a _migration_ vou rodar o comando:
+```sh
+$ php artisan migrate:fresh
+```
+Esse comando vai "dropar" as tabelas do banco e rodar as _migrations_ novamente (_commit_ [f21d96c](https://github.com/brnocesar/alura/commit/f21d96c2552c980163535ce5d63cb17dfdedd972)).
+
+Agora voltando à função que apaga registros (_commit_ [](https://github.com/brnocesar/alura/commit/)),  podemos implementar o verbo `DELETE` para esta rota, mas como o HTTP não aceita verbos diferentes de `GET` e `POST` precisamos indicar na Blade que o método usado. Além disso podemos alterar um pouco a rota para ficar com uma "carinha" de API (_commit_ [](https://github.com/brnocesar/alura/commit/)).
+
 ## 7. <a name='7'></a>
 ## 8. <a name='8'></a>
 ## 9. <a name='9'></a>
