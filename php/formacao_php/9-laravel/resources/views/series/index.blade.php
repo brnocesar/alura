@@ -13,19 +13,19 @@ Séries
 @endif
 
 <div class="d-flex justify-content-end">
-    <a href="{{ route('adicionar_serie') }}" class="btn btn-dark mb-2">Adicionar</a>
+    <a href="{{ route('adicionar_serie') }}" class="btn btn-dark mb-2"><i class="fas fa-plus"></i></a>
 </div>
 
 <ul class="list-group">
     @foreach ($series as $serie)
-        <li class="list-group-item">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
             {{ $serie->nome }}
             <form method="post" action="{{ route('deleta_serie', $serie->id) }}"
                 onsubmit="return confirm('Tem certeza que vai excluir {{ addslashes($serie->nome)}}?')"
             >
                 @csrf
                 @method('DELETE')
-                <button class="btn btn-danger">Excluir</button>
+                <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
             </form>
         </li>
     @endforeach
