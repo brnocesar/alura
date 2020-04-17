@@ -20,8 +20,9 @@ Séries
     @foreach ($series as $serie)
         <li class="list-group-item">
             {{ $serie->nome }}
-            <form method="POST" action="/series/remover/{{ $serie->id }}">
+            <form method="POST" action="/series/{{ $serie->id }}">
                 @csrf
+                @method('DELETE')
                 <button class="btn btn-danger">Excluir</button>
             </form>
         </li>
