@@ -10,7 +10,7 @@ Adicionar Série
     <a href="/series" class="btn btn-dark mb-2">Voltar</a>
 </div>
 
-<form method="post" action="/series/criar">
+<form method="post" action="{{ route('registra_serie') }}">
     @csrf
     <div class="form-group">
         <label for="nome">Nome</label>
