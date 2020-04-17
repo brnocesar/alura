@@ -6,6 +6,12 @@ Séries
 
 @section('conteudo')
 
+@if ( !empty($mensagem) )
+    <div class="alert alert-success">
+        {{$mensagem}}
+    </div>
+@endif
+
 <div class="d-flex justify-content-end">
     <a href="/series/criar" class="btn btn-dark mb-2">Adicionar</a>
 </div>
