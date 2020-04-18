@@ -6,6 +6,16 @@ Adicionar Série
 
 @section('conteudo')
 
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <div class="d-flex justify-content-end">
     <a href="/series" class="btn btn-dark mb-2"><i class="fas fa-backspace"></i></a>
 </div>
