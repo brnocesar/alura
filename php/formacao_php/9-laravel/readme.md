@@ -6,11 +6,11 @@ O Laravel é um _framework full stack_ do PHP, ou seja, nos oferece ferramentas 
 2. <a href='#2'>_Controllers_</a>
 3. <a href='#3'>_Views_</a>
 4. <a href='#4'>Criando registros</a>
-5. <a href='#5'>Lapidando a aplicação</a>
+5. <a href='#5'>Lapidando a aplicação (parte 1)</a>
 6. <a href='#6'>Destruindo registros</a>
-7. <a href='#7'></a>
-8. <a href='#8'></a>
-9. <a href='#9'></a>
+7. <a href='#7'>Nomeando rotas</a>
+8. <a href='#8'>Lapidando a aplicação (parte 2)</a>
+9. <a href='#9'>Validando os dados</a>
 10. <a href='#10'></a>
 
 ## 1. Configurando o ambiente<a name='1'></a>
@@ -159,7 +159,7 @@ Antes de usarmos esse recurso devemos indicar ao Laravel quais atributos serão 
 
 Dependendo de como montamos o formulário da _view_ (se os nomes dos campos coincidem com os nomes dos atributos da classe) podemos ser ainda mais práticos e passar a _request_, que no fim das contas é um _array_ associativo (_commit_ [8f79508](https://github.com/brnocesar/alura/commit/8f7950805fbd7366a2b714d092f90dfc6e0a976e)).
 
-## 5. Lapidando a aplicação<a name='5'></a>
+## 5. Lapidando a aplicação (parte 1)<a name='5'></a>
 Podemos realizar algumas alterações que tornem a aplicação mais agradável para os usuários como: redirecionamentos (_commit_ [48db541](https://github.com/brnocesar/alura/commit/48db5414591a70c44a9515e34d713a2a800b56a5)) ou apresentar de mensagens de _feeback_ (_commit_ [b8f551f](https://github.com/brnocesar/alura/commit/b8f551fc5022fe57f5576047c744510e8daf39b7)), após uma ação ser realizada.
 
 ## 6. Destruindo registros<a name='6'></a>
@@ -172,11 +172,35 @@ $ php artisan migrate:fresh
 ```
 Esse comando vai "dropar" as tabelas do banco e rodar as _migrations_ novamente (_commit_ [f21d96c](https://github.com/brnocesar/alura/commit/f21d96c2552c980163535ce5d63cb17dfdedd972)).
 
-Agora voltando à função que apaga registros (_commit_ [](https://github.com/brnocesar/alura/commit/)),  podemos implementar o verbo `DELETE` para esta rota, mas como o HTTP não aceita verbos diferentes de `GET` e `POST` precisamos indicar na Blade que o método usado. Além disso podemos alterar um pouco a rota para ficar com uma "carinha" de API (_commit_ [](https://github.com/brnocesar/alura/commit/)).
+Agora voltando à função que apaga registros (_commit_ [aa10055](https://github.com/brnocesar/alura/commit/aa10055973cc5b06e900bc105f7524c6218b09c3)), podemos implementar o verbo `DELETE` para esta rota, mas como o HTTP não aceita verbos diferentes de `GET` e `POST`, precisamos indicar isso na Blade através da diretiva `@method`. Além disso podemos alterar um pouco a rota para ficar com uma "carinha" de API (_commit_ [670c5fb](https://github.com/brnocesar/alura/commit/670c5fb29cddc4afba3286001878cafee3e072a4)).
 
-## 7. <a name='7'></a>
-## 8. <a name='8'></a>
-## 9. <a name='9'></a>
+Outro cuidado que podemos ter é prevenir exclusões acidentais e isso pode ser facilmente feito com um alert do JavaScript (_commit_ [cae4d74](https://github.com/brnocesar/alura/commit/cae4d744bd8fc9905a507725ec89192bdcd2801c)).
+
+## 7. Nomeando rotas<a name='7'></a>
+Isso é algo bastante simples de se fazer e ao mesmo tempo muito poderoso, pois agora não precisamos nos preocupar em alterar as rotas nos locais em que elas serão acessadas.
+
+Para nomear uma rota basta aplicar o método `name()` nesta rota e passar o valor do nome como parâmetro. Na hora de definir uma rota para ser acessada usamos o _helper_ `route()` que recebe o nome da rota (_commit_ [d3064bc](https://github.com/brnocesar/alura/commit/d3064bcadef57a7fee84c7712f2f1a1816e19f15)).
+
+## 8. Lapidando a aplicação (parte 2)<a name='8'></a>
+Podemos mexer no estilo das _views_ para deixa-las mais bonitinhas, alinhando os elementos e adicionando ícones (_commit_ [3abd552](https://github.com/brnocesar/alura/commit/3abd552a5f6f1a4d301ad7e1bebf8bff41e658ab)).
+## 9. Validando os dados<a name='9'></a>
+### 9.1. `validate()`
+Para validar os dados vindos de uma requisição temos o método `validate()` da classe Request. Para usá-lo basta passar um _array_ associativo em que a chave é o nome do campo (da requisição) e o valor são as regras de validação (_commit_ [365857e](https://github.com/brnocesar/alura/commit/365857e84acdcc6e8c59d75914e3f9a95934be12)).
+
+Outra facilidade que o Laravel nos oferece é sobre como dizer ao usuário que essas regras não estão sendo seguidas. Caso algum campo não passe no teste de validação, o Laravel injeta na sessão mensagens indicando qual campo violou qual regra. E na própria [documentação do Laravel](https://laravel.com/docs/5.8/validation#quick-displaying-the-validation-errors) é disponibilizado um fragmento de código para ser colocado nas Blades e mostrar os erros (_commit_ [69adde7](https://github.com/brnocesar/alura/commit/69adde75ebb6cd7623434ef6db456858e5eeae1e)).
+
+### 9.2. _Form Request_
+O método `validate()` pode ser uma boa forma de validar requisições quando temos apenas um ou dois campos, mas em situações que esse número é maior o ideal é utilizarmos uma classe própria para essa tarefa. Essas classes sào chamadas de _Form Request_ e para cria-la usamos o comando:
+```sh
+$ php artisan make:request SeriesFormRequest
+```
+que cria um arquivo com nome `SeriesFormRequest.php` na pasta `Requests` dentro de `Http` (_commit_ [668a220](https://github.com/brnocesar/alura/commit/668a220a5cb7da2a3eafaa31727a92dbab8e430c)).
+
+Para usar essa classe precisamos apenas: dizer que o usuário esta autorizado a realizar esta requisição na função `authorize()` (qualquer usuário no caso, já que ainda não temos um sistema de autenticação); colocar a regra de validação na função `rules()` e definir que nosso método `store()` em `SeriesController` espera receber um Request específico, no caso o `SeriesFormRequest`.
+
+Além disso podemos ainda personalizar as mensagens de erro, definindo uma mensagem para cada regra (_commit_ [c141d7e](https://github.com/brnocesar/alura/commit/c141d7eae3c21015dcbed4d013a0ebfa7a478381)).
+
+
 ## . <a name=''></a>
 ## . <a name=''></a>
 ## . <a name=''></a>
