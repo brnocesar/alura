@@ -21,7 +21,7 @@ Séries
         <li class="list-group-item d-flex justify-content-between align-items-center">
             {{ $serie->nome }}
             <span class="d-flex">
-                <a href="/series/{{ $serie->id }}/temporadas" class="btn btn-info btn-sm mr-1">
+                <a href="{{ route('listar_temporadas', $serie->id) }}" class="btn btn-info btn-sm mr-1">
                     <i class="fas fa-external-link-alt"></i>
                 </a>
                 <form method="post" action="{{ route('deleta_serie', $serie->id) }}"
