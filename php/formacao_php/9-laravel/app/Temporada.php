@@ -3,10 +3,12 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Temporada extends Model
 {
+    protected $table = 'temporadas';
+    protected $fillable = ['numero'];
+
     public function serie()
     {
         return $this->belongsTo(Serie::class);
