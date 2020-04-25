@@ -25,7 +25,7 @@ class SeriesController extends Controller
 
     public function store(SeriesFormRequest $request, CriadorDeSerie $criadorDeSerie)
     {
-        $serie = $criadorDeSerie->criarSerie();
+        $serie = $criadorDeSerie->criarSerie($request->nome, $request->qtd_temporadas, $request->ep_por_temporada);
 
         $request->session()->flash(
             'mensagem',
