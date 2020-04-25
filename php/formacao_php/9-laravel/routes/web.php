@@ -18,3 +18,4 @@ Route::delete('/series/{id}', 'SeriesController@destroy')->name('deleta_serie');
 Route::post('/series/{id}/editar-nome', 'SeriesController@editarNome');
 
 Route::get('/series/{serieId}/temporadas', 'TemporadasController@index')->name('listar_temporadas');
+Route::get('temporadas/{temporadaId}/episodios', 'EpisodiosController@index')->name('listar_episodios');
