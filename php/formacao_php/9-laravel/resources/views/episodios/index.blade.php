@@ -23,7 +23,7 @@ Episódios da {{$temporada->numero}}<sup>a</sup> Temporada de {{$temporada->seri
         @foreach ($temporada->episodios as $episodio)
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 Episódio {{ $episodio->numero }}
-                <input type="checkbox">
+                <input type="checkbox" name="episodios[]" value="{{ $episodio->id }}">
             </li>
         @endforeach
     </ul>
