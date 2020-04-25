@@ -78,6 +78,9 @@ Séries
         fetch(url, {
             body: formData,
             method: 'POST'
+        }).then(() => {
+            toggleInput(serieId);
+            document.getElementById(`nome-serie-${serieId}`).textContent = nome;
         });
     }
 </script>
