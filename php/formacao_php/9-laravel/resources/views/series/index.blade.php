@@ -19,8 +19,22 @@ Séries
 <ul class="list-group">
     @foreach ($series as $serie)
         <li class="list-group-item d-flex justify-content-between align-items-center">
-            {{ $serie->nome }}
+            <span id="nome-serie-{{ $serie->id }}">{{ $serie->nome }}</span>
+
+            <div class="input-group w-50" hidden id="input-nome-serie-{{ $serie->id }}">
+                <input type="text" class="form-control" value="{{ $serie->nome }}">
+                <div class="input-group-append">
+                    <button class="btn btn-primary btn-sm" onclick="editarSerie({{ $serie->id }})">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    @csrf
+                </div>
+            </div>
+
             <span class="d-flex">
+                <button class="btn btn-info btn-sm mr-1" onclick="toggleInput({{ $serie->id }})">
+                    <i class="fas fa-edit"></i>
+                </button>
                 <a href="{{ route('listar_temporadas', $serie->id) }}" class="btn btn-info btn-sm mr-1">
                     <i class="fas fa-external-link-alt"></i>
                 </a>
@@ -35,5 +49,21 @@ Séries
         </li>
     @endforeach
 </ul>
+
+<script>
+    function toggleInput(serieId) {
+        const nome = document.getElementById(`nome-serie-${serieId}`);
+        const input = document.getElementById(`input-nome-serie-${serieId}`);
+
+        if ( nome.hasAttribute('hidden') ) {
+            nome.removeAttribute('hidden');
+            input.hidden = true;
+        }
+        else {
+            input.removeAttribute('hidden');
+            nome.hidden = true;
+        }
+    }
+</script>
 
 @endsection
