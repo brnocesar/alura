@@ -25,6 +25,6 @@ class EpisodiosController extends Controller
         });
         $temporada->push();
 
-        return redirect()->route('listar_episodios', $temporada->id);
+        return redirect()->back();
     }
 }
