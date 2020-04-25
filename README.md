@@ -1,5 +1,5 @@
 # learning-PHP
-Este repositório reúne guias, notas e projetos de estudo em PHP. A maior parte do (se não for tudo mesmo!) foi desenvolvida acompanhando cursos na Alura.
+Este repositório reúne guias, notas e projetos de estudos em PHP. A maior parte (se não for tudo mesmo!) foi desenvolvida acompanhando cursos na Alura.
 
 ### Formação PHP Alura
 1. <a href='https://github.com/brnocesar/alura/blob/master/formacao_alura/1-intro/'>Introdução</a>
