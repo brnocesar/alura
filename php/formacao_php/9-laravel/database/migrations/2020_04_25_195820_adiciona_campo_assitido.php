@@ -14,7 +14,7 @@ class AdicionaCampoAssitido extends Migration
     public function up()
     {
         Schema::table('episodios', function (Blueprint $table) {
-            //
+            $table->boolean('assistido')->default(false);
         });
     }
 
