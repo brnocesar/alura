@@ -17,15 +17,18 @@ class EpisodiosController extends Controller
 
     public function assistir(Temporada $temporada, Request $request)
     {
+        // dd($request->all());
         $episodiosAssistidos = $request->episodios;
 
         $temporada->episodios->each(function (Episodio $episodio) use ($episodiosAssistidos) {
 
-            $episodio->assistido = in_array($episodio->id, $episodiosAssistidos);
+            $episodio->assistido = in_array($episodio->id, $episodiosAssistidos ?? []);
         });
         $temporada->push();
 
-        $request->session()->flash('mensagem', 'Episódios marcados como assistidos');
+        if ( $request->has('episodios') ) {
+            $request->session()->flash('mensagem', 'Episódios marcados como assistidos');
+        }
 
         return redirect()->back();
     }
