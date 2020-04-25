@@ -17,7 +17,7 @@ Adicionar Série
 @endif
 
 <div class="d-flex justify-content-end">
-    <a href="{{ route('listar_series') }}" class="btn btn-dark mb-2"><i class="fas fa-backspace"></i></a>
+    <a href="{{ route('listar_series') }}" class="btn btn-dark mb-2" style="font-size: 80%"><i class="fas fa-backspace mr-2"></i>Voltar</a>
 </div>
 
 <form method="post" action="{{ route('registra_serie') }}">

@@ -13,7 +13,7 @@ Séries
 @endif
 
 <div class="d-flex justify-content-end">
-    <a href="{{ route('adicionar_serie') }}" class="btn btn-dark mb-2"><i class="fas fa-plus"></i></a>
+    <a href="{{ route('adicionar_serie') }}" class="btn btn-outline-dark mb-2" style="font-size: 80%"><i class="fas fa-plus mr-2"></i>Adicionar</a>
 </div>
 
 <ul class="list-group">
@@ -32,7 +32,7 @@ Séries
             </div>
 
             <span class="d-flex">
-                <button class="btn btn-info btn-sm mr-1" onclick="toggleInput({{ $serie->id }})">
+                <button class="btn btn-secondary btn-sm mr-1" onclick="toggleInput({{ $serie->id }})">
                     <i class="fas fa-edit"></i>
                 </button>
                 <a href="{{ route('listar_temporadas', $serie->id) }}" class="btn btn-info btn-sm mr-1">
