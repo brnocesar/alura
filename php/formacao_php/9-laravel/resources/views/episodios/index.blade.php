@@ -18,7 +18,8 @@ Episódios da {{$temporada->numero}}<sup>a</sup> Temporada de {{$temporada->seri
     </a>
 </div>
 
-<form action="#">
+<form action="{{ route('assistir_episodios', $temporada->id) }}" method="POST">
+    @csrf
     <ul class="list-group">
         @foreach ($temporada->episodios as $episodio)
             <li class="list-group-item d-flex justify-content-between align-items-center">

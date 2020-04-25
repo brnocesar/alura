@@ -13,4 +13,9 @@ class EpisodiosController extends Controller
 
         return view('episodios.index', compact('temporada'));
     }
+
+    public function assistir(Temporada $temporada, Request $request)
+    {
+        dd($request->all());
+    }
 }
