@@ -6,15 +6,7 @@ Adicionar Série
 
 @section('conteudo')
 
-@if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+@include('mensagem')
 
 <div class="d-flex justify-content-end">
     <a href="{{ route('listar_series') }}" class="btn btn-dark mb-2" style="font-size: 80%"><i class="fas fa-backspace mr-2"></i>Voltar</a>

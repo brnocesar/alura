@@ -6,11 +6,7 @@ Episódios da {{$temporada->numero}}<sup>a</sup> Temporada de {{$temporada->seri
 
 @section('conteudo')
 
-@if ( !empty($mensagem) )
-    <div class="alert alert-success">
-        {{$mensagem}}
-    </div>
-@endif
+@include('mensagem')
 
 <div class="d-flex justify-content-end">
     <a href="{{ route('listar_temporadas', $temporada->serie->id) }}" class="btn btn-dark mb-2" style="font-size: 80%">

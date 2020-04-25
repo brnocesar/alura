@@ -6,11 +6,7 @@ Temporadas de {{$serie->nome}}
 
 @section('conteudo')
 
-@if ( !empty($mensagem) )
-    <div class="alert alert-success">
-        {{$mensagem}}
-    </div>
-@endif
+@include('mensagem')
 
 <div class="d-flex justify-content-end">
     <a href="{{ route('listar_series') }}" class="btn btn-dark mb-2" style="font-size: 80%">

@@ -6,11 +6,7 @@ Séries
 
 @section('conteudo')
 
-@if ( !empty($mensagem) )
-    <div class="alert alert-success">
-        {{$mensagem}}
-    </div>
-@endif
+@include('mensagem')
 
 <div class="d-flex justify-content-end">
     <a href="{{ route('adicionar_serie') }}" class="btn btn-outline-dark mb-2" style="font-size: 80%"><i class="fas fa-plus mr-2"></i>Adicionar</a>
