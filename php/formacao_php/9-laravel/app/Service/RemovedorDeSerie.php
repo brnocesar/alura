@@ -14,17 +14,25 @@ class RemovedorDeSerie
             $serie = Serie::find($serieId);
             $nomeSerie = $serie->nome;
 
-            $serie->temporadas->each(function (Temporada $temporada){
-
-                $temporada->episodios->each(function (Episodio $episodio){
-
-                    $episodio->delete();
-                });
-                $temporada->delete();
-            });
+            $this->removerTemporadas($serie);
             $serie->delete();
         });
 
         return $nomeSerie;
+    }
+
+    private function removerTemporadas(Serie $serie)
+    {
+        $serie->temporadas->each(function (Temporada $temporada){
+            $this->removerEpisodios($temporada);
+            $temporada->delete();
+        });
+    }
+
+    private function removerEpisodios(Temporada $temporada)
+    {
+        $temporada->episodios->each(function (Episodio $episodio){
+            $episodio->delete();
+        });
     }
 }
