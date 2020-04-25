@@ -11,6 +11,6 @@ class EpisodiosController extends Controller
     {
         $episodios = $temporada->episodios;
 
-        return view('episodios.index', compact('episodios'));
+        return view('episodios.index', compact('temporada'));
     }
 }
