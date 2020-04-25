@@ -11,7 +11,12 @@ O Laravel é um _framework full stack_ do PHP, ou seja, nos oferece ferramentas 
 7. <a href='#7'>Nomeando rotas</a>
 8. <a href='#8'>Lapidando a aplicação (parte 2)</a>
 9. <a href='#9'>Validando os dados</a>
-10. <a href='#10'></a>
+10. <a href='#10'>Novos _models_</a>
+10. <a href='#11'>CRUD de séries</a>
+10. <a href='#12'>Episódios</a>
+10. <a href='#13'>Autenticação</a>
+10. <a href='#14'></a>
+10. <a href='#15'></a>
 
 ## 1. Configurando o ambiente<a name='1'></a>
 ### 1.1. Criando um projeto
@@ -201,6 +206,135 @@ Para usar essa classe precisamos apenas: dizer que o usuário esta autorizado a 
 Além disso podemos ainda personalizar as mensagens de erro, definindo uma mensagem para cada regra (_commit_ [c141d7e](https://github.com/brnocesar/alura/commit/c141d7eae3c21015dcbed4d013a0ebfa7a478381)).
 
 
-## . <a name=''></a>
-## . <a name=''></a>
-## . <a name=''></a>
+## 10. Novos _models_<a name='10'></a>
+Para representar melhor uma série podemos armazenar informações sobre suas temporadas e episodios, então vamos modelar essas duas classes. Os atributos e relacionamentos das classes vão ser:
+- Serie
+    - id: identificador único;
+    - nome
+    - temporadas: cada série pode ter várias temporadas
+- Temporada
+    - id: identificador único;
+    - numero
+    - serie: cada temporada pertence a uma série
+    - episodios: cada temporada pode ter vários episódios
+- Episodio
+    - id: identificador único;
+    - numero
+    - temporada: cada episódio pertence a uma temporada
+
+Agora que ja temos um modelo mais completinho para nosso sistema, podemos começar a criar nossos _models_ e _migrations_, e para isso vamos utilizar o `artisan`. Rodando o comando:
+```sh
+$ php artisan make:model Temporada -m
+```
+será criado um arquivo `Temporada.php` na pasta `app` com a estrutura básica de um arquivo de _model_. Além disso, como adicionamos a _flag_ `-m` será criada uma _migration_ automaticamente. Para a classe Episodio basta repetir o procedimento trocando o nome do _model_ passado (_commit_ [c9aefd8](https://github.com/brnocesar/alura/commit/c9aefd851a6fc5cf075f202c38913f79182205b5)).
+
+### 10.1. Relacionamentos
+Para definir relacionamentos no Laravel não usamos atributos, mas sim métodos. Vamos criar métodos com um nome pela qual queremos acessar a relação.
+
+Por convenção, quando temos uma relação do tipo "um para muitos" ou "muitos para muitos", o nome do relacionamamento é definido no plural (no lado "múltiplo") e singular no outro lado.
+
+Dessa forma se queremos acessar a série de um episódio usamos `$temporada->serie`, ou os episodios de uma temporada `$temporada->episodios`.
+
+Note que conforme [definimos o relacionamento](https://github.com/brnocesar/alura/commit/b6325438eb6964deb1207cd986c9683eecdea777) de um lado, temos a relação inversa no outro:
+- 1:1 - `hasOne` <-> `belongsTo`
+- 1:N - `hasMany` <-> `belongsTo`
+- N:N - `belongsToMany` <-> `belongsToMany`
+
+### 10.2. _Migrations_
+Agora definimos os atributos de cada uma das classes em sua _migration_ e também os relacionamentos, ou seja, ao que este relacionamento referência (_commit_ [a228b70](https://github.com/brnocesar/alura/commit/a228b70058013cef7ee33150f3279f77b8340d5c)). 
+
+## 11. CRUD de séries<a name='11'></a>
+### 11.1. Modificando a criação de séries
+Vamos modificar o cadastro de séries de modo que seja possível inserir o número de temporadas e a quantidade de episódios por temporada (vamos considerar que todas as temporadas possuem a mesma quantidade de episódios).
+
+O primeiro passo é modificar o formulário (_commit_ [150d0e6](https://github.com/brnocesar/alura/commit/150d0e6bc851cd8046bcf8f324daef01656ff09d)). 
+
+Após isso acrescentamos o código responsável por criar os registros de temporadas e episódios no método `store()` de séries. Note que precisamos adicionar atributos `$fillabele` com os campos que serão passados no `create()` em cada um dos _models_, assim como foi feito com séries. Além, disso foi necessário corrigir um pequeno erro de digitação em uma das _migrations_ xD (_commit_ [f86c23a](https://github.com/brnocesar/alura/commit/f86c23a921bb064b9a4714b8f6cf9c3a03a94e07)).
+
+### 11.2. Listando temporadas
+Como as temporadas "fazem parte" de uma série, faz sentido apresenta-las "a partir da série", então vamos criar uma página para isso.
+
+Primeiro criamos um botão na página de listagem de séries que vai levar até a página de listar temporadas (_commit_ [2426111](https://github.com/brnocesar/alura/commit/2426111f53b41d67557797ab5d7c56339fefe3be)). 
+
+Em seguida criamos uma rota e a mapeamos para o método `index()` do controller de temporadas (_commit_ [76af820](https://github.com/brnocesar/alura/commit/76af82028c17e20a84c81665bb820f4c4b6b7fce)).
+
+Agora usamos o _artisan_ para criar um controller chamado `TemporadasController`, com o comando:
+```sh
+$ php artisan make:controller TemporadasController
+```
+
+E dentro deste controller criamos o método `index()` que recupera a coleção de temporadas de uma série e passa essa coleção para _view_ que retorna  (_commit_ [673ab80](https://github.com/brnocesar/alura/commit/673ab80c873d948cccb844bb3131780f623a90b5)).
+
+Finalmente criamos a _view_ de listar temporadas de forma muito similar ao que foi feito com séries (_commit_ [50a3f26](https://github.com/brnocesar/alura/commit/50a3f261530370aae41e39275c9d6b420abc5ec5)). Note que alteramos o método `index()` do controller de temporadas e passamos a enviar apenas o objeto Serie para a _view_, isso está sendo feito pois é possível acessar a coleção de temporadas associadas a esta série através do relacionamento.
+
+### 11.3. Refatorando e separando a "criação de séries"
+Vamos separar todo o código relativo a criação de séries em uma nova classe, uma classe de serviço. Então criamos um arquivo chamado `CriadorDeSerie.php` na pasta `app/Service` e movemos o código responsável por criar uma série para um método dentro desta classe, que retorna a série criada.
+
+No método `store()`, onde esse código estava, passamos a receber mais um objeto, um do tipo `CriadorDeSerie` (injeção de dependência), e então, criamos a série a partir do método desse objeto (_commit_ [eabaee8](https://github.com/brnocesar/alura/commit/eabaee8952a04147aa6123db973da42912523137)).  
+Mas na classe de serviço é necessário passar os parâmetros que serão usados, assim como no método `store()` (_commit_ [277d406](https://github.com/brnocesar/alura/commit/277d40664fac0049a757c19fe4155e0de0aeac90)).
+
+### 11.4. Refatorando a exclusão de séries
+Vamos modificar o código para que as temporadas de uma série e seus episódios sejam excluídos também, pois quando queremos excluir uma entidade, devemos excluir seus objetos relacionados.
+
+A partir dos relacionamentos usamos o método `each()` que recebe uma função anônima que será executado para cada objeto da coleção. Esta função anônima recebe como parâmetro um objeto do tipo em que é aplicado (?) (_commit_ [ec74bd2](https://github.com/brnocesar/alura/commit/ec74bd250a33449b57c3b63dcbdc3920549ed119)).
+
+Após isso podemos extrair esse código para uma classe de serviço específica para esta função (_commit_ [9cf8f34](https://github.com/brnocesar/alura/commit/9cf8f341f4d5e4b05c5d41847aaaa6ffbf824a64)).
+
+Mas note que da forma como foi implementado, se ocorrer um problema em alguma das exclusões é bem provável que processo não seja finalizado e alguns objetos não sejam excluídos. Por isso vamos usar o método `transaction()` da facade `DB`.  
+Esse método recebe uma função e executada todo seu código em uma única transação, havendo algum erro em alguma execução interna, a transação não ocorre.
+
+Note que precisamos ter acesso à variável que armazena o nome da série e ao seu ID, por isso "usamos" as variáveis para serem usadas na função anônima. Mas perceba que com a variável que armazena o nome da série passamos seu endereço de memória, se não fizessemos dessa forma o PHP criaria apenas uma cópia da variável para usar na função anônima (_commit_ [5d92c33](https://github.com/brnocesar/alura/commit/5d92c333ee97db83b867959a0a81fe2bd7cf0789)).
+
+Dependendo da situação, muitos níveis de identação dentro de um método podem acabar atralhando a leitura do código, então podemos separar cada uma das responsabilidades (exclusão de um tipo de objeto) em um método separado (_commit_ [18a71c9](https://github.com/brnocesar/alura/commit/18a71c9871613b09d3f37c38a16f7a292249667b)).
+
+### 11.5. Refatorando criação de séries (novamente)
+Vamos aplicar a mesma lógica de separação de responsabilidades e usar _transaction()_ na classe de serviço que cria séries (_commit_ [4a9ed10](https://github.com/brnocesar/alura/commit/4a9ed10e565a3a21d75e4980124fb226ed8e1f4e)).
+
+Mas perceba que tivemos que passar quatro variáveis para o _use()_ da função anônima, isso acaba aumentando a complexidade do código bem como a possibilidade de cometer(-mos) erros. Então vamos utilizar outro maneira de informar ao Laravel que uma transação está iniciando e depois que ela terminou, usando `DB::beginTransaction()` e `DB::commit()`. Assim não precisamos usar a função anônima (_commit_ [b5e38a7](https://github.com/brnocesar/alura/commit/b5e38a7539efa078a6a234bea1223314f8f2c9ae)).
+
+### 11.6. Alterando o nome de uma série
+Essa ação será feita (pelo usuário) a partir da página de listagem de séries. Vamos adicionar elementos HTML que seram _hidden_ por padrão e quando o usuário quiser editar o nome de alguma série esse campo será apresentado mediante o clique em um botão editar. Essa mudança nos estados (_hidden_ e não-*hidden*) será feita por código JavaScript (_commit_ [ebad098](https://github.com/brnocesar/alura/commit/ebad0989a6214a701d10443265bc9e546a7a8311)).
+
+Criamos um método JavaScript para enviar a requisição ao Laravel com o valor do campo _input_ nome, uma rota, e o método no _server side_ responsável por persistir esta mudança (_commit_ [35b120b](https://github.com/brnocesar/alura/commit/35b120b3222ba4958317e678760bf08c7712d4ae)).
+
+Agora vamos lapidar um pouco mais esta funcionalidade, após clicar no botão que confirma a alteração queremos voltar a esconder o input. Usamos um `then()` no `fetch()`, que através de uma função anônima (_arrow function_) chama a funcão `toggleInput()` passando o ID da série e atribui o novo nome ao conteudo do elemento (_commit_ [dd5df72](https://github.com/brnocesar/alura/commit/dd5df72f471100d62e004af4afd909a368ecf401)). E com isso podemos considerar finalizado o CRUD de séries (_commit_ [b74dda5](https://github.com/brnocesar/alura/commit/b74dda5e58b72ccbcff7f10e11bb17b140d59667)).
+
+## 12. Episódios<a name='12'></a>
+### 12.1. Listando episódios
+Agora que temos um CRUD para a entidade **Serie** vamos voltar nossa atenção para os episódios. A primeira coisa a ser feita é transformar as temporadas listadas em um link que posteriormente vai levar para a listagem dos respectivos episódios (_commit_ [e5d447f](https://github.com/brnocesar/alura/commit/e5d447f01c78ca00944a2f3d2e978581b8c2e1f7)) e também adicionamos um "selinho" (_badge_) indicando quantos episódio foram assistidos em relação ao total (_commit_ [a3b2781](https://github.com/brnocesar/alura/commit/a3b2781bc5c11a0102d297717d6b11e68faf190f)).
+
+Agora precisamos de um método que retorne a _view_ de listagem dos episódios, então criamos um _controller_ para episódios com o método `index()` (_commit_ [a537d4b](https://github.com/brnocesar/alura/commit/a537d4b8c74363a8b334f6316e8e04c4290e7a51)).  
+Criamos a rota para acessar essa página passando o ID da temporada e partir desse parâmetro obtemos a temporada correspondente (_commit_ [64dfc4b](https://github.com/brnocesar/alura/commit/64dfc4b4e2cb8dfba9f6101db230551668e9e3bc)).  
+Mas o Laravel possui um recurso que facilita ainda mais esse processo, podemos injetar a dependência de uma classe indicando que queremos receber um objeto desta classe no método, e desde que os parâmetros no método e na URL sejam iguais, o Laravel já retorna um objeto dessa classe usando o `find()` (_commit_ [c5438a7](https://github.com/brnocesar/alura/commit/c5438a7c00edef627d581a4fe81f5a64dd5b1631)). Mas para que isso ocorra apenas um parâmetro pode ser passado na URL (?<sup>*</sup>).
+
+Enfim, a partir do objeto da classe **Temporada** conseguimos acessar a coleção de seus episódios relacionados e [retorná-los](https://github.com/brnocesar/alura/commit/842d3a0ac39fd43dd93b919fbc0cb77aecfb6026) para a _view_ de listagem criada (_commit_ [b6c3421](https://github.com/brnocesar/alura/commit/b6c34212c6736cc30467d4c48f012765275a3203)).
+
+### 12.2. Assitindo episódios
+Para marcar os episódios que já foram assitidos adicionamos um _checkbox_ para cada e colocamos a lista de episódios dentro de um _form_ (_commit_ [21ce68e](https://github.com/brnocesar/alura/commit/21ce68e23fe683ad8b50ffb8851330e97f853f24)), pois precisamos enviar essa informação para algum lugar.
+
+Para armazenar a informação de quais episódios ja foram assistidos precisamos adicionar um campo na tabela 'episodios', então rodamos o comando abaixo para criar uma _migration_ que "mexe" nessa tabela (_commit_ [7f694f3](https://github.com/brnocesar/alura/commit/7f694f3d6f342293fdffc69b0ec29fafac5aef69)):
+```sh
+$ php artisan make:migration AdicionaCampoAssitido --table=episodios
+```
+no método `up()` da _migration_ definimos a coluna que será adicionada como sendo do tipo _boolean_ e com valor padrão `false` (_commit_ [93d4796](https://github.com/brnocesar/alura/commit/93d4796431311f83e5e2197f703cb66149b8e42b)), e então rodamos a _migration_.
+
+Para facilitar o "recebimento" da informação de quais episódios ja foram assistidos vamos enviar essa informação da _view_ como um _array_ pelo formulário. Para isso basta adicionar um par de colchetes junto ao _name_ do _checkbox_ e definir seu valor como o ID do episódio, assim, quando o formulário for enviado o campo `episodios` será um vetor dos episódios marcados como assitidos (_commit_ [ac038ec](https://github.com/brnocesar/alura/commit/ac038ecb64b2d112c4d9f42d74221931d7885dc8)).  
+Agora basta definir a rota, adicionála ao _form_ e crir o método que irá receber a requisição do formulário (_commit_ [c246884](https://github.com/brnocesar/alura/commit/c24688459eff11049a16a783d8aca5ac255f52e0)).
+
+No método que recebe a requisição deste formulário escrevemos um código que verifica se cada episódio foi assitido e atribui o devido valor ao atributo `assistido` da tabela de episódios, para isso usamos o método `each()` que executa uma função para cada objeto de uma coleção e ao final o método `push()` que envia todas as modificações de um objeto e nas suas relações para o Banco. Depois que a informação foi tratada e persistida retornamos a última rota acessada (_commit_ [1507628](https://github.com/brnocesar/alura/commit/1507628bc30a120012c47c6f4a0ab7480deeb074)).
+
+Falta definir uma condição para que os _checkboxes_ fiquem marcados e isso é feito avaliando o valor do atributo `assitido` (_commit_ [a10eab4](https://github.com/brnocesar/alura/commit/a10eab4226b940e8705d5cc89f5bb84c18c91a8e)).  
+Também enviamos uma _flash message_ indicando que a lista de episódios assistidos foi modificada (_commit_ [958e799](https://github.com/brnocesar/alura/commit/958e79926f314b67d66b8e8bb2d842867410655f)).
+
+**BUG**: notei que se nenhum episódio fosse selecionado, ao clicar no salvar teríamos um erro pois o campo episódios não existiria na requisição, esse problema foi resolvido [aqui](https://github.com/brnocesar/alura/commit/b621eeee8d004f5961acca8800930c9e6d7055f4).
+
+**REFATORANDO**: vamos refatorar o HTML em nossas Blades referente à exibição das _flash messages_. Então extraio o HTML para um arquivo próprio na raiz da pasta `views` e passo a incluir essa _"subview"_ usando a diretiva `@include()` do Blade(_commit_ [b76e7db](https://github.com/brnocesar/alura/commit/b76e7dba69161e7c0a2b3dd064b7a309a087afd1)).
+
+Para finalizar essa parte da aplicação, vamos exibir o número de episódios assitidos. Para isso escrevemos um método na _model_ `Temporada` que retorna uma coleção que contém apenas os episódios assistidos. Para selecionar os objetos que vão compor essa coleção usamos o método `filter()`, que retorna apenas os objetos que atendem o critério definido. Feito isso, basta acessar este método no objeto `$temporada` na _view_ e usar também o método `count()` (_commit_ [fc536c8](https://github.com/brnocesar/alura/commit/fc536c8f211d9be9d190d5678b2b20092713b176)).
+
+## 13. Autenticação<a name='13'></a>
+
+---
+(_commit_ [](https://github.com/brnocesar/alura/commit/))
+---
+adicionar no composer um comando que crie o arquivo para o banco de dados e rode as migrations
