@@ -13,13 +13,17 @@ Temporadas de {{$serie->nome}}
 @endif
 
 <div class="d-flex justify-content-end">
-    <a href="{{ route('listar_series') }}" class="btn btn-dark mb-2"><i class="fas fa-backspace"></i></a>
+    <a href="{{ route('listar_series') }}" class="btn btn-dark mb-2" style="font-size: 80%">
+        <i class="fas fa-backspace mr-2"></i>Voltar
+    </a>
 </div>
 
 <ul class="list-group">
     @foreach ($serie->temporadas as $temporada)
         <li class="list-group-item">
-            Temporada {{ $temporada->numero }}
+            <a href="#">
+                Temporada {{ $temporada->numero }}
+            </a>
         </li>
     @endforeach
 </ul>
