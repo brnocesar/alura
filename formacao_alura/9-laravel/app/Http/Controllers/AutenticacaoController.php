@@ -26,4 +26,14 @@ class AutenticacaoController extends Controller
 
         return redirect()->back()->withErrors('Usuário e/ou senha incorretos');
     }
+
+    public function create()
+    {
+        return view('autenticacao.create');
+    }
+
+    public function store(Request $request)
+    {
+
+    }
 }
