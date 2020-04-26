@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AutenticacaoController extends Controller
 {
@@ -34,6 +36,13 @@ class AutenticacaoController extends Controller
 
     public function store(Request $request)
     {
+        $credenciais = $request->except('_token');
+        $credenciais['password'] = Hash::make($credenciais['password']);
 
+        $user = User::create($credenciais);
+
+        Auth::login($user);
+        $request->session()->flash('mensagem', "Usuário " . Auth::user()->name . " criado");
+        return redirect()->route('listar_series');
     }
 }

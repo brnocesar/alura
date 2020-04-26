@@ -12,8 +12,8 @@ Criar usuário
     @csrf
 
     <div class="form-group">
-        <label for="nome">Nome</label>
-        <input type="text" name="nome" id="nome" required class="form-control">
+        <label for="name">Nome</label>
+        <input type="text" name="name" id="name" required class="form-control">
     </div>
 
     <div class="form-group">
