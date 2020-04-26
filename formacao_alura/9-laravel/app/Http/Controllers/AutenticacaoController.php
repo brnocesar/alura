@@ -20,7 +20,7 @@ class AutenticacaoController extends Controller
             return redirect()->route('listar_series');
         }
 
-        if ( !Auth::attempt($request->only(['email', 'password'])) ) {
+        if ( !Auth::attempt(['email' => $request->email, 'password' => $request->password]) ) {
             return redirect()->route('listar_series');
         }
 
