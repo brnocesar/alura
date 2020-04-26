@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/series', 'SeriesController@index')->name('listar_series');
+Route::get('/series', 'SeriesController@index')->name('listar_series')->middleware('auth');
 Route::get('/series/criar', 'SeriesController@create')->name('adicionar_serie');
 Route::post('/series/criar', 'SeriesController@store')->name('registra_serie');
 Route::delete('/series/{id}', 'SeriesController@destroy')->name('deleta_serie');
