@@ -12,14 +12,14 @@
 */
 
 Route::get('/series', 'SeriesController@index')->name('listar_series');
-Route::get('/series/criar', 'SeriesController@create')->name('adicionar_serie')->middleware('auth');
-Route::post('/series/criar', 'SeriesController@store')->name('registra_serie')->middleware('auth');
-Route::delete('/series/{id}', 'SeriesController@destroy')->name('deleta_serie')->middleware('auth');
-Route::post('/series/{id}/editar-nome', 'SeriesController@editarNome')->middleware('auth');
+Route::get('/series/criar', 'SeriesController@create')->name('adicionar_serie')->middleware('autenticador');
+Route::post('/series/criar', 'SeriesController@store')->name('registra_serie')->middleware('autenticador');
+Route::delete('/series/{id}', 'SeriesController@destroy')->name('deleta_serie')->middleware('autenticador');
+Route::post('/series/{id}/editar-nome', 'SeriesController@editarNome')->middleware('autenticador');
 
 Route::get('/series/{serieId}/temporadas', 'TemporadasController@index')->name('listar_temporadas');
 Route::get('temporadas/{temporada}/episodios', 'EpisodiosController@index')->name('listar_episodios');
-Route::post('temporadas/{temporada}/episodios/assitir', 'EpisodiosController@assistir')->name('assistir_episodios')->middleware('auth');
+Route::post('temporadas/{temporada}/episodios/assitir', 'EpisodiosController@assistir')->name('assistir_episodios')->middleware('autenticador');
 
 Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
