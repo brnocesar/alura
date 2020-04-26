@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
 
 class Autenticador
 {
@@ -15,6 +16,10 @@ class Autenticador
      */
     public function handle($request, Closure $next)
     {
+        if ( !Auth::check() ) {
+            return redirect()->route('pagina_login');
+        }
+
         return $next($request);
     }
 }
