@@ -10,8 +10,17 @@
     </head>
 
     <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-2 d-flex justify-content-between">
+            <div class="container">
+                <a class="navbar-brand" href="{{ route('listar_series') }}">Séries</a>
+                <a class="navi-link btn btn-danger ml-2 mr-2" style="font-size: 80%" href="{{ route('deslogar') }}">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                </a>
+            </div>
+        </nav>
+
         <div class="container">
-            <div class="jumbotron">
+            <div class="jumbotron" style="background-color: #f1e3fd;">
                 <h1>@yield('cabecalho')</h1>
             </div>
 
