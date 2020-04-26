@@ -26,9 +26,13 @@ Episódios da {{$temporada->numero}}<sup>a</sup> Temporada de {{$temporada->seri
         @endforeach
 
     </ul>
-    <div class="d-flex justify-content-end mt-2">
+
+    <div class="d-flex justify-content-end mt-2 mb-3">
+        @auth
         <button class="btn btn-primary mt-2 mb-2"><i class="fas fa-save"></i></button>
+        @endauth
     </div>
+
 </form>
 
 @endsection
