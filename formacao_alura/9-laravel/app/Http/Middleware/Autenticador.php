@@ -16,7 +16,7 @@ class Autenticador
      */
     public function handle($request, Closure $next)
     {
-        if ( !Auth::check() ) {
+        if ( !$request->is('entrar', 'registrar', 'series', '*/temporadas', '*/episodios') and !Auth::check() ) {
             return redirect()->route('pagina_login');
         }
 
