@@ -2,59 +2,58 @@
 O Laravel é um _framework full stack_ do PHP, ou seja, nos oferece ferramentas para desenvolver a lógica da aplicação (_back-end_) e a interface de interação do usuário (_front-end_). Ele segue a arquitetura MVC e oferece uma série de facilidades que permitem um rápido desenvolvimento. O objetivo aqui será desenvolver uma aplicação para gerenciar as séries que o usuário estiver assistindo.
 
 #### Índice
-1. <a href='#1'>Configurando o ambiente</a>
-1.1. Criando um projeto
-2.2. Estrutura de arquivos
-1.3. A primeira rota
-2. <a href='#2'>_Controllers_</a>
-2.1. Acessando dados da requisição
-3. <a href='#3'>_Views_</a>
-3.1. _View_ de listagem de séries
-3.2. Estilizando a _view_ com Bootstrap
-3.3. _View_ para adicionar série
-3.4. Blades
-4. <a href='#4'>Criando registros</a>
-4.1. Configurando o Banco de Dados
-4.2. _Migrations_
-4.3. _Model_
-4.4. Consultas no Banco
-4.5. Atribuição em massa
-5. <a href='#5'>Lapidando a aplicação</a>
-6. <a href='#6'>Destruindo registros</a>
-7. <a href='#7'>Nomeando rotas</a>
-8. <a href='#8'>Lapidando a aplicação (mais um pouco)</a>
-9. <a href='#9'>Validando os dados</a>
-9.1. `validate()`
-9.2. _Form Request_
-10. <a href='#10'>Novos _models_</a>
-10.1. Relacionamentos
-10.2. _Migrations_
-11. <a href='#11'>CRUD de séries</a>
-11.1. Modificando a criação de séries
-11.2. Listando temporadas
-11.3. Refatorando e separando a "criação de séries"
-11.4. Refatorando a exclusão de séries
-11.5. Refatorando criação de séries (novamente)
-11.6. Alterando o nome de uma série
-12. <a href='#12'>Episódios</a>
-12.1. Listando episódios
-12.2. Assitindo episódios
-13. <a href='#13'>Autenticação</a>
-13.1. `Auth`
-13.2. Protegendo rotas
-13.2.1. Usando `Auth::check()`
-13.2.2. Em cada rota
-13.2.3. No construtor
-13.2.4. No _kernel_
-13.3. Autenticação "própria"
-13.3.1. Entrando
-13.3.2. Registrando novos usuários
-13.4. Melhorando a navegação
-13.5. _Middleware_
-13.5.1. Modificando o _middleware_ padrão para autenticação
-13.5.2. Criando nosso próprio _middleware_ para autenticação
-14. <a href='#14'>Testes automatizados</a>
-15. <a href='#15'></a>
+1. <a href='#1'>Configurando o ambiente</a>  
+1.1. Criando um projeto  
+2.2. Estrutura de arquivos  
+1.3. A primeira rota  
+2. <a href='#2'>_Controllers_</a>  
+2.1. Acessando dados da requisição  
+3. <a href='#3'>_Views_</a>  
+3.1. _View_ de listagem de séries  
+3.2. Estilizando a _view_ com Bootstrap  
+3.3. _View_ para adicionar série  
+3.4. Blades  
+4. <a href='#4'>Criando registros</a>  
+4.1. Configurando o Banco de Dados  
+4.2. _Migrations_  
+4.3. _Model_  
+4.4. Consultas no Banco  
+4.5. Atribuição em massa  
+5. <a href='#5'>Lapidando a aplicação</a>  
+6. <a href='#6'>Destruindo registros</a>  
+7. <a href='#7'>Nomeando rotas</a>  
+8. <a href='#8'>Lapidando a aplicação (mais um pouco)</a>  
+9. <a href='#9'>Validando os dados</a>  
+9.1. `validate()`  
+9.2. _Form Request_  
+10. <a href='#10'>Novos _models_</a>  
+10.1. Relacionamentos  
+10.2. _Migrations_  
+11. <a href='#11'>CRUD de séries</a>  
+11.1. Modificando a criação de séries  
+11.2. Listando temporadas  
+11.3. Refatorando e separando a "criação de séries"  
+11.4. Refatorando a exclusão de séries  
+11.5. Refatorando criação de séries (novamente)  
+11.6. Alterando o nome de uma série  
+12. <a href='#12'>Episódios</a>  
+12.1. Listando episódios  
+12.2. Assitindo episódios  
+13. <a href='#13'>Autenticação</a>  
+13.1. `Auth`  
+13.2. Protegendo rotas  
+13.2.1. Usando `Auth::check()`  
+13.2.2. Em cada rota  
+13.2.3. No construtor  
+13.2.4. No _kernel_  
+13.3. Autenticação "própria"  
+13.3.1. Entrando  
+13.3.2. Registrando novos usuários  
+13.4. Melhorando a navegação  
+13.5. _Middleware_  
+13.5.1. Modificando o _middleware_ padrão para autenticação  
+13.5.2. Criando nosso próprio _middleware_ para autenticação  
+14. <a href='#14'>Testes automatizados</a>  
 
 ## 1. Configurando o ambiente<a name='1'></a>
 ### 1.1. Criando um projeto
