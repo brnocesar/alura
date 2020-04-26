@@ -16,11 +16,11 @@ class AutenticacaoController extends Controller
     {
         if ( Auth::check() ) {
 
-            $request->session()->flash('mensagem', "Usuário já está logado");
+            $request->session()->flash('mensagem', "Usuário " . Auth::user()->name . " já está logado");
             return redirect()->route('listar_series');
         }
 
-        if ( !Auth::attempt(['email' => $request->email, 'password' => $request->password]) ) {
+        if ( !Auth::attempt($request->only('email', 'password')) ) {
             return redirect()->route('listar_series');
         }
 
