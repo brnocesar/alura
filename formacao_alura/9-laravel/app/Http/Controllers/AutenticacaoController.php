@@ -14,6 +14,12 @@ class AutenticacaoController extends Controller
 
     public function entrar(Request $request)
     {
+        if ( Auth::check() ) {
+
+            $request->session()->flash('mensagem', "Usuário já está logado");
+            return redirect()->route('listar_series');
+        }
+
         if ( !Auth::attempt($request->only(['email', 'password'])) ) {
             return redirect()->route('listar_series');
         }
