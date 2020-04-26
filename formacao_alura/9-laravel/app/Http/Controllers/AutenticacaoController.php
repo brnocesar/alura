@@ -43,6 +43,7 @@ class AutenticacaoController extends Controller
         $user = User::create($credenciais);
 
         Auth::login($user);
+
         $request->session()->flash('mensagem', "Usuário " . Auth::user()->name . " criado");
         return redirect()->route('listar_series');
     }

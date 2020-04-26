@@ -13,9 +13,24 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-2 d-flex justify-content-between">
             <div class="container">
                 <a class="navbar-brand" href="{{ route('listar_series') }}">Séries</a>
+
+                @auth
                 <a class="navi-link btn btn-danger ml-2 mr-2" style="font-size: 80%" href="{{ route('deslogar') }}">
                     <i class="fas fa-sign-out-alt mr-2"></i>Sair
                 </a>
+                @endauth
+
+                @guest
+                <span>
+                    <a class="navi-link btn btn-light mb-2 mr-2" style="font-size: 80%" href="{{ route('pagina_registro') }}">
+                        <i class="fas fa-user-plus mr-2"></i>Criar usuário
+                    </a>
+                    <a class="navi-link btn btn-success mb-2 mr-2" style="font-size: 80%" href="{{ route('deslogar') }}">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Entrar
+                    </a>
+                </span>
+                @endguest
+
             </div>
         </nav>
 

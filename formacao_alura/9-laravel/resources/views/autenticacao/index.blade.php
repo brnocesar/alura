@@ -21,14 +21,17 @@ Entrar
         <input type="password" name="password" id="password" required min="1" class="form-control">
     </div>
 
-    <div class="d-flex justify-content-end">
+    <div class="d-flex justify-content-center">
         <button type="submit" class="btn btn-primary mb-2 mr-2" style="font-size: 80%">
             <i class="fas fa-sign-in-alt mr-2"></i>Entrar
         </button>
-        <button href="#" class="btn btn-dark mb-2 mr-2" style="font-size: 80%">
-            <i class="fas fa-user-plus mr-2"></i>Criar usuário
-        </button>
     </div>
 </form>
+
+<div class="d-flex justify-content-center">
+    <a class="btn btn-dark mb-2 mr-2" style="font-size: 80%" href="{{ route('pagina_registro') }}">
+        <i class="fas fa-user-plus mr-2"></i>Criar usuário
+    </a>
+</div>
 
 @endsection
