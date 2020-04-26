@@ -23,10 +23,11 @@ class AutenticacaoController extends Controller
         }
 
         if ( !Auth::attempt($request->only('email', 'password')) ) {
-            return redirect()->route('listar_series');
+            return redirect()->back()->withErrors('Usuário e/ou senha incorretos');
         }
 
-        return redirect()->back()->withErrors('Usuário e/ou senha incorretos');
+        $request->session()->flash('mensagem', "Usuário " . Auth::user()->name . " logado");
+        return redirect()->route('listar_series');
     }
 
     public function create()
@@ -44,5 +45,12 @@ class AutenticacaoController extends Controller
         Auth::login($user);
         $request->session()->flash('mensagem', "Usuário " . Auth::user()->name . " criado");
         return redirect()->route('listar_series');
+    }
+
+    public function sair(Request $request)
+    {
+        Auth::logout();
+
+        return redirect()->route('pagina_login');
     }
 }
