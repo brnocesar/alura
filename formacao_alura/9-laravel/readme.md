@@ -3,20 +3,58 @@ O Laravel é um _framework full stack_ do PHP, ou seja, nos oferece ferramentas 
 
 #### Índice
 1. <a href='#1'>Configurando o ambiente</a>
+1.1. Criando um projeto
+2.2. Estrutura de arquivos
+1.3. A primeira rota
 2. <a href='#2'>_Controllers_</a>
+2.1. Acessando dados da requisição
 3. <a href='#3'>_Views_</a>
+3.1. _View_ de listagem de séries
+3.2. Estilizando a _view_ com Bootstrap
+3.3. _View_ para adicionar série
+3.4. Blades
 4. <a href='#4'>Criando registros</a>
-5. <a href='#5'>Lapidando a aplicação (parte 1)</a>
+4.1. Configurando o Banco de Dados
+4.2. _Migrations_
+4.3. _Model_
+4.4. Consultas no Banco
+4.5. Atribuição em massa
+5. <a href='#5'>Lapidando a aplicação</a>
 6. <a href='#6'>Destruindo registros</a>
 7. <a href='#7'>Nomeando rotas</a>
-8. <a href='#8'>Lapidando a aplicação (parte 2)</a>
+8. <a href='#8'>Lapidando a aplicação (mais um pouco)</a>
 9. <a href='#9'>Validando os dados</a>
+9.1. `validate()`
+9.2. _Form Request_
 10. <a href='#10'>Novos _models_</a>
-10. <a href='#11'>CRUD de séries</a>
-10. <a href='#12'>Episódios</a>
-10. <a href='#13'>Autenticação</a>
-10. <a href='#14'></a>
-10. <a href='#15'></a>
+10.1. Relacionamentos
+10.2. _Migrations_
+11. <a href='#11'>CRUD de séries</a>
+11.1. Modificando a criação de séries
+11.2. Listando temporadas
+11.3. Refatorando e separando a "criação de séries"
+11.4. Refatorando a exclusão de séries
+11.5. Refatorando criação de séries (novamente)
+11.6. Alterando o nome de uma série
+12. <a href='#12'>Episódios</a>
+12.1. Listando episódios
+12.2. Assitindo episódios
+13. <a href='#13'>Autenticação</a>
+13.1. `Auth`
+13.2. Protegendo rotas
+13.2.1. Usando `Auth::check()`
+13.2.2. Em cada rota
+13.2.3. No construtor
+13.2.4. No _kernel_
+13.3. Autenticação "própria"
+13.3.1. Entrando
+13.3.2. Registrando novos usuários
+13.4. Melhorando a navegação
+13.5. _Middleware_
+13.5.1. Modificando o _middleware_ padrão para autenticação
+13.5.2. Criando nosso próprio _middleware_ para autenticação
+14. <a href='#14'>Testes automatizados</a>
+15. <a href='#15'></a>
 
 ## 1. Configurando o ambiente<a name='1'></a>
 ### 1.1. Criando um projeto
@@ -61,7 +99,7 @@ Então vamos mover o código que está na rota para esta classe, fazendo as devi
 No lugar da função na rota informamos: o caminho relativo à pasta Controllers (`SeriesController`) e o método que será executado (`listarSeries`), unidos por uma arroba (`@`) (_commit_ [b998c74](https://github.com/brnocesar/alura/commit/b998c742a14108e05ea1c8260262f10fb21726d7)).  
 Feito isso basta acessar a rota novamente e conferir que está tudo certo (é para estar tudo certo, se não tiver você fez alguma coisa de errado, ou a sintaxe do Laravel mudou desde que isso foi escrito).
 
-## 2.1. Acessando dados da requisição
+### 2.1. Acessando dados da requisição
 Podemos [injetar uma dependência](https://github.com/brnocesar/alura/tree/master/php/formacao_php/8-mvc#9-4) no nosso método para que ele possa receber dados de uma requisição através da classe `Request`. Com isso temos acesso a várias informações interessantes como a URL da requisição e aos parâmetros passados (_commit_ [56c9087](https://github.com/brnocesar/alura/commit/56c90871bc1fef44b67b247606894d41f4d39a54)).
 
 ## 3. _Views_<a name='3'></a>
@@ -188,6 +226,7 @@ Para nomear uma rota basta aplicar o método `name()` nesta rota e passar o valo
 
 ## 8. Lapidando a aplicação (parte 2)<a name='8'></a>
 Podemos mexer no estilo das _views_ para deixa-las mais bonitinhas, alinhando os elementos e adicionando ícones (_commit_ [3abd552](https://github.com/brnocesar/alura/commit/3abd552a5f6f1a4d301ad7e1bebf8bff41e658ab)).
+
 ## 9. Validando os dados<a name='9'></a>
 ### 9.1. `validate()`
 Para validar os dados vindos de uma requisição temos o método `validate()` da classe Request. Para usá-lo basta passar um _array_ associativo em que a chave é o nome do campo (da requisição) e o valor são as regras de validação (_commit_ [365857e](https://github.com/brnocesar/alura/commit/365857e84acdcc6e8c59d75914e3f9a95934be12)).
@@ -333,8 +372,109 @@ Também enviamos uma _flash message_ indicando que a lista de episódios assisti
 Para finalizar essa parte da aplicação, vamos exibir o número de episódios assitidos. Para isso escrevemos um método na _model_ `Temporada` que retorna uma coleção que contém apenas os episódios assistidos. Para selecionar os objetos que vão compor essa coleção usamos o método `filter()`, que retorna apenas os objetos que atendem o critério definido. Feito isso, basta acessar este método no objeto `$temporada` na _view_ e usar também o método `count()` (_commit_ [fc536c8](https://github.com/brnocesar/alura/commit/fc536c8f211d9be9d190d5678b2b20092713b176)).
 
 ## 13. Autenticação<a name='13'></a>
+### 13.1. `Auth`
+Para proteger a aplicação é necessário que suas rotas sejam protegidas de forma que apenas usuários autorizados possam acessá-las. Portanto a aplicação deve ser capaz gerenciar registros de usuários e controlar o que cada um pode acessar. O Laravel já fornece uma estrutura bem completa, basta rodar o comando:
+```sh
+$ php artisan make:auth
+```
+e então vemos que alguns arquivos foram criados (um _controller_ e algumas _views_) e o arquivo de rotas foi modificado (_commit_ [b619617](https://github.com/brnocesar/alura/commit/b6196179f8073f2ba6663724cfa73bb0656f21e6)).
+
+Agora se acessar-mos as rotas `/login` e `register`, vemos que existem páginas prontas para serem usadas, podemos inclusive nos registrar.
+
+### 13.2. Protegendo rotas
+Mesmo com essa nova funcionalidade, se fizermos *logout*, ainda conseguiremos acessar as antigas rotas, então vamos ver formas de protegê-las.
+
+#### 13.2.1. Usando `Auth::check()`
+Podemos verificar se o usuário está logado diretamente no método acessado, avaliando o retorno do método estático `check()` da classe **Auth** (_commit_ [fa7c443](https://github.com/brnocesar/alura/commit/fa7c443599a9d42f509aa5b9ecd9f5d79debbca1)).
+
+#### 13.2.2. Em cada rota
+Podemos informar em cada uma das rotas se ela é protegida por um "autenticador", adicionando o método `middleware('auth')`. Quando fazemos isso dizemos ao Laravel que alguma classe ou serviço vai realizar uma manipulação nessa requisição antes que ela chegue ao _controller_, nesse caso é a classe **Auth** (_commit_ [09ae1f4](https://github.com/brnocesar/alura/commit/09ae1f49d8b4e6c6eb431999145a6dfc91185a7f)).
+
+#### 13.2.3. No construtor
+Os dois processos acima são bastante repetitivos e penosos, se quisermos proteger todas as rotas de um determinado _controller_ podemos chamar o método `middleware()` no construtor. Assim, sempre que um método desse _controller_ for acessado, e consequentemente uma instância sua for criada, e _middleware_ será executado (_commit_ [e461c76](https://github.com/brnocesar/alura/commit/e461c76684fed5a19d1c6e9b6722a8dbb814b25a)).
+
+#### 13.2.4. No _kernel_
+Outro local em que podemos definir qual _middleware_ vai ser executado e onde é na classe `app/Http/Kernel.php`. Essa classe possui alguns atributos queTestes automatizados influênciam a aplicação da seguinte forma:
+- `$middleware`: especifica os "manipuladores" (_handlers_) executados globalmente, ou seja, para toda aplicação;
+- `$middlewareGroups`: permite especificar o grupo em que um _handler_ será utilizado, por exemplo, nas rotas definidas em `web` ou `api`;
+- `$routeMiddleware`: e onde são definidos os nomes dos _handlers_.
+
+Poderiamos adicionar o _middleware_ de autenticação no grupo `web` (_commit_ [a2150fe](https://github.com/brnocesar/alura/commit/a2150fed62f7f2b3fd7d48f11b4605a7eaa86bf3)), mas para que isso seja efetivo, precisamos encontrar uma forma de transformar as rotas `/login`, `/register` e  etc em exceçẽs. Pois se isso não for feito a aplicação vai entrar em um _loop_ infinito e receberemos um "redirecionamento incorreto", já que usuários não-autenticados são redirecionados para a rota `/login` que também está protegida.
+
+### 13.3. Autenticação "própria"
+Vamos criar nossa "própria" autenticação, mas ainda assim usando alguns recursos do Laravel quando for conveniente. 
+
+#### 13.3.1. Entrando
+Vamos criar as rotas para: acessar a página de _login_ e submeter as credênciais; devemos criar a página com o formulário de _login_; e o _controller_ responsável por realizar essas ações.
+
+Note que as rotas criadas acessam a mesma URI, de resto cada uma possui um verbo, acessam diferentes métodos e possuem nomes distintos (_commit_ [cdb8369](https://github.com/brnocesar/alura/commit/cdb83695db7169f0f26a3973ba451666f94bf06f)).
+
+No formulário da _view_ não precisamos definir uma rota no atributo `action` da tag `<form>` pois a submissão ocorre para a mesma URI, apenas temos que especificar o verbo da requisição para que o Laravel saiba qual rota usar. Além disso note que o nome dos campos estão em inglês, isso é devido aos métodos do Laravel que vamos usar e esperam receber campos com esses nomes (_commit_ [267a21d](https://github.com/brnocesar/alura/commit/267a21d7c2b1e7688c690c567d8271206d67fbec)).
+
+No método que realiza o login passamos as credênciais do usuário como um _array_ associativo para o méto estático `Auth::attempt()` que tenta realizar o _login_ e retorna `true` em caso de sucesso. Quando isso acontece o Laravel armazena na sessão que existe um usuário logado e qual é.
+
+Se o _login_ for realizado redirecionamos para a página de listar séries e do contrário redirecionamos de volta com uma _flash massage_ informando o erro (_commit_ [ca9ba2b](https://github.com/brnocesar/alura/commit/ca9ba2bd7e1e744d322dd735391dc7820ee3a2b5)). 
+
+Mas perceba que se já estamos logados e tentamos realizar _login_ novamente, recebemos o mesmo erro, então adicionamos uma condição que avalia isso e envia uma mensagem mais adequada (_commit_ [f98c03f](https://github.com/brnocesar/alura/commit/f98c03f6b514d726175275ac8e75785ae5270a33)). 
+
+Se tivéssimos nomeado os campos do formulário com outros nomes, que não os usados pelos componentes de autenticação do Laravel, teríamos que específica-los ao passar o _array_ para o método `attempt()` (_commit_ [6849064](https://github.com/brnocesar/alura/commit/6849064f7b5595d6ba21ce6e8163ffc374c4ad8e)).
+
+Por fim protegêmos todas as rotas que acessam algum método do _controller_ de séries (_commit_ [c2e3172](https://github.com/brnocesar/alura/commit/c2e317210cbb6c0a3756c59a672cabc0e01c2ebe)).
+
+#### 13.3.2. Registrando novos usuários
+Vamos adicionar essa funcionalidade na autenticação "própria". No _controller_ da autenticaçao própria criamos os método que vão retornar a paǵina com o formulário e o que vai persistir os dados no Banco.
+
+Em seguida criamos as rotas de forma bem similar ao que foi feito para o _login_ próprio, fazemos elas "iguais".
+
+Criamos a _view_ com o formulário (_commit_ [71baa0d](https://github.com/brnocesar/alura/commit/71baa0d4692a22584cfbd9f542e3b0b761e5136c)).
+
+E finalmente, implementamos a lógica no _controller_ (_commit_ [171917c](https://github.com/brnocesar/alura/commit/171917cad4b98f0a9bf314c3968a0d3ea4fac8ee)). Novamente, o fato de usarmos os nomes dos atributos do _model_ **User** nos campos do fomrulário nos traz uma facilidade na hora de criar um objeto desta classe. Mas perceba que antes disso usamos o método `make()` para criptografar a senha, essa é a forma padrão do Laravel criptografar informações.
+
+### 13.4. Melhorando a navegação
+Vamos adicionar mehorias na navegação começando por adicionar uma _navbar_ no arquivo `lauoyt.blade.php`, para maiores detalhes consulte a [documentação do Bootstrap](https://getbootstrap.com/docs/4.0/components/navbar/). Nesta _navbar_ vamos ter um botão que envia para a página de listar séries e outro que realiza o _logout_. 
+
+Como o código responsável por deslogar um usuário é pequeno, poderíamos escrevê-lo até mesmo na própria definição da rota usando uma função anônima (_commit_ [de2f0c4](https://github.com/brnocesar/alura/commit/de2f0c42b12010939ead28c6c67c019bd73f42c0)). Na imensa maioria dos casos, isso será considerado uma prática ruim, então vamos escrever um método no _controller_ de autenticação própria (_commit_ [81f1725](https://github.com/brnocesar/alura/commit/81f172525f42d68e5b6bb2297c45a21e39348690)).
+
+Agora vamos começar a esconder/mostrar alguns elementos em função de ser um usuário autenticado ou não que está acessando. O primeiro elemento que vamos mexer é o botão de "Sair", que queremos apresentá-lo apenas se o usuário está logado, do contrário exibe opções relativas a _login_ e registro (_commit_ [2703d65](https://github.com/brnocesar/alura/commit/2703d65de3e622c407799a399681c8493e5e624d)).
+
+Seguindo essa linha, vamos alterar os níveis de permissão relativos às séries. Primeiro retiramos o _middleware_ de autenticação do _controller_ de séries e o colocamos apenas nas rotas que não queremos permitir acesso para "visitantes" (_commit_ [50ca623](https://github.com/brnocesar/alura/commit/50ca6231b7d87198384885af8ee7d022ec10f5fa)). 
+
+Escondemos os elementos (botões, campos, _checkboxes_) usados para acessar as ações proibidas aos visitantes (_commit_ [c031d3f](https://github.com/brnocesar/alura/commit/c031d3f48bdfc6eac237c3ff30c066d14ad55751)).
+
+### 13.5. _Middleware_
+Quando tentamos acessar uma rota protegida, como visitante, somos redirecionados para a rota `/login` que é página de _login_ do Laravel. Se quisermos mudar isso, para que o redirecionamento seja feito para a rota `/entrar` temos duas opções: modificar o _middleware_ padrão (que está sendo utilizado neste momento) ou criar nosso próprio.
+
+#### 13.5.1. Modificando o _middleware_ padrão para autenticação
+Para encontrar este _middleware_ podemos ir através do arquivo `app/Http/Kernel.php` e no vetor `$routeMiddleware` vemos que ele se encontra na pasta `\App\Http\Middleware` sob o nome de `Authenticate.php`. 
+
+Abrindo esse arquivo vemos que existe apenas um método nessa classe e a única coisa que ele faz é retornar a rota `/login` de acordo com uma condição.
+
+Para resolver nosso problema por esse caminho basta trocar pela rota `/entrar` (_commit_ [071d0c0](https://github.com/brnocesar/alura/commit/071d0c0b9d02bed07167cca0a4376f39405b7172)).
+
+#### 13.5.2. Criando nosso próprio _middleware_ para autenticação
+Para criar um _middleware_ temos um comando do Artisan:
+```sh
+$ php artisan make:middleware Autenticador
+```
+ao rodar este comando será criado uTestes automatizadosm arquivo chamado `Autenticador.php` na pasta `\App\Http\Middleware`. Neste arquivo temos um método `handle()` que recebe dois parâmetros: uma `$request` e uma função do PHP indicando o próximo _middleware_ a ser executado (_commit_ [0a133b0](https://github.com/brnocesar/alura/commit/0a133b0ddbbd4911b9f9110854d4bcb3eb44ffb7)). 
+
+Mas vamos discorrer mais um pouco sobre o que é um _middleware_ e para que ele serve. Quando acessamos uma rota é com o objetivo de executar algum método (em geral) em um _controller_, que pode servir para retornar um _view_ ou persistir algum dado no Banco. Ou seja, nós enviamos informações (requisição) **para** o método e esperamos obter uma resposta de acordo com sua execução.
+
+Os _middlewares_ são como "filtros" que vão atuar sobre a requisição ou resposta desse código, como por exemplo, existe um _middleware_ que verifica a existência do token `@csrf` em requisições com verbo POST (não tenho certeza se é essa a condição pra verificar isso<sup>(*)</sup>).
+
+Para "filtrar" a requisição, ou seja, fazer algo antes do _controller_ ser executado, basta adicionar o código responsável por isso no corpo da função `handle()`. Se for pra avaliar a resposta, ainda não sei, mas ja deixo anotado aqui pra procurar melhor depois<sup>(*)</sup>.
+
+Nesse caso, o _middleware_ será usaTestes automatizadosdo em rotas protegidas é então queremos que ele verifique se o usuário está logado e se não estiver deve redirecionar para a rota `/entrar` (_commit_ [06a3c8c](https://github.com/brnocesar/alura/commit/06a3c8c4ca6c47b7ba2084a782f8443045bc3674)).
+
+Para facilitar o uso do nosso autenticador próprio podemos definir um nome para ele no arquivo `app/Http/Kernel.php` no vetor `$routeMiddleware` (_commit_ [52398e4](https://github.com/brnocesar/alura/commit/52398e4b3ac3c36aa4f43e265f45ba6fedcb19b1)).
+
+Mas agora que usamos um _middleware_ em que temos um maior controle do que ele faz, podemos testar mais uma vez adicionar o autenticador no grupo de _middlewares_ executados para todas as rotas. Para isso é claro, devemos especificar as rotas que ele deve ignorar e fazemos isso avaliando o retorno de `$request->is()` que recebe "padrões" de URI como parâmtro (_commit_ [d55662f](https://github.com/brnocesar/alura/commit/d55662f84f6af0850cb4b037a1b52f97e089b778)).
+
+## 14. Testes automatizados<a name='14'></a>
+
 
 ---
 (_commit_ [](https://github.com/brnocesar/alura/commit/))
 ---
 adicionar no composer um comando que crie o arquivo para o banco de dados e rode as migrations
+composer pos-clone: instala as dependencias, cria .env, gera chave, cria banco sqlite e roda as migrations, levanta servidor, abre navegador no localhost
