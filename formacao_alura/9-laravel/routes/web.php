@@ -23,3 +23,6 @@ Route::post('temporadas/{temporada}/episodios/assitir', 'EpisodiosController@ass
 
 Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/entrar', 'AutenticacaoController@index')->name('pagina_login');
+Route::post('/entrar', 'AutenticacaoController@entrar')->name('realizar_login');
