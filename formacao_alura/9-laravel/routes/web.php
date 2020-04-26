@@ -20,3 +20,6 @@ Route::post('/series/{id}/editar-nome', 'SeriesController@editarNome');
 Route::get('/series/{serieId}/temporadas', 'TemporadasController@index')->name('listar_temporadas');
 Route::get('temporadas/{temporada}/episodios', 'EpisodiosController@index')->name('listar_episodios');
 Route::post('temporadas/{temporada}/episodios/assitir', 'EpisodiosController@assistir')->name('assistir_episodios');
+
+Auth::routes();
+Route::get('/home', 'HomeController@index')->name('home');
