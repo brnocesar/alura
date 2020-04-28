@@ -530,9 +530,3 @@ Podemos preparar o cenário para o teste na função `setUp()`, onde apenas cria
 3. sabemos que quando uma série é excluída seu `'nome'` é retornado, então verificamos se o retorno da exclusão é uma _string_;
 4. verificamos o valor da _string_ retornada, que deve ser igual ao nome passado na criação da série; e
 5. nos asseguramos que não existe um registro na tabela `'series'` com o ID da série excluída (_commit_ [81e89bc](https://github.com/brnocesar/alura/commit/81e89bc25d3359247cd47667faaaf95bf50901ee)).
-
----
-(_commit_ [](https://github.com/brnocesar/alura/commit/))
----
-adicionar no composer um comando que crie o arquivo para o banco de dados e rode as migrations
-composer pos-clone: instala as dependencias, cria .env, gera chave, cria banco sqlite e roda as migrations, levanta servidor, abre navegador no localhost
