@@ -32,5 +32,9 @@ class TemporadaTest extends TestCase
 
         $episodiosAssistidos = $temporada->getEpisodiosAssistidos();
         $this->assertCount(2, $episodiosAssistidos);
+
+        $episodiosAssistidos->each(function (Episodio $episodio){
+            $this->assertTrue($episodio->assistido);
+        });
     }
 }
