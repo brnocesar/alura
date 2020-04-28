@@ -57,6 +57,15 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
+        ],
+        "testar": [
+            "composer install",
+            "cp .env.example .env",
+            "php artisan key:generate",
+            "touch database/database.sqlite",
+            "php artisan migrate",
+            "php artisan serve",
+            "xdg-open http://localhost:8000/"
         ]
     }
 }
