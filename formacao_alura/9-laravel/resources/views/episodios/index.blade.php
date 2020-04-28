@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('cabecalho')
-Episódios da {{$temporada->numero}}<sup>a</sup> Temporada de {{$temporada->serie->nome}}
+Episódios da {{$temporada->numero}}<sup>a</sup> Temporada de <i>{{ $temporada->serie->nome }}</i>
 @endsection
 
 @section('conteudo')

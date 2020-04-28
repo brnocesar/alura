@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('cabecalho')
-Temporadas de {{$serie->nome}}
+Temporadas de <i>{{ $serie->nome }}</i>
 @endsection
 
 @section('conteudo')

@@ -15,9 +15,14 @@
                 <a class="navbar-brand" href="{{ route('listar_series') }}">Séries</a>
 
                 @auth
-                <a class="navi-link btn btn-danger ml-2 mr-2" style="font-size: 80%" href="{{ route('deslogar') }}">
-                    <i class="fas fa-sign-out-alt mr-2"></i>Sair
-                </a>
+                <span>
+                    <span class="text-warning">
+                        Bem-vindo <strong>{{ Auth::user()->name }}</strong>
+                    </span>
+                    <a class="navi-link btn btn-danger ml-4 mr-2" style="font-size: 75%" href="{{ route('deslogar') }}">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                    </a>
+                </span>
                 @endauth
 
                 @guest
