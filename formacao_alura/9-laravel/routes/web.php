@@ -11,6 +11,10 @@
 |
 */
 
+Route::get('/', function (){
+    return redirect()->route('listar_series');
+});
+
 Route::get('/series', 'SeriesController@index')->name('listar_series');
 Route::get('/series/criar', 'SeriesController@create')->name('adicionar_serie')->middleware('autenticador');
 Route::post('/series/criar', 'SeriesController@store')->name('registra_serie')->middleware('autenticador');
