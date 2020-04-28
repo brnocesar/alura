@@ -470,7 +470,66 @@ Para facilitar o uso do nosso autenticador próprio podemos definir um nome para
 Mas agora que usamos um _middleware_ em que temos um maior controle do que ele faz, podemos testar mais uma vez adicionar o autenticador no grupo de _middlewares_ executados para todas as rotas. Para isso é claro, devemos especificar as rotas que ele deve ignorar e fazemos isso avaliando o retorno de `$request->is()` que recebe "padrões" de URI como parâmtro (_commit_ [d55662f](https://github.com/brnocesar/alura/commit/d55662f84f6af0850cb4b037a1b52f97e089b778)).
 
 ## 14. Testes automatizados<a name='14'></a>
+O PHPUnit é um _framework_ de testes do PHP que vem integrado ao Laravel por padrão e roda na linha de comando.
 
+### 14.1. Primeiro teste - `Temporada`
+O primeiro teste que faremos será em cima do _model_ `Temporada`, vamos verificar se o método `getEpisodiosAssistidos()` está retornando a quantidade correta de episódios assistidos. 
+
+Podemos criar um arquivo para testes usando o Artisan:
+```sh
+$ php artisan make:test TemporadaTest --unit
+```
+com este comando criamos um arquivo de nome `TemporadaTest.php` na pasta `tests/Unit` (_commit_ [a01f739](https://github.com/brnocesar/alura/commit/a01f7393cd0a9c9e21d18fe973f35d93c0a06aa8)), se não for passado o parâmetro `--unit` o arquivo será criado na pasta `tests/Feature`. Não sei (ainda) qual a implicação disso.
+
+**OBS. 1:** É importante se atentar que o nome do arquivo de testes deve terminal com `Test`, pode ter qualquer coisa antes, desde que o final seja `Test` (hehe).  
+**OBS. 2:** As funções dentro de um arquivo de testes podem ter qualquer nome, **desde que** comecem com `test`.
+
+No arquivo criado já vem um teste para verificar se `true` é `true`. Além disso, por padrão projetos Laravel vem com outros dois testes: `tests/Unit/ExampleTest.php` é igual mencionado acima; e `tests/Feature/ExampleTest.php` verifica se se a rota `/` existe. Você pode excluí-los se quiser.
+
+No método `testeExample()` apagamos o exemplo que ja veio e começar a adicionar o código do nosso teste: 
+- criamos uma instância de Temporada e **algumas** de Episódio;
+- atribuímos `true` ou `false` para o atributo `assistido` dos objetos Episodio (da forma como você quiser);
+- usando o método `add()`, relacionamos os objetos Episodio à nossa instânica de Temporada;
+- obtemos a coleção de episódios assistidos com o método `getEpisodiosAssistidos()` (_commit_ [40b62a3](https://github.com/brnocesar/alura/commit/40b62a369b92e9580247e7d9d5c3a6ad3a8c05c6))  
+
+chamamos o método `$this->assertCount()` passando como parâmetros o tamanho esperado para a coleção e a coleção que será avaliada. Para rodar os testes usamos o comando abaixo:
+```sh
+$ vendor/bin/phpunit
+```
+
+Agora podemos adicionar outra verificação: se o atributo `assitido` possui valor `true` para todos os objetos da coleção de episódios assistidos (_commit_ [1011dc5](https://github.com/brnocesar/alura/commit/1011dc5638187887b6dc71f19082bb4205a68d81)).
+
+Considerando que teremos vários testes para a classe Temporada, por uma questão de organização, faz mais sentido separá-los em métodos dentro do arquivo de testes para Temporada. Para preparar o cenário de testes apenas uma vez e não ficar repetindo código, podemos utilizar o método `setUp()` fornecido pelo PHPUnit. Este método é executado antes de cada teste, então podemos preparar o cenrário de testes nesse método e ao final de sua execução atribuir isso para uma propriedade da classe de testes (_commit_ [b55442f](https://github.com/brnocesar/alura/commit/b55442f195d34f8333580151418d32cdb44ddd41)).
+
+### 14.2. Testando inserção de registros no Banco - `CriadorDeSerie`
+Agora vamos realizar testes acerca da criação de registros no Banco e vamos fazê-los em cima do _service_ `CriadorDeSerie`. Após criar o arquivo para testes instânciamos o "criador de séries" e criamos uma série de nome qualquer, com uma temporada e um episódio por temporada.
+
+Então adicionamos as verificações:
+1. `$serieCriada` é uma instância de `Serie`?
+2. na tabela `'series'` existe uma série com nome `$nomeSerie`?
+3. na tabela `'temporadas'` existe algum registro com `'serie_id'` igual a `$serieCriada->id` e com `'numero'` igual a `1`?
+4. na tabela `'episodios'` existe algum registro com `'numero'` igual a `1`? (_commit_ [68c5f5d](https://github.com/brnocesar/alura/commit/68c5f5dad760267f042e0f64111e94282ec8711e))
+
+### 14.3. Rodando os teste em um Banco "na meméria"
+Perceba que o último teste de fato realizou a persistência no Banco da aplicação e podemos contonar esse problema realizando os testes em um Banco dedicado a essa finalidade.
+
+Para isso devemos criar um arquivo para as variáveis de ambiente desse Banco chamado `.env.testing` e precisamos colocar apenas as as variáveis que dizem respeito ao Banco. Mais ainda, o SQLite permite usar um Banco na memória, bastando definir o nome da Base de Dados como `:memory:`. Dessa forma, o conteúdo do arquivo `.env.testing` será:
+```env
+DB_CONNECTION=sqlite
+DB_DATABASE=:memory:
+```
+
+Além disso devemos dar um `use` na _trait_ `RefreshDatabase` para que esse Banco seja criado na memória (_commit_ [83a5dd9](https://github.com/brnocesar/alura/commit/83a5dd922b368aeb68e275729e4739f19225e445)).
+
+### 14.4. Testando exclusão de registros no Banco - `RemovedorDeSerie`
+Esse é o caso de um teste em que executamos a ação testada entre _asserts_, pois precisamos nos certificar de que o registro que será excluído de fato existia.
+
+Podemos preparar o cenário para o teste na função `setUp()`, onde apenas criamos uma série. Na função em que de fato vão ocorrer os testes:
+1. primeiramente, avaliamos se o registro que vamos excluir existe no Banco;
+2. instânciamos o `RemovedorDeSerie` e rnta de testes do PHP que pode ser rodada na linhaemovemos a série (criada no `setUp()`) atribuindo seu retorno a uma variável;
+3. sabemos que quando uma série é excluída seu `'nome'` é retornado, então verificamos se o retorno da exclusão é uma _string_;
+4. verificamos o valor da _string_ retornada, que deve ser igual ao nome passado na criação da série; e
+5. nos asseguramos que não existe um registro na tabela `'series'` com o ID da série excluída (_commit_ [81e89bc](https://github.com/brnocesar/alura/commit/81e89bc25d3359247cd47667faaaf95bf50901ee)).
 
 ---
 (_commit_ [](https://github.com/brnocesar/alura/commit/))
