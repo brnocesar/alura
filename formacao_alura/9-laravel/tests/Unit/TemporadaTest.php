@@ -10,13 +10,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class TemporadaTest extends TestCase
 {
-    /**
-     * A basic unit test example.
-     *
-     * @return void
-     */
-    public function testExample()
+    private $temporada;
+
+    protected function setUp(): void
     {
+        parent::setUp();
+
         $temporada = new Temporada();
 
         $episodio1 = new Episodio();
@@ -30,11 +29,23 @@ class TemporadaTest extends TestCase
         $temporada->episodios->add($episodio2);
         $temporada->episodios->add($episodio3);
 
-        $episodiosAssistidos = $temporada->getEpisodiosAssistidos();
+        $this->temporada = $temporada;
+    }
+
+    public function testBuscaEpisodiosAssitidos()
+    {
+        $episodiosAssistidos = $this->temporada->getEpisodiosAssistidos();
         $this->assertCount(2, $episodiosAssistidos);
 
         $episodiosAssistidos->each(function (Episodio $episodio){
             $this->assertTrue($episodio->assistido);
         });
+    }
+
+    public function testBuscaTodosEpisodios()
+    {
+        $episodios = $this->temporada->episodios;
+
+        $this->assertCount(3, $episodios);
     }
 }
