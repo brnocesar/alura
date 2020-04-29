@@ -1,0 +1,53 @@
+{
+    "name": "brnocesar/buscador-formacoes-alura",
+    "description": "Projeto de aprendizado que lista as formações da Alura",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Bruno Cesar",
+            "email": "bruunoocesar@gmail.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^6.5",
+        "symfony/dom-crawler": "^5.0",
+        "symfony/css-selector": "^5.0"
+    },
+    "autoload": {
+        "classmap": [
+            "./Teste.php"
+        ],
+        "files": [
+            "./funcoes.php"
+        ],
+        "psr-4": {
+            "Alura\\BuscadorDeFormacoes\\": "src/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.5",
+        "squizlabs/php_codesniffer": "*",
+        "phan/phan": "^2.4"
+    },
+    "scripts": {
+        "cs": "phpcs --standard=PSR12 src/",
+        "phan": "phan --allow-polyfill-parser",
+        "check": [
+            "@phan",
+            "@cs"
+        ],
+        "gitcommit": [
+            "git add .",
+            "git commit -m \"Commit automático pelo composer\""
+        ],
+        "mensagem-teste1": "Alura\\BuscadorDeFormacoes\\TesteDoScript::exibeMensagemScript",
+        "mensagem-teste2": "Teste::metodo"
+    },
+    "scripts-descriptions": {
+        "check": "Roda as verificações do código: PHPCS e PHAN",
+        "mensagem-teste1": "Executa método de uma classe que está no vendor namespace",
+        "mensagem-teste2": "Executa método de uma classe que está na raiz do projeto"
+    },
+    "license": "GPL-3.0",
+    "bin": ["/buscar-cursos"]
+}
