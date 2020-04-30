@@ -24,7 +24,7 @@ Adicionar Série
             <input type="number" class="form-control" id="qtd_temporadas" name="qtd_temporadas">
         </div>
         <div class="col col-2">
-            <label for="ep_por_temporada">Ep. por temporada</label>
+            <label for="ep_por_temporada">Ep. / temporada</label>
             <input type="number" class="form-control" id="ep_por_temporada" name="ep_por_temporada">
         </div>
     </div>
