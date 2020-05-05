@@ -463,7 +463,7 @@ Os _middlewares_ são como "filtros" que vão atuar sobre a requisição ou resp
 
 Para "filtrar" a requisição, ou seja, fazer algo antes do _controller_ ser executado, basta adicionar o código responsável por isso no corpo da função `handle()`. Se for pra avaliar a resposta, ainda não sei, mas ja deixo anotado aqui pra procurar melhor depois<sup>(*)</sup>.
 
-Nesse caso, o _middleware_ será usaTestes automatizadosdo em rotas protegidas é então queremos que ele verifique se o usuário está logado e se não estiver deve redirecionar para a rota `/entrar` (_commit_ [06a3c8c](https://github.com/brnocesar/alura/commit/06a3c8c4ca6c47b7ba2084a782f8443045bc3674)).
+Nesse caso, o _middleware_ será usado em rotas protegidas é então queremos que ele verifique se o usuário está logado e se não estiver deve redirecionar para a rota `/entrar` (_commit_ [06a3c8c](https://github.com/brnocesar/alura/commit/06a3c8c4ca6c47b7ba2084a782f8443045bc3674)).
 
 Para facilitar o uso do nosso autenticador próprio podemos definir um nome para ele no arquivo `app/Http/Kernel.php` no vetor `$routeMiddleware` (_commit_ [52398e4](https://github.com/brnocesar/alura/commit/52398e4b3ac3c36aa4f43e265f45ba6fedcb19b1)).
 
