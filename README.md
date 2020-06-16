@@ -11,5 +11,6 @@ Esse repositório reúne guias, notas e projetos de estudos em PHP. A maior part
 7. <a href='https://github.com/brnocesar/alura/blob/master/7-doctrine/readme.md'>Doctrine</a>
 8. <a href='https://github.com/brnocesar/alura/blob/master/8-mvc/readme.md'>Arquitetura MVC</a>
 9. <a href='https://github.com/brnocesar/alura/blob/master/9-laravel/readme.md'>Laravel</a>
+10. <a href='https://github.com/brnocesar/learning-PHP/blob/master/10-lumen/README.md'>Lumen</a>
 
 ### Outros
