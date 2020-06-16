@@ -1,6 +1,6 @@
 # Arquitetura MVC com PHP
 
-#### Índice
+#### Índice<a name='topo'></a>
 1. <a href='#1'>Configurando o ambiente</a>
 2. <a href='#2'>Ponto único de entrada</a>
 3. <a href='#3'>_Controllers_</a>
@@ -30,10 +30,14 @@ $ php -S localhost:8000 -t public
 
 Note que o diretório `/public` foi passado como o _target_ pois ele será o ponto de entrada de nossa aplicação, ou seja, é o único diretório que será acessível pela Web.
 
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
+
 ## 2. Ponto único de entrada<a name='2'></a>
 Quando acessamos um endereço pela URL e não informamos a rota que queremos acessar através de um domínio, o `localhost:8000` por exemplo, o PHP vai buscar pelo arquivo `index.php` no ponto de entrada da aplicação. O mesmo ocorre quando digitamos alguma coisa na rota sem expecificarmos uma extensão, digamos `localhost:8000/batatinha`, nesse caso o PHP vai procurar o arquivo `index.php` no diretório `/batatinha` a partir do ponto de entrada da aplicação.
 
 Podemos usar a variável global `$_SERVER` para acessar dados do servidor, dentre eles a rota que esta sendo acessada, e dessa forma, implementar uma tratativa no arquivo `index.php` para avaliar o que retornar de acordo com a rota. Isso garante que nossa aplicação terá um único ponto de entrada, garantindo maior controle.
+
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
 
 ## 3. _Controllers_<a name='3'></a>
 Como o PHP oferece o recurso de Orientação a Objetos (OO) podemos criar classes que **controlem** cada uma das rotas da aplicação, essas classes são os _controllers_. Toda implementação até este ponto pode ser encontrada no _commit_ [84708bc](https://github.com/brnocesar/alura/commit/84708bc6a100c54e224f0b65def056fd0af44702).
@@ -45,12 +49,16 @@ O progresso até aqui pode ser visto no _commit_ [461dfe4](https://github.com/br
 ## 3.1. Interfaces
 Como os dois _controllers_ criados até o momento são bem parecidos, possuem uma função com mesmo nome e assinatura, faz sentido implementar uma interface com essas informações. Assim teremos uma espécie de "contrato" que os _controllers_ "assinaram" definindo o que cada um deles precisa implementar de forma obrigatória, trazendo um pouco mais de segurança para nosso código (_commit_ [7c7c772](https://github.com/brnocesar/alura/commit/7c7c7728902ac612e0f99e29ef51803e16b6aea3)).
 
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
+
 ## 4. Isolando HTML<a name='4'></a>
 Por questão de organização e para facilitar a manutenção do nosso código podemos (devemos) separar o HTML do código referente às regras de negócio.
 
 Para isso, criamos os devidos diretórios na pasta `public` e arquivos específicos para cada uma das páginas. Após isso basta mover o código HTML dos _controllers_ para seus respectivos arquivos e dar um `require` nos _controllers_ (_commit_ [9d8bafa](https://github.com/brnocesar/alura/commit/9d8bafa37ef3d74c2f9cc92e2e0f00902c15d9b4)).
 
 Agora que separamos o HTML podemos observar que estes arquivos possuem código em comum, então faz sentido separá-los em arquivos menores (_commit_ [448084d](https://github.com/brnocesar/alura/commit/448084d7ed5c2198745f27a37a7307f28b9e69f5)).
+
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
 
 ## 5. HTTP, Formulários e Validação<a name='5'></a>
 Para que seja possível adicionar novos cursos precisamos modificar a _view_ do formulário (`view/cursos/novo-curso.php`). Adicionamos a rota que queremos enviar a requisição no atributo `action` da tag HTML `<form>` e definimos o verbo da requisição como `POST`.  
@@ -62,6 +70,8 @@ Podemos indicar redirecionamentos para nossa aplicação através de cabeçalhos
 
 ### 5.2. Rotas
 Vamos separar as rotas da aplicação em arquivo próprio e implementar uma lógica no arquivo `public/index.php` para que, ele apenas faça a intermediação entre o arquivo de rotas e os _controller_ (_commit_ [8c1de9f7](https://github.com/brnocesar/alura/commit/8c1de9f722866c5d355943c1d1e3616d2fcd4bdf)).
+
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
 
 ## 6. Finalizando o CRUD de Cursos<a name='6'></a>
 ### 6.1. Remover Curso
@@ -126,6 +136,8 @@ No _commit_ [3312ed4](https://github.com/brnocesar/alura/commit/3312ed4d42579d94
 Quando quisermos pegar o conteúdo do _buffer_ usamos a função `ob_get_contents()` que retorna o conteúdo como _string_, após isso devemos limpar o _buffer_ com `ob_clean()`. Ou podemos simplesmente usar `ob_get_clean()`, que retorna o conteúdo do _buffer_ e após isso o limpa.
 
 Após isso ainda temos que atualizar os controladores de _views_, mandando-os imprimir na tela o conteúdo HTML retornado.
+
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
 
 ## 7. Autenticação<a name='7'></a>
 ### 7.1. Página de Login
@@ -204,6 +216,8 @@ Note que devemos:
 
 No _commit_ [10a66b0](https://github.com/brnocesar/alura/commit/10a66b08e1967ba061feee2b7f65a2158a4231a6) você pode acompanhar as alterações.
 
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
+
 ## 8. _Traits_<a name='8'></a>
 De forma "beeeeeemm" resumida, _traits_ são usadas para resolver o "problema" da herança multipla em PHP, já que não é possível herdar mais de uma classe. É a herança horizontal.   
 No caso das _flash messages_ podemos centralizar em um arquivo a responsabilidade definir uma variável na sessão, para usar nas _flash messages_ por exemplo.
@@ -212,6 +226,8 @@ Então criamos um arquivo chamado `FlashMessageTrait.php` na pasta Helper e defi
 Agora basta "informar o uso" desta _trait_ nos arquivos que enviam mensagem para a sessão, isso é feito adicionando a palavra chave `use` junto com o nome da _trait_ `use FlashMessageTrait;` logo no começo da classe. Dessa forma é como se o PHP adicionasse todo o conteúdo a _trait_ na classe em que está sendo usado, tornando suas funcões disponíveis nessa classe. Feito isso basta trocar o código que adiciona as mensagens na sessão (_commit_ [23d1818](https://github.com/brnocesar/alura/commit/23d1818bf3671fd6468af783f44797846523a488)).
 
 Podemos fazer mesmo para a funcionalidade de "renderizar HTML", ao invés de termos uma classe reponsável por isso e que será herdada pelas classes que retornem _views_, teremos uma _trait_ que fará isso (_commit_ [4372eab](https://github.com/brnocesar/alura/commit/4372eab510927480326cd41fee402a10585a8d94)).
+
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
 
 ## 9. PSRs e Boas Práticas<a name='9'></a>
 ### 9.1. O que são as PSRs
@@ -252,6 +268,8 @@ Apenas recapitulando, as PSRs tratadas foram:
 - PSR-15: _HTTP Server Request Handlers_
     - Haviamos escrito uma interface com apenas a função `processaRequisicao()`, que não recebia nada como parâmetro e também não possuia retorno algum. Agora os _controllers_ implementam a interface de um pacote externo. O nome da interface, de sua função, os parâmetros recebidos e retornos, agora seguem o padrão da comunidade.
 
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
+
 ## 10. WebService<a name='10'></a>
 Até o moento nossa aplicação foi acessada por um usuário que escolhia a ação a ser feita ou as informações que ele queria consultar, e seu navegador recebia todo o código HTML para renderizar e apresentar uma página agradável para o usuário.
 
@@ -262,3 +280,6 @@ Adicionamos _controllers_ e rotas que retornam uma "lista" de cursos nos formato
 - XML: o PHP não possui _built in functions_ que tranformem objetos para este formato, mas o processo é bem simples então é feito (nesse caso) diretamente no _controller_ (_commit_ [c61b8c3](https://github.com/brnocesar/alura/commit/c61b8c38406e867321d681ab5b5662f1a78d45dc)).
 
 Ainda adicionamos o `Content-Type` no cabeçalho da resposta HTTP (_commit_ [1ced421](https://github.com/brnocesar/alura/commit/1ced421321f2bc0e6e96c8ce9777571a59473fc2)).
+
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
+

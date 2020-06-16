@@ -1,10 +1,10 @@
 # Laravel
 O Laravel é um _framework full stack_ do PHP, ou seja, nos oferece ferramentas para desenvolver a lógica da aplicação (_back-end_) e a interface de interação do usuário (_front-end_). Ele segue a arquitetura MVC e oferece uma série de facilidades que permitem um rápido desenvolvimento. O objetivo aqui será desenvolver uma aplicação para gerenciar as séries que o usuário estiver assistindo.
 
-#### Índice
+#### Índice<a name='topo'></a>
 1. <a href='#1'>Configurando o ambiente</a>  
 1.1. Criando um projeto  
-2.2. Estrutura de arquivos  
+1.2. Estrutura de arquivos  
 1.3. A primeira rota  
 2. <a href='#2'>_Controllers_</a>  
 2.1. Acessando dados da requisição  
@@ -89,6 +89,8 @@ Agora vamos criar nossa própria rota que vai apresentar um texto de nossa escol
 
 Mas como a aplicação é para gerenciar minhas séries, vou trocar o texto inicial (e a rota) para algo mais próximo do contexto. Além disso vou apresentar o conteúdo como HTML (_commit_ [6a4eb96](https://github.com/brnocesar/alura/commit/6a4eb969212fa08dce5085bb5a7a4060af1e0cf5)). Agora ao acessar a rota `localhost:8000/series` é possível observar que existe uma lista HTML na página retornada.
 
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
+
 ## 2. _Controllers_<a name='2'></a>
 Note que neste momento as rotas estão fazendo mais que sua responsabilidade, que é "levar à execução de uma ação". Como essa ação será executada é responsabilidade de outro tipo de arquivo, portanto, vamos criar um _controller_ e mover este código que foi escrito na rota.
 
@@ -100,6 +102,8 @@ Feito isso basta acessar a rota novamente e conferir que está tudo certo (é pa
 
 ### 2.1. Acessando dados da requisição
 Podemos [injetar uma dependência](https://github.com/brnocesar/alura/tree/master/php/formacao_php/8-mvc#9-4) no nosso método para que ele possa receber dados de uma requisição através da classe `Request`. Com isso temos acesso a várias informações interessantes como a URL da requisição e aos parâmetros passados (_commit_ [56c9087](https://github.com/brnocesar/alura/commit/56c90871bc1fef44b67b247606894d41f4d39a54)).
+
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
 
 ## 3. _Views_<a name='3'></a>
 ### 3.1. _View_ de listagem de séries
@@ -141,6 +145,8 @@ O Blade utiliza o conceito de seções, o que significa que podemos definir (rot
 Agora que temos um _layout_ Blade, podemos modificar nossas _views_ para utilizarem-no. O primeiro passo é renomear as _views_ para o padrão Blade. Após isso, a primeiro coisa em cada _view_ deve ser a informação de que elas "herdam" o _layout_, e aṕos isso vamos abrindo e fechando cada seção adicionando o devido conteúdo (_commit_ [919751d](https://github.com/brnocesar/alura/commit/919751d2633321b6f097016a77f335442a115db8)).
 
 Outra funcionalidade do Blade é permitir escrever PHP de uma forma mais amgável utilizando `@` ao invés de `tags` (_commit_ [4e0a1f0](https://github.com/brnocesar/alura/commit/4e0a1f0d4eb87fc5a7f705880e1d1a35694818c9)).
+
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
 
 ## 4. Criando registros<a name='4'></a>
 ### 4.1. Configurando o Banco de Dados
@@ -201,8 +207,12 @@ Antes de usarmos esse recurso devemos indicar ao Laravel quais atributos serão 
 
 Dependendo de como montamos o formulário da _view_ (se os nomes dos campos coincidem com os nomes dos atributos da classe) podemos ser ainda mais práticos e passar a _request_, que no fim das contas é um _array_ associativo (_commit_ [8f79508](https://github.com/brnocesar/alura/commit/8f7950805fbd7366a2b714d092f90dfc6e0a976e)).
 
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
+
 ## 5. Lapidando a aplicação (parte 1)<a name='5'></a>
 Podemos realizar algumas alterações que tornem a aplicação mais agradável para os usuários como: redirecionamentos (_commit_ [48db541](https://github.com/brnocesar/alura/commit/48db5414591a70c44a9515e34d713a2a800b56a5)) ou apresentar de mensagens de _feeback_ (_commit_ [b8f551f](https://github.com/brnocesar/alura/commit/b8f551fc5022fe57f5576047c744510e8daf39b7)), após uma ação ser realizada.
+
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
 
 ## 6. Destruindo registros<a name='6'></a>
 Vamos implementar a funcionalidade de excluir séries cadastradas e para isso vamos criar uma função que é acessada através do método POST, para evitar que _bots_ ou automações externas sejam capazes de excluir registros.
@@ -218,13 +228,19 @@ Agora voltando à função que apaga registros (_commit_ [aa10055](https://githu
 
 Outro cuidado que podemos ter é prevenir exclusões acidentais e isso pode ser facilmente feito com um alert do JavaScript (_commit_ [cae4d74](https://github.com/brnocesar/alura/commit/cae4d744bd8fc9905a507725ec89192bdcd2801c)).
 
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
+
 ## 7. Nomeando rotas<a name='7'></a>
 Isso é algo bastante simples de se fazer e ao mesmo tempo muito poderoso, pois agora não precisamos nos preocupar em alterar as rotas nos locais em que elas serão acessadas.
 
 Para nomear uma rota basta aplicar o método `name()` nesta rota e passar o valor do nome como parâmetro. Na hora de definir uma rota para ser acessada usamos o _helper_ `route()` que recebe o nome da rota (_commit_ [d3064bc](https://github.com/brnocesar/alura/commit/d3064bcadef57a7fee84c7712f2f1a1816e19f15)).
 
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
+
 ## 8. Lapidando a aplicação (parte 2)<a name='8'></a>
 Podemos mexer no estilo das _views_ para deixa-las mais bonitinhas, alinhando os elementos e adicionando ícones (_commit_ [3abd552](https://github.com/brnocesar/alura/commit/3abd552a5f6f1a4d301ad7e1bebf8bff41e658ab)).
+
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
 
 ## 9. Validando os dados<a name='9'></a>
 ### 9.1. `validate()`
@@ -243,6 +259,7 @@ Para usar essa classe precisamos apenas: dizer que o usuário esta autorizado a 
 
 Além disso podemos ainda personalizar as mensagens de erro, definindo uma mensagem para cada regra (_commit_ [c141d7e](https://github.com/brnocesar/alura/commit/c141d7eae3c21015dcbed4d013a0ebfa7a478381)).
 
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
 
 ## 10. Novos _models_<a name='10'></a>
 Para representar melhor uma série podemos armazenar informações sobre suas temporadas e episodios, então vamos modelar essas duas classes. Os atributos e relacionamentos das classes vão ser:
@@ -280,6 +297,8 @@ Note que conforme [definimos o relacionamento](https://github.com/brnocesar/alur
 
 ### 10.2. _Migrations_
 Agora definimos os atributos de cada uma das classes em sua _migration_ e também os relacionamentos, ou seja, ao que este relacionamento referência (_commit_ [a228b70](https://github.com/brnocesar/alura/commit/a228b70058013cef7ee33150f3279f77b8340d5c)). 
+
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
 
 ## 11. CRUD de séries<a name='11'></a>
 ### 11.1. Modificando a criação de séries
@@ -337,6 +356,8 @@ Criamos um método JavaScript para enviar a requisição ao Laravel com o valor 
 
 Agora vamos lapidar um pouco mais esta funcionalidade, após clicar no botão que confirma a alteração queremos voltar a esconder o input. Usamos um `then()` no `fetch()`, que através de uma função anônima (_arrow function_) chama a funcão `toggleInput()` passando o ID da série e atribui o novo nome ao conteudo do elemento (_commit_ [dd5df72](https://github.com/brnocesar/alura/commit/dd5df72f471100d62e004af4afd909a368ecf401)). E com isso podemos considerar finalizado o CRUD de séries (_commit_ [b74dda5](https://github.com/brnocesar/alura/commit/b74dda5e58b72ccbcff7f10e11bb17b140d59667)).
 
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
+
 ## 12. Episódios<a name='12'></a>
 ### 12.1. Listando episódios
 Agora que temos um CRUD para a entidade **Serie** vamos voltar nossa atenção para os episódios. A primeira coisa a ser feita é transformar as temporadas listadas em um link que posteriormente vai levar para a listagem dos respectivos episódios (_commit_ [e5d447f](https://github.com/brnocesar/alura/commit/e5d447f01c78ca00944a2f3d2e978581b8c2e1f7)) e também adicionamos um "selinho" (_badge_) indicando quantos episódio foram assistidos em relação ao total (_commit_ [a3b2781](https://github.com/brnocesar/alura/commit/a3b2781bc5c11a0102d297717d6b11e68faf190f)).
@@ -369,6 +390,8 @@ Também enviamos uma _flash message_ indicando que a lista de episódios assisti
 **REFATORANDO**: vamos refatorar o HTML em nossas Blades referente à exibição das _flash messages_. Então extraio o HTML para um arquivo próprio na raiz da pasta `views` e passo a incluir essa _"subview"_ usando a diretiva `@include()` do Blade(_commit_ [b76e7db](https://github.com/brnocesar/alura/commit/b76e7dba69161e7c0a2b3dd064b7a309a087afd1)).
 
 Para finalizar essa parte da aplicação, vamos exibir o número de episódios assitidos. Para isso escrevemos um método na _model_ `Temporada` que retorna uma coleção que contém apenas os episódios assistidos. Para selecionar os objetos que vão compor essa coleção usamos o método `filter()`, que retorna apenas os objetos que atendem o critério definido. Feito isso, basta acessar este método no objeto `$temporada` na _view_ e usar também o método `count()` (_commit_ [fc536c8](https://github.com/brnocesar/alura/commit/fc536c8f211d9be9d190d5678b2b20092713b176)).
+
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
 
 ## 13. Autenticação<a name='13'></a>
 ### 13.1. `Auth`
@@ -469,6 +492,8 @@ Para facilitar o uso do nosso autenticador próprio podemos definir um nome para
 
 Mas agora que usamos um _middleware_ em que temos um maior controle do que ele faz, podemos testar mais uma vez adicionar o autenticador no grupo de _middlewares_ executados para todas as rotas. Para isso é claro, devemos especificar as rotas que ele deve ignorar e fazemos isso avaliando o retorno de `$request->is()` que recebe "padrões" de URI como parâmtro (_commit_ [d55662f](https://github.com/brnocesar/alura/commit/d55662f84f6af0850cb4b037a1b52f97e089b778)).
 
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
+
 ## 14. Testes automatizados<a name='14'></a>
 O PHPUnit é um _framework_ de testes do PHP que vem integrado ao Laravel por padrão e roda na linha de comando.
 
@@ -530,3 +555,5 @@ Podemos preparar o cenário para o teste na função `setUp()`, onde apenas cria
 3. sabemos que quando uma série é excluída seu `'nome'` é retornado, então verificamos se o retorno da exclusão é uma _string_;
 4. verificamos o valor da _string_ retornada, que deve ser igual ao nome passado na criação da série; e
 5. nos asseguramos que não existe um registro na tabela `'series'` com o ID da série excluída (_commit_ [81e89bc](https://github.com/brnocesar/alura/commit/81e89bc25d3359247cd47667faaaf95bf50901ee)).
+
+<p style="text-align: right"> <a href="#topo">voltar ao topo </p>
