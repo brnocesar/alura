@@ -1,24 +1,39 @@
-# Lumen PHP Framework
+# Lumen
 
-[![Build Status](https://travis-ci.org/laravel/lumen-framework.svg)](https://travis-ci.org/laravel/lumen-framework)
-[![Total Downloads](https://poser.pugx.org/laravel/lumen-framework/d/total.svg)](https://packagist.org/packages/laravel/lumen-framework)
-[![Latest Stable Version](https://poser.pugx.org/laravel/lumen-framework/v/stable.svg)](https://packagist.org/packages/laravel/lumen-framework)
-[![License](https://poser.pugx.org/laravel/lumen-framework/license.svg)](https://packagist.org/packages/laravel/lumen-framework)
+(...) o que é o lumen
 
-Laravel Lumen is a stunningly fast PHP micro-framework for building web applications with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Lumen attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as routing, database abstraction, queueing, and caching.
+**Índice**<a name='topo'></a>
 
-## Official Documentation
+1. <a href='#1'>Configurando o ambiente</a>  
+1.1. Criando o projeto  
+1.2. Diferenças para o Laravel
 
-Documentation for the framework can be found on the [Lumen website](https://lumen.laravel.com/docs).
+## 1. Configurando o ambiente
 
-## Contributing
+### 1.1. Criando o projeto
 
-Thank you for considering contributing to Lumen! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Acesse a [documentação oficial](https://lumen.laravel.com/docs) do Lumen e verifique se sua máquina satisfaz os requisitos (PHP por necessidade e Composer por comodidade) e logo após basta seguir para o comando que cria um projeto:
 
-## Security Vulnerabilities
+```terminal
+composer create-project --prefer-dist laravel/lumen nome_do_projeto
+```
 
-If you discover a security vulnerability within Lumen, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+Para facilitar os testes e o desenvolvimento da aplicação podemos ainda utilizar um cliente HTTP para fazer as requisições. Duas boas opções são o [Postman](https://www.postman.com/) e [Insomnia](https://insomnia.rest/).
 
-## License
+### 1.2. Principais diferenças para o Laravel
 
-The Lumen framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Logo de cara podemos notar algumas diferenças em relação ao Laravel, dentre elas temos:
+
+- pasta `/route`: possui apenas um arquivo chamado `web.php`
+- grupos de rotas: são definidos dentro do arquivo de rotas (mencionado no item acima) e não mais no _provider_ de rotas `app/Providers/RouteServiceProvider.php`
+- servidor embutido: não existe no Lumen, deve ser usado o do própio PHP
+  - `php -S localhost:8000 -t public`
+- a configuração do Banco é feita apenas no `.env`
+- ainda temos a interface por linha de comandos **_artisan_**, mas agora com menos funcionalidades. Não é mais possível, por exemplo, criar _controllers_ e _models_ pela linha de comando.
+- mas uma das principais diferenças é que o Lumen não vem com o Eloquent habilitado por padrão. Para fazê-lo, basta descomentar uma linha no arquivo `bootstrap/app.php` (_commit_ [d97821a](https://github.com/brnocesar/alura/commit/d97821adaa15a10f25ed4d04691b256113aa713b)):
+
+```php
+...
+// $app->withEloquent();
+...
+```
