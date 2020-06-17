@@ -12,4 +12,15 @@ class Episode extends Model
     {
         return $this->belongsTo(Serie::class);
     }
+
+
+    public function getWatchedAttribute($watched): bool
+    {
+        return $watched;
+    }
+
+    public function getNumberAttribute(): int
+    {
+        return 666;
+    }
 }
