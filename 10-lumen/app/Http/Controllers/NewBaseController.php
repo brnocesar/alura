@@ -10,7 +10,8 @@ abstract class NewBaseController extends Controller
 
     public function index(Request $request)
     {
-        return $this->classe::paginate($request->per_page);
+        // return $this->classe::paginate($request->per_page);
+        return json_encode($this->classe::paginate($request->per_page), JSON_UNESCAPED_SLASHES);
     }
 
     public function store(Request $request)

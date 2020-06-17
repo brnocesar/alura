@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Episode extends Model
 {
     protected $fillable = ['season', 'number', 'watched', 'serie_id'];
+    protected $appends = ['links'];
 
     public function serie()
     {
@@ -22,5 +23,13 @@ class Episode extends Model
     public function getSerieIdAttribute($serie_id): int
     {
         return $serie_id;
+    }
+
+    public function getLinksAttribute($links): array
+    {
+        return [
+            "self" => "/episodios/{$this->id}",
+            "series" => "/series/{$this->id}"
+        ];
     }
 }
