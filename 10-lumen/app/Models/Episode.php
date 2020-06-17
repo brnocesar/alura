@@ -18,9 +18,4 @@ class Episode extends Model
     {
         return $watched;
     }
-
-    public function getNumberAttribute(): int
-    {
-        return 666;
-    }
 }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Serie extends Model
 {
     protected $fillable = ['name'];
+    protected $perPage = 3;
 
 
     public function episodes()
