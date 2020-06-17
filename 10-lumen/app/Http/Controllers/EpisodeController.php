@@ -10,4 +10,12 @@ class EpisodeController extends NewBaseController
     {
         $this->classe = Episode::class;
     }
+
+
+    public function perSerie(int $serieId)
+    {
+        $episodios = Episode::where('serie_id', '=', $serieId)->get();
+
+        return $episodios;
+    }
 }

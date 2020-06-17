@@ -18,4 +18,9 @@ class Episode extends Model
     {
         return $watched;
     }
+
+    public function getSerieIdAttribute($serie_id): int
+    {
+        return $serie_id;
+    }
 }
