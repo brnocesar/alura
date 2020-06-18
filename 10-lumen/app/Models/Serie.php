@@ -22,7 +22,7 @@ class Serie extends Model
         $this->attributes['name'] = $name . ' ;)';
     }
 
-    public function getLinksAttribute($links): array
+    public function getLinksAttribute(): array
     {
         return [
             "self" => "/api/series/{$this->id}",

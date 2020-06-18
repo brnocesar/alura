@@ -25,7 +25,7 @@ class Episode extends Model
         return $serie_id;
     }
 
-    public function getLinksAttribute($links): array
+    public function getLinksAttribute(): array
     {
         return [
             "self" => "/episodios/{$this->id}",

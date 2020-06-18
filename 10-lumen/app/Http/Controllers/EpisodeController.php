@@ -16,6 +16,6 @@ class EpisodeController extends NewBaseController
     {
         $episodios = Episode::where('serie_id', '=', $serieId)->get();
 
-        return $episodios;
+        return json_encode($episodios, JSON_UNESCAPED_SLASHES);
     }
 }
