@@ -80,6 +80,10 @@ $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
 ]);
 
+$app->routeMiddleware([
+    'autenticador' => App\Http\Middleware\AutenticadorMaisMelhorDeBom::class,
+]);
+
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers
