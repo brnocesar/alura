@@ -18,6 +18,8 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
+$router->post('/api/login', 'TokenController@generateToken');
+
 $router->group(['prefix' => '/api', 'middleware' => 'auth'], function () use ($router) {
 
     $router->group(['prefix' => '/series'], function () use ($router) {
