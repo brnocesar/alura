@@ -6,10 +6,10 @@
 3. [Lançando exceções](#3)  
 3.1 [_Annotations_](#3-1)
 4. [Hierarquia de exceções](#4)  
-4.1. [Criando exceções](#4-1)
+4.1. [Criando exceções](#4-1)  
 4.2. [Bloco `finally`](#4-2)
 
-## 1. Execução de um programa {: #1 }
+## 1. Execução de um programa <a name='1'></a>
 
 A execução de um programa PHP inicia sempre a partir de um arquivo (_main_, ponto único de entrada?) e este arquivo (assim como todos?) possui duas formas básicas de instrução: (i) declaração (de funções, classes e etc) e a execução.
 
@@ -72,7 +72,7 @@ Considerando o código acima, podemos representar a ordem de execução através
 
 A melhor forma de visualizar a pilha de execução é usando um depurador. Mas para quebrar um galho podemos usar o `var_dump(debug_backtrace())` que retorna a pilha de execução até o ponto de sua chamada.
 
-## 2. Tratamento de exceções {: #2 }
+## 2. Tratamento de exceções <a name='2'></a>
 
 Inicialmente vamos modificar a `funcao1()` criando um _array_ de tamanho fixo e depois tentar acessar uma posição que não existe nesse _array_.
 
@@ -121,7 +121,7 @@ Note que agora temos um erro e não uma exceção, significa que existe um probl
 
 Se ao contrário de uma divisão explícita tivermos uma expressão em que denominador é uma variável que assume o valor zero, receberemos apenas um `Warning:  Division by zero`, que não irá interromper a execução do programa.
 
-### 2.1. Capturando exceções e erros {: #2-1 }
+### 2.1. Capturando exceções e erros <a name='2-1'></a>
 
 Exceções em tempo de execução e erros modificam o fluxo de execução de um programa. Portanto, devemos usar alguma estrutura de controle para prevenir essas alterações no fluxo. Devemos ser capazes de "capturar" um problema que ocorra durante a execução e a estrutura `try/catch` serve exatamente  para isso.
 
@@ -160,7 +160,7 @@ try {
 }
 ```
 
-## 3. Lançando exceções {: #3 }
+## 3. Lançando exceções <a name='3'></a>
 
 Como as exceções modificam o fluxo de execução de um programa, podem existir situações em que seu uso seja para tratar comportamentos excepicionais relacionados a alguma regra de negócio e não a um "problema" que ocorreu durante a execução.
 
@@ -178,7 +178,7 @@ try {
 }
 ```
 
-### 3.1. _Annotations_ {: #3-1 }
+### 3.1. _Annotations_ <a name='3-1'></a>
 
 Usando _annotations_ podemos documentar funções que lançam exceções. Isso não será lido pelo PHP, mas pode ser utilizado pela sua IDE ou algum pacote que você esteja usando para te ajudar.
 
@@ -190,7 +190,7 @@ function funcaoQueLancaExcecao()
 {}
 ```
 
-## 4. Hierarquia de exceções {: #4 }
+## 4. Hierarquia de exceções <a name='4'></a>
 
 Todas as classes lançáveis no PHP derivam da interface `Throwable`, que é usada apenas pelo PHP e não pode ser implementada diretamente por outras classes que não sejam as do PHP.
 
@@ -202,7 +202,7 @@ As exceções básicas do SPL são duas: as **lógicas** (`LogicException`), lan
 
 Apesar de não ser possível, para um programador usuário de PHP, criar exceções que extendam diretamente a interface `Throwable`, é possível escrever um `catch` genérico capturando esse tipo.
 
-### 4.1. Criando exceções {: #4-1 }
+### 4.1. Criando exceções <a name='4-1'></a>
 
 Exceções criadas pelos programadores usuários de PHP devem extender a classe `Exception`, ou qualquer uma que a extenda. Para isso basta criar uma classe normal e extender o tipo exceção que melhor se adeque a sua necessidade.
 
@@ -224,7 +224,7 @@ try {
 
 Em geral, o mais comum é que as exceções "customizadas" não implementem nenhum método, pois todos os métodos básicos já são herdados. Mas caso haja a necessidade de implementar métodos específicos para essa exceção, eles estaram disponíveis quando ela for capturada por algum `catch`.
 
-### 4.2. Bloco `finally` {: #4-2 }
+### 4.2. Bloco `finally` <a name='4-2'></a>
 
 O código dentro do bloco `finally` será executado independente da ocorrência ou captura de uma exceção, ele sempre executa. É um recurso não muito utilizado de forma prática, pois o mesmo resultado pode ser facilmente alcançado sem utilizá-lo.
 
