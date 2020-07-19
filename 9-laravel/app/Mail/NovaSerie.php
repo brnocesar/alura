@@ -11,14 +11,17 @@ class NovaSerie extends Mailable
 {
     use Queueable, SerializesModels;
 
+    // public $nomeDaSerie;
+    protected $nomeDaSerie;
+
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($nomeDaSerie)
     {
-        //
+        $this->nomeDaSerie = $nomeDaSerie;
     }
 
     /**
@@ -28,6 +31,6 @@ class NovaSerie extends Mailable
      */
     public function build()
     {
-        return $this->view('mail.series.nova-serie');
+        return $this->view('mail.series.nova-serie', ['nomeDaSerie' => $this->nomeDaSerie]);
     }
 }
