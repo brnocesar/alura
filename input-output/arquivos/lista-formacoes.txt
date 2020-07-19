@@ -1,0 +1,6 @@
+Desenvolvedor PHP
+Python
+Data Science
+Clojure
+Vue.js
+BI e Data Warehouse

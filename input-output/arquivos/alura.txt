@@ -1,0 +1,20 @@
+curso,Introdução ao PHP
+curso,Avançando com PHP
+curso,Orientação a Objetos com PHP
+curso,Avançando com Orienteção a Objetos com PHP
+curso,PHP: Manipulando coleções com Arrays
+curso,PHP Exceptions: Tratamento de Erros
+curso,PHP Composer: Dependências, Autoload e Publicação
+curso,PHP e PDO: Trabalhando com bancos de dados
+curso,PHP Doctrine: Introdução ao Mapeamento Objeto-Relacional
+curso,MVC com PHP: Entenda o padrão Model-View-Controller
+curso,Laravel parte 1: Produtividade no desenvolvimento web
+curso,Laravel parte 2: Trabalhando com Autenticação, Relacionamentos e Testes
+curso,Lumen: API Rest com o Micro-framework do Laravel
+curso,I/O em PHP
+formacao,"Desenvolvedor PHP"
+formacao,Python
+formacao,"Data Science"
+formacao,Clojure
+formacao,Vue.js
+formacao,"BI e Data Warehouse"

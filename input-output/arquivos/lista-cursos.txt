@@ -1,0 +1,14 @@
+Introdução ao PHP
+Avançando com PHP
+Orientação a Objetos com PHP
+Avançando com Orienteção a Objetos com PHP
+PHP: Manipulando coleções com Arrays
+PHP Exceptions: Tratamento de Erros
+PHP Composer: Dependências, Autoload e Publicação
+PHP e PDO: Trabalhando com bancos de dados
+PHP Doctrine: Introdução ao Mapeamento Objeto-Relacional
+MVC com PHP: Entenda o padrão Model-View-Controller
+Laravel parte 1: Produtividade no desenvolvimento web
+Laravel parte 2: Trabalhando com Autenticação, Relacionamentos e Testes
+Lumen: API Rest com o Micro-framework do Laravel
+I/O em PHP
