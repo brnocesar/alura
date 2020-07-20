@@ -16,6 +16,7 @@ class DisparadorDeEmail
             $email = new NovaSerie($novaSerie->nome);
 
             Mail::to($usuario)->send($email);
+            sleep(5);
         });
 
         return;
