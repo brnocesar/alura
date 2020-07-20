@@ -35,5 +35,11 @@ Route::post('/registrar', 'AutenticacaoController@store')->name('realizar_regist
 Route::get('/sair', 'AutenticacaoController@sair')->name('deslogar');
 
 Route::get('/mail-teste', function (){
-    return new App\Mail\NovaSerie('Terrace House');
+
+    // dd(auth()->user());
+    Illuminate\Support\Facades\Mail::to(auth()->user())->send(
+        new App\Mail\NovaSerie('Terrace House')
+    );
+
+    return 'e-mail enviado';
 });

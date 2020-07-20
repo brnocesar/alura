@@ -11,7 +11,7 @@ class NovaSerie extends Mailable
 {
     use Queueable, SerializesModels;
 
-    // public $nomeDaSerie;
+    public $subject = "Nova série adicionada";
     protected $nomeDaSerie;
 
     /**
