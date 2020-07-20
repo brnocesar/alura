@@ -6,6 +6,7 @@ use App\Episodio;
 use App\Http\Requests\SeriesFormRequest;
 use App\Serie;
 use App\Service\CriadorDeSerie;
+use App\Service\DisparadorDeEmail;
 use App\Service\RemovedorDeSerie;
 use App\Temporada;
 use Illuminate\Http\Request;
@@ -27,9 +28,11 @@ class SeriesController extends Controller
         return view('series.create', compact('mensagem'));
     }
 
-    public function store(SeriesFormRequest $request, CriadorDeSerie $criadorDeSerie)
+    public function store(SeriesFormRequest $request, CriadorDeSerie $criadorDeSerie, DisparadorDeEmail $email)
     {
         $serie = $criadorDeSerie->criarSerie($request->nome, $request->qtd_temporadas, $request->ep_por_temporada);
+
+        $email->enviaEmailNovaSerie($serie);
 
         $request->session()->flash(
             'mensagem',

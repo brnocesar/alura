@@ -33,13 +33,3 @@ Route::post('/entrar', 'AutenticacaoController@entrar')->name('realizar_login');
 Route::get('/registrar', 'AutenticacaoController@create')->name('pagina_registro');
 Route::post('/registrar', 'AutenticacaoController@store')->name('realizar_registro');
 Route::get('/sair', 'AutenticacaoController@sair')->name('deslogar');
-
-Route::get('/mail-teste', function (){
-
-    // dd(auth()->user());
-    Illuminate\Support\Facades\Mail::to(auth()->user())->send(
-        new App\Mail\NovaSerie('Terrace House')
-    );
-
-    return 'e-mail enviado';
-});
