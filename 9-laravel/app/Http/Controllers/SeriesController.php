@@ -32,7 +32,7 @@ class SeriesController extends Controller
     {
         $serie = $criadorDeSerie->criarSerie($request->nome, $request->qtd_temporadas, $request->ep_por_temporada);
 
-        $email->enviaEmailNovaSerie($serie, true);
+        $email->enviaEmailNovaSerie($serie);
 
         $request->session()->flash(
             'mensagem',

@@ -9,13 +9,14 @@ use Illuminate\Support\Facades\Mail;
 
 class DisparadorDeEmail
 {
-    public function enviaEmailNovaSerie(Serie $novaSerie, bool $all=false): void
+    public function enviaEmailNovaSerie(Serie $novaSerie): void
     {
-        $email = new NovaSerie($novaSerie->nome);
+        User::all()->each(function (User $usuario) use ($novaSerie) {
 
-        Mail::to(
-            $all ? User::all() : auth()->user()
-        )->send($email);
+            $email = new NovaSerie($novaSerie->nome);
+
+            Mail::to($usuario)->send($email);
+        });
 
         return;
     }
