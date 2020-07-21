@@ -11,13 +11,13 @@ class DisparadorDeEmail
 {
     public function enviaEmailNovaSerie(Serie $novaSerie): void
     {
-        User::all()->each(function (User $usuario) use ($novaSerie) {
+        $multiplicador = 0;
+        User::all()->each(function (User $usuario) use ($novaSerie, &$multiplicador) {
 
-            $email = new NovaSerie($novaSerie->nome);
-
-            // Mail::to($usuario)->send($email);
-            Mail::to($usuario)->queue($email);
-            // sleep(5);
+            Mail::to($usuario)->later(
+                now()->addSeconds(5 * $multiplicador++),
+                new NovaSerie($novaSerie->nome)
+            );
         });
 
         return;
