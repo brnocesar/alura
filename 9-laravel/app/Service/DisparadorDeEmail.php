@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Mail\NovaSerie;
+use App\Mail\NovaSerieEmail;
 use App\Serie;
 use App\User;
 use Illuminate\Support\Facades\Mail;
@@ -16,7 +16,7 @@ class DisparadorDeEmail
 
             Mail::to($usuario)->later(
                 now()->addSeconds(5 * $multiplicador++),
-                new NovaSerie($novaSerie->nome)
+                new NovaSerieEmail($novaSerie->nome)
             );
         });
 

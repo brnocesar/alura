@@ -7,7 +7,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class NovaSerie extends Mailable
+class NovaSerieEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
