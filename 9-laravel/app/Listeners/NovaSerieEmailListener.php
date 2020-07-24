@@ -9,7 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 
-class NovaSerieEmailListener
+class NovaSerieEmailListener implements ShouldQueue
 {
     /**
      * Create the event listener.
