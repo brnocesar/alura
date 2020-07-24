@@ -3,8 +3,11 @@
 namespace App\Listeners;
 
 use App\Events\NovaSerieEvent;
+use App\Mail\NovaSerieEmail;
+use App\User;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Mail;
 
 class NovaSerieEmailListener
 {
@@ -26,6 +29,14 @@ class NovaSerieEmailListener
      */
     public function handle(NovaSerieEvent $event)
     {
-        //
+        $nomeDaSerie = $event->nomeDaSerie;
+        $multiplicador = 0;
+        User::all()->each(function (User $usuario) use ($nomeDaSerie, &$multiplicador) {
+
+            Mail::to($usuario)->later(
+                now()->addSeconds(5 * $multiplicador++),
+                new NovaSerieEmail($nomeDaSerie)
+            );
+        });
     }
 }
