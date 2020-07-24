@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Episodio;
+use App\Events\NovaSerieEvent;
 use App\Http\Requests\SeriesFormRequest;
 use App\Serie;
 use App\Service\CriadorDeSerie;
@@ -32,7 +33,7 @@ class SeriesController extends Controller
     {
         $serie = $criadorDeSerie->criarSerie($request->nome, $request->qtd_temporadas, $request->ep_por_temporada);
 
-        $email->enviaEmailNovaSerie($serie);
+        event(new NovaSerieEvent($serie->nome));
 
         $request->session()->flash(
             'mensagem',
