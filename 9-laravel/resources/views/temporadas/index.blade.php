@@ -14,7 +14,13 @@ Temporadas de <i>{{ $serie->nome }}</i>
     </a>
 </div>
 
-<ul class="list-group">
+@if ( $serie->capa )
+    <div class="d-flex justify-content-center mt-2">
+        <img src="{{$serie->capa_url}}" alt="Imagem de {{$serie->nome}}" class="img-thumbnail" height="250px" width="250px" />
+    </div>
+@endif
+
+<ul class="list-group mt-3">
     @foreach ($serie->temporadas as $temporada)
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <a href="{{ route('listar_episodios', $temporada->id) }}">

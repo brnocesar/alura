@@ -12,10 +12,13 @@ Séries
     <a href="{{ route('adicionar_serie') }}" class="btn btn-success mb-2" style="font-size: 80%"><i class="fas fa-plus mr-2"></i>Adicionar</a>
 </div>
 
-<ul class="list-group">
+<ul class="list-group mt-2 mb-4">
     @foreach ($series as $serie)
         <li class="list-group-item d-flex justify-content-between align-items-center">
-            <span id="nome-serie-{{ $serie->id }}">{{ $serie->nome }}</span>
+            <div>
+                <img src="{{$serie->capa_url}}" alt="Imagem de {{$serie->nome}}" class="img-thumbnail" height="60px" width="60px" />
+                <span class="ml-2" id="nome-serie-{{ $serie->id }}">{{ $serie->nome }}</span>
+            </div>
 
             @auth
             <div class="input-group w-50" hidden id="input-nome-serie-{{ $serie->id }}">
