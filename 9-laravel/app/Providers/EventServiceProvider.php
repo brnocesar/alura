@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Events\ApagaSerieEvent;
 use App\Events\NovaSerieEvent;
 use App\Listeners\NovaSerieEmailListener;
 use App\Listeners\NovaSerieLogListener;
+use App\Listeners\RemoveImagemCapaListener;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -24,6 +26,9 @@ class EventServiceProvider extends ServiceProvider
         NovaSerieEvent::class => [
             NovaSerieEmailListener::class,
             NovaSerieLogListener::class
+        ],
+        ApagaSerieEvent::class => [
+            RemoveImagemCapaListener::class
         ]
     ];
 
