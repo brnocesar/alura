@@ -8,12 +8,15 @@ use Illuminate\Support\Facades\DB;
 
 class CriadorDeSerie
 {
-    public function criarSerie(string $nomeSerie, int $qtdTemporadas, int $epPorTemporada): Serie
+    public function criarSerie(string $nomeSerie, int $qtdTemporadas, int $epPorTemporada, string $capaPath=null): Serie
     {
         $serie = null;
         DB::beginTransaction();
 
-        $serie = Serie::create(['nome' => $nomeSerie]);
+        $serie = Serie::create([
+            'nome' => $nomeSerie,
+            'capa' => $capaPath
+        ]);
         $this->criarTemporadas($serie, $qtdTemporadas, $epPorTemporada);
 
         DB::commit();

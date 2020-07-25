@@ -31,7 +31,8 @@ class SeriesController extends Controller
 
     public function store(SeriesFormRequest $request, CriadorDeSerie $criadorDeSerie, DisparadorDeEmail $email)
     {
-        $serie = $criadorDeSerie->criarSerie($request->nome, $request->qtd_temporadas, $request->ep_por_temporada);
+        // dd($request->capa, $request->file(), $request->file('capa'));
+        $serie = $criadorDeSerie->criarSerie($request->nome, $request->qtd_temporadas, $request->ep_por_temporada, $request->capa);
 
         event(new NovaSerieEvent($serie->nome));
 
