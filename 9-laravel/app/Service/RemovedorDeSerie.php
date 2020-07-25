@@ -18,7 +18,7 @@ class RemovedorDeSerie
             $this->removerTemporadas($serie);
             $serie->delete();
 
-            event(new ApagaSerieEvent($serie));
+            event(new ApagaSerieEvent( (object) $serie->toArray() ));
         });
 
         return $nomeSerie;

@@ -15,6 +15,9 @@ class ApagaSerieEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    /**
+     * @var object
+     */
     public $serie;
 
     /**
@@ -22,7 +25,7 @@ class ApagaSerieEvent
      *
      * @return void
      */
-    public function __construct(Serie $serie)
+    public function __construct(object $serie)
     {
         $this->serie = $serie;
     }
