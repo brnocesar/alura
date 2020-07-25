@@ -29,10 +29,14 @@ class SeriesController extends Controller
         return view('series.create', compact('mensagem'));
     }
 
-    public function store(SeriesFormRequest $request, CriadorDeSerie $criadorDeSerie, DisparadorDeEmail $email)
+    public function store(SeriesFormRequest $request, CriadorDeSerie $criadorDeSerie)
     {
-        // dd($request->capa, $request->file(), $request->file('capa'));
-        $serie = $criadorDeSerie->criarSerie($request->nome, $request->qtd_temporadas, $request->ep_por_temporada, $request->capa);
+        $serie = $criadorDeSerie->criarSerie(
+            $request->nome,
+            $request->qtd_temporadas,
+            $request->ep_por_temporada,
+            $request->hasFile('capa') ? $request->file('capa')->store('series') : null
+        );
 
         event(new NovaSerieEvent($serie->nome));
 

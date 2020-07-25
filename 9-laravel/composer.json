@@ -64,6 +64,7 @@
             "php artisan key:generate",
             "touch database/database.sqlite",
             "php artisan migrate:refresh",
+            "php artisan storage:link",
             "xdg-open http://localhost:8000/",
             "php artisan serve"
         ]

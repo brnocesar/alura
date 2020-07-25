@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class CriadorDeSerie
 {
-    public function criarSerie(string $nomeSerie, int $qtdTemporadas, int $epPorTemporada, string $capaPath=null): Serie
+    public function criarSerie(string $nomeSerie, int $qtdTemporadas, int $epPorTemporada, ?string $capaPath): Serie
     {
         $serie = null;
         DB::beginTransaction();
