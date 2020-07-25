@@ -26,10 +26,10 @@ class EventServiceProvider extends ServiceProvider
         NovaSerieEvent::class => [
             NovaSerieEmailListener::class,
             NovaSerieLogListener::class
-        ],
+        ]/* ,
         ApagaSerieEvent::class => [
             RemoveImagemCapaListener::class
-        ]
+        ] */
     ];
 
     /**

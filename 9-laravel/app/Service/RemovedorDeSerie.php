@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\{Serie, Temporada, Episodio};
 use App\Events\ApagaSerieEvent;
+use App\Jobs\RemoveImagemCapaJob;
 use Illuminate\Support\Facades\DB;
 
 class RemovedorDeSerie
@@ -18,7 +19,7 @@ class RemovedorDeSerie
             $this->removerTemporadas($serie);
             $serie->delete();
 
-            event(new ApagaSerieEvent( (object) $serie->toArray() ));
+            RemoveImagemCapaJob::dispatch( (object) $serie->toArray() );
         });
 
         return $nomeSerie;
