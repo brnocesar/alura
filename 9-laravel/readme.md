@@ -54,6 +54,33 @@ O Laravel é um _framework full stack_ do PHP, ou seja, nos oferece ferramentas 
 13.5.1. Modificando o _middleware_ padrão para autenticação  
 13.5.2. Criando nosso próprio _middleware_ para autenticação  
 14. <a href='#14'>Testes automatizados</a>  
+.1. Primeiro teste (`Temporada`)  
+14.2. Testando inserção de registros no Banco (`CriadorDeSerie`)  
+14.3. Rodando os testes em um Banco "na meméria"  
+14.4. Testando exclusão de registros no Banco (`RemovedorDeSerie`)  
+15. <a href='#15'>Envio de e-mail</a>  
+15.1. Template do e-mail  
+15.1.1. _Markdown_  
+15.2. Enviando e-mail  
+15.2.1. _mailtrap_  
+15.2.2. Incorporando o envio à regra de negócio  
+15.2.3. Adicionando tempo entre os envios  
+16. <a href='#16'>Processamento dados com filas</a>  
+16.1. Configurando o ambiente  
+16.2. Enviando processos para a fila  
+17. <a href='#17'>Eventos e ouvintes</a>  
+17.1. Criando um _event-listener_ para enviar _e-mail_  
+17.2. Registrando os eventos  
+17.3. Emitindo um evento  
+17.4. Criando um _listener_ para _log_ da aplicação  
+17.5. Processando eventos de forma assíncrona  
+18. <a href='#18'>_Upload_ de arquivos</a>  
+18.1. Carregando arquivo a partir do formulário  
+18.2. Configurando armazenamento  
+18.3. Apresentando as imagens  
+18.4. Excluindo o arquivo direto no _service_  
+18.5. Excluindo o arquivo através de um evento  
+19. <a href='#19'>Usando _jobs_</a>  
 
 ## 1. Configurando o ambiente<a name='1'></a>
 ### 1.1. Criando um projeto
@@ -495,15 +522,19 @@ Mas agora que usamos um _middleware_ em que temos um maior controle do que ele f
 <p style="text-align: right"> <a href="#topo">voltar ao topo </p>
 
 ## 14. Testes automatizados<a name='14'></a>
+
 O PHPUnit é um _framework_ de testes do PHP que vem integrado ao Laravel por padrão e roda na linha de comando.
 
-### 14.1. Primeiro teste - `Temporada`
+### 14.1. Primeiro teste (`Temporada`)
+
 O primeiro teste que faremos será em cima do _model_ `Temporada`, vamos verificar se o método `getEpisodiosAssistidos()` está retornando a quantidade correta de episódios assistidos. 
 
 Podemos criar um arquivo para testes usando o Artisan:
+
 ```sh
 $ php artisan make:test TemporadaTest --unit
 ```
+
 com este comando criamos um arquivo de nome `TemporadaTest.php` na pasta `tests/Unit` (_commit_ [a01f739](https://github.com/brnocesar/alura/commit/a01f7393cd0a9c9e21d18fe973f35d93c0a06aa8)), se não for passado o parâmetro `--unit` o arquivo será criado na pasta `tests/Feature`. Não sei (ainda) qual a implicação disso.
 
 **OBS. 1:** É importante se atentar que o nome do arquivo de testes deve terminal com `Test`, pode ter qualquer coisa antes, desde que o final seja `Test` (hehe).  
@@ -518,6 +549,7 @@ No método `testeExample()` apagamos o exemplo que ja veio e começar a adiciona
 - obtemos a coleção de episódios assistidos com o método `getEpisodiosAssistidos()` (_commit_ [40b62a3](https://github.com/brnocesar/alura/commit/40b62a369b92e9580247e7d9d5c3a6ad3a8c05c6))  
 
 chamamos o método `$this->assertCount()` passando como parâmetros o tamanho esperado para a coleção e a coleção que será avaliada. Para rodar os testes usamos o comando abaixo:
+
 ```sh
 $ vendor/bin/phpunit
 ```
@@ -526,7 +558,8 @@ Agora podemos adicionar outra verificação: se o atributo `assitido` possui val
 
 Considerando que teremos vários testes para a classe Temporada, por uma questão de organização, faz mais sentido separá-los em métodos dentro do arquivo de testes para Temporada. Para preparar o cenário de testes apenas uma vez e não ficar repetindo código, podemos utilizar o método `setUp()` fornecido pelo PHPUnit. Este método é executado antes de cada teste, então podemos preparar o cenrário de testes nesse método e ao final de sua execução atribuir isso para uma propriedade da classe de testes (_commit_ [b55442f](https://github.com/brnocesar/alura/commit/b55442f195d34f8333580151418d32cdb44ddd41)).
 
-### 14.2. Testando inserção de registros no Banco - `CriadorDeSerie`
+### 14.2. Testando inserção de registros no Banco (`CriadorDeSerie`)
+
 Agora vamos realizar testes acerca da criação de registros no Banco e vamos fazê-los em cima do _service_ `CriadorDeSerie`. Após criar o arquivo para testes instânciamos o "criador de séries" e criamos uma série de nome qualquer, com uma temporada e um episódio por temporada.
 
 Então adicionamos as verificações:
@@ -535,10 +568,12 @@ Então adicionamos as verificações:
 3. na tabela `'temporadas'` existe algum registro com `'serie_id'` igual a `$serieCriada->id` e com `'numero'` igual a `1`?
 4. na tabela `'episodios'` existe algum registro com `'numero'` igual a `1`? (_commit_ [68c5f5d](https://github.com/brnocesar/alura/commit/68c5f5dad760267f042e0f64111e94282ec8711e))
 
-### 14.3. Rodando os teste em um Banco "na meméria"
+### 14.3. Rodando os testes em um Banco "na meméria"
+
 Perceba que o último teste de fato realizou a persistência no Banco da aplicação e podemos contonar esse problema realizando os testes em um Banco dedicado a essa finalidade.
 
 Para isso devemos criar um arquivo para as variáveis de ambiente desse Banco chamado `.env.testing` e precisamos colocar apenas as as variáveis que dizem respeito ao Banco. Mais ainda, o SQLite permite usar um Banco na memória, bastando definir o nome da Base de Dados como `:memory:`. Dessa forma, o conteúdo do arquivo `.env.testing` será:
+
 ```env
 DB_CONNECTION=sqlite
 DB_DATABASE=:memory:
@@ -546,7 +581,8 @@ DB_DATABASE=:memory:
 
 Além disso devemos dar um `use` na _trait_ `RefreshDatabase` para que esse Banco seja criado na memória (_commit_ [83a5dd9](https://github.com/brnocesar/alura/commit/83a5dd922b368aeb68e275729e4739f19225e445)).
 
-### 14.4. Testando exclusão de registros no Banco - `RemovedorDeSerie`
+### 14.4. Testando exclusão de registros no Banco (`RemovedorDeSerie`)
+
 Esse é o caso de um teste em que executamos a ação testada entre _asserts_, pois precisamos nos certificar de que o registro que será excluído de fato existia.
 
 Podemos preparar o cenário para o teste na função `setUp()`, onde apenas criamos uma série. Na função em que de fato vão ocorrer os testes:
@@ -557,3 +593,214 @@ Podemos preparar o cenário para o teste na função `setUp()`, onde apenas cria
 5. nos asseguramos que não existe um registro na tabela `'series'` com o ID da série excluída (_commit_ [81e89bc](https://github.com/brnocesar/alura/commit/81e89bc25d3359247cd47667faaaf95bf50901ee)).
 
 <p style="text-align: right"> <a href="#topo">voltar ao topo </p>
+
+## 15. Envio de _e-mail_<a name='15'></a>
+
+O Laravel já nos fornece uma classe que gerencia vários recursos interessantes para o "envio de _e-mails_" e podemos criar uma classe de _e-mail_ através de um comando _artisan_:
+
+```terminal
+php artisan make:mail NovaSerie
+```
+
+Como resultado será criado o arquivo `app/Mail/NovaSerie.php`, que tem esse nome pois iremos usar essa classe para notificar os usuários sobre a criação de uma nova Série. Abrindo esse arquivo temos apenas dois métodos: o construtor e um método `build()` (_commit_ [df3656e](https://github.com/brnocesar/alura/commit/df3656ec884fa8302abc1f3d3c51bd0ff560c979)).
+
+### 15.1. Template do e-mail
+
+O método `build()` retorna a _view_ que será o _template_ do e-mail enviado. Esta _view_ se comporta exatamente como as _views_ das páginas que podem ser acessadas na nossa aplicação. Então podemos criar um arquivo Blade com um _layout_ e apenas precisamos adicionar o _dot path_ deste arquivo no método `build()`.
+
+Após isso, podemos criar uma rota de teste apenas para visualizar o _template_ de _e-mail_. A função executada ao acessar essa rota precisa apenas retornar uma instância da nossa classe _e-mail_ (_commit_ [f4db4e0](https://github.com/brnocesar/alura/commit/f4db4e01ef98fc4448a084894bbd4f4e5d85de7d)), que a _view_ com o _template_ será automáticamente retornada.
+
+Em relação a passagem de parâmetros o comportamento é exatamente igual por parte das _views_, a difereça fica por conta da forma como eles são passados **para** os métodos do _back_, ou seja, como a nossa classe de _e-mail_ os recebe. Para que o método `build()` saiba o que enviar, devemos criar atributos que sejam inicializados pelo construtor, dessa forma eles estarão disponíveis para serem usados dentro da classe (_commit_ [88d1792](https://github.com/brnocesar/alura/commit/88d1792a74bb0eb8f831c744defceec5f82876a8)). Se esses atributos forem criados como públicos não é necessário passar um _array_ associativo para  a _view_, eles ficarão disponíveis automáticamente.
+
+#### 15.1.1. _Markdown_
+
+Também é possivel escrever o _template_ de _e-mails_ em _markdown_, para isso basta adicionar a _flag_ `--markdown` passando o `dot path` do template (a partir do diretório _views_).
+
+```terminal
+php artisan make:mail NovaSerie --markdown=mail.series.nova-serie
+```
+
+Ou se quisermos aproveitar uma classe de _e-mail_ já existente, devemos trocar a chamada do método `view()` pelo método `markdown()` e adequar a estrutura do arquivo do _template_ (_commit_ [033e9a3](https://github.com/brnocesar/alura/commit/033e9a3a097417e1dd771fb45c5fec28a1402d57)). Mais detalhes podem ser vistos na [documentação](https://laravel.com/docs/7.x/mail#markdown-mailables)
+
+### 15.2. Enviando e-mail
+
+Falar sobre as formas de uma aplicação enviar _e-mails_, SMTP, etc.
+
+O Laravel já possui _drivers_ de _e-mail_, então basta configurarmos as devidas credênciais e ele fará todo o resto.
+
+### 15.2.1. _mailtrap_
+
+Neste momento será utilizada a ferramenta [**mailtrap.io**](https://mailtrap.io/), que cria uma "caixa de entrada _fake_" para receber os _e-mails_ da aplicação. Isso é muito útil em ambientes de desenvolvimento, que é o nosso caso.
+
+Após realizar o _login_ no _site_ da ferramenta acesse a "_demo inbox_" e copie os valores das credênciais _Username_ e Password_ e cole nas respectivas variáveis de ambiente, `MAIL_USERNAME` e `MAIL_PASSWORD`. Por padrão o Laravel já vem configurado para o uso do **mailtrap**, então não é necessário alterar mais nada, mas é sempre bom dar uma conferida.
+
+```env
+MAIL_DRIVER=smtp
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=lalalalalala
+MAIL_PASSWORD=1234abcd
+MAIL_ENCRYPTION=null
+```
+
+Se olharmos novamente na [documentação](https://laravel.com/docs/7.x/mail#sending-mail) podemos ver o código necessário para enviar um _e-mail_ e após isso podemos criar uma rota de teste, semelhante ao que foi feito para o _template_ (_commit_ [e918070](https://github.com/brnocesar/alura/commit/e918070441bd03e2163a6f710baafd82537a5066)).
+
+### 15.2.2. Incorporando o envio à regra de negócio
+
+Como o objetivo desses envios é notificar os usuários de novas séries que foram cadastradas, fica claro que devemos disparar o envio de _e-mails_ logo após isso ocorrer. Então devemos colocar o código responsável por isso no método `store()` do _controller_ de **séries**.
+
+Isso pode ser feito de várias formas, aqui eu optei por criar um _service_ que dispara o envio de _e-mails_ e injetar sua dependência no método `store()` (_commit_ [b8852fe](https://github.com/brnocesar/alura/commit/b8852fe6b427aa34a8fc34e840494557cf0c0712)). Depois alterei o código para enviar o _e-mail_ para todos os usuários, enviando apenas um e-mail para uma lista de endereços (_commit_ [0c130b4](https://github.com/brnocesar/alura/commit/0c130b4304321f47155c9f3d9b5e6d17df246a9d)). E por fim iterei sobre a coleção de usuários para que o fosse enviado um _e-mail_ especificamente para cada usuário (_commit_ [15d7e52](https://github.com/brnocesar/alura/commit/15d7e52b46eb91343978494263fddeb5245e4ede)).
+
+### 15.2.3. Adicionando tempo entre os envios
+
+Isso é importante de ser feito pois muitas ferramentas de envio impõem uma taxa limite de envios por segundo. No **mailtrap** por exemplo, o plano gratuito permite apenas dois envios a cada dez segundos. Para "resolver" esse problema basta adicionar um `sleep()` com o tempo adequado no _service_ que dispara os _e-mails_ (_commit_ [741fbb3](https://github.com/brnocesar/alura/commit/741fbb3798870821186fdcd59132a790e473bdcf)).
+
+## 16. Processamento dados com filas<a name='16'></a>
+
+Falar sobre processos síncronos e assíncronos.
+
+O uso de filas permite que sejam executados processos assíncronos, ou seja, a execução do processo seguinte não depende do anteirior terminar. Isso é muito útil para resolver nosso problema dos _e-mails_ que precisam de um intervalo mínimo entre os envios.
+
+### 16.1. Configurando o ambiente
+
+As configurações de ambiente para as filas no Laravel são armazenadas no arquivo `config/queue.php` Neste arquivo já existem algumas conexões previamente configuradas, então basta escolher uma e preencher no `.env`:
+
+```env
+QUEUE_CONNECTION=database
+```
+
+A opção que selecionamos é a `database`, que vai utilizar uma tabela do banco para armazenar os processos em fila. Como será utilizada uma tabela, precisamos de uma _migration_ para ela, e o _artisan_ fornece um comando específico para criar esta "tabela de _jobs_":
+
+```terminal
+php artisan queue:table
+```
+
+Como resultado será criado o arquivo `database/migrations/<timestamp>_create_jobs_table.php` que já contém todas as colunas necessárias para representar o processo: é possível especificar a fila (a padrão se chama `default`), na coluna `payload` colocamos todos os parâmetros e etc.
+
+Além disso devemos criar uma tabela para gerenciar os processos que falharem, para que seja possível tentar executá-los novamente, e para esta tabela o comando é:
+
+```terminal
+php artisan queue:failed-table
+```
+
+Após isso basta rodar essas _migrations_ (_commit_ [622ab9f](https://github.com/brnocesar/alura/commit/622ab9f34f822b47fe994d080168951c99ca217a)).
+
+### 16.2. Enviando processos para a fila
+
+No caso específico dos _e-mails_, em termos do código tudo que precisamos fazer é [trocar](https://laravel.com/docs/5.8/mail#queueing-mail) o método `send()` pelo `queue()` no nosso _service_ que faz o envio dos _e-mails_ (_commit_ [8933eff](https://github.com/brnocesar/alura/commit/8933eff8822291e4261bd1f66ee2a73e5ba215d9)). E para que a fila seja executada devemos rodar um comando _artisan_ que fica "escutando" a fila, existem dois:
+
+```terminal
+php artisan queue:listen
+php artisan queue:work
+```
+
+Basicamente o primeiro é utilizado em ambiente de desenvolvimento (fica lendo o código) e o segundo em produção (usa cache). É possível passar parâmetros nesses comandos para especificar o número de tentativas e o_delay_ entre as tentativas, por exemplo, vamos especificar duas tentativas para o envio de e-mail e um _delay_ de 5 segundos para que a nova tentativa seja executada:
+
+```terminal
+php artisan queue:listen --tries=2 --delay=5
+```
+
+E outros comandos bastante úteis para o desenvolvimento são:
+
+```terminal
+php artisan queue:failed
+php artisan queue:retry
+```
+
+o primeiro apresenta os processos que falharam (em todas as tentativas) e o segundo retorna esse(s) processo falhado para a fila.
+
+Também é possivel definir o _delay_ entre os processos diretamente no código. Novamente no _service_ para envio _e-mail_, agora trocamos o método `queue()` pelo `later()`, que aceita também uma instância de `DateTime` indicando quando deve ser feito o envio. No caso, foi definido que os envios devem ocorrer a cada 5 segundos (_commit_ [aeba295](https://github.com/brnocesar/alura/commit/aeba2957097d51772bcce229c78695ee0bf69aae)).
+
+## 17. Eventos e ouvintes<a name='17'></a>
+
+Este é um conceito/recurso derivado do _design pattern **observable**_ e com ele podemos escrever um código menos acoplados, ou seja, é possível a aplicação de forma que cada unidade do código (função ou classe) tenha uma única responsabilidade (ou algo próximo disso) e possa executar apenas uma única tarefa. Se funcionamento é baseado na definição de "eventos" e "ouvintes" (_listeners_), onde os _listeners_ serão executados quando seu respectivo evento for gerado.
+
+### 17.1. Criando um _event-listener_ para enviar _e-mail_
+
+O _artisan_ fornece comandos para criar tanto os eventos como os ouvintes:
+
+```terminal
+php artisan make:event NovaSerieEvent
+php artisan make:listener NovaSerieEmailListener -e NovaSerieEvent
+```7
+
+como resultado são criados os arquivos `app/Events/NovaSerieEvent.php` e `app/Listeners/NovaSerieEmailListener.php` (_commit_ [ac1c5a5](https://github.com/brnocesar/alura/commit/ac1c5a5599ce2ad58e092062a5b6771d846fc832)), note que no método `handle()` do _listener_ é feita uma injeção de dependência para a classe do evento de forma automática (ou isso não é injeção de dependência?).
+
+No evento precisamos apenas criar atributos públicos que devem ser inicializados pelo contrutor e serão acessados pelos ouvintes. E no _listener_ devemos colocar todo o código que queremos executar dentro do método `handle()` (_commit_ [fb80536](https://github.com/brnocesar/alura/commit/fb80536ec8066852152b18d8a5331bc580dbc1b2)).
+
+### 17.2. Registrando os eventos
+Cada evento pode ter vários _listeners_ associados e eles podem ser completamente independentes um do outro. Os _event listeners_ devem ser registrados no arquivo `app/Providers/EventServiceProvider.php` no vetor `listen`, onde o evento será a chave de cada elemento e o valor um _array_ com todos seus ouvintes  (_commit_ [30375eb](https://github.com/brnocesar/alura/commit/30375eba283ce048d4891eea83e24d2caaeb6fc7)).
+
+Outra possibilidade seria registrar os eventos e ouvintes primeiro e depois rodar o comando _artisan_ que gera os eventos e ouvintes listados que ainda não existem:
+
+```terminal
+php artisan event:generate
+```
+
+### 17.3. Emitindo um evento
+
+Agora devemos "emitir" o evento basta realizar a chamada do método `event()` passando uma instância do evento desejado. No caso queremos emitir esse evento com a criação de uma nova série, então faremos isso no método `store()` do _controller_ de séries (_commit_ [59ec2f1](https://github.com/brnocesar/alura/commit/59ec2f1949b217fd75bc542a848369183ff07958)).
+
+### 17.4. Criando um _listener_ para _log_ da aplicação
+
+Um outro exemplo pode ser a criação de _logs_ para as novas séries cadastradas, pós escrever o código que cria o _log_ (_commit_ [ab6d69f](https://github.com/brnocesar/alura/commit/ab6d69f675cfa754f7d233ebf974bf4f90c34395)), podemos verificar os _logs_ na pasta `storage/logs/` pelo último arquivo criado (depois de executar a ação é claro).
+
+### 17.5. Processando eventos de forma assíncrona
+
+Para executar os _listeners_ de um evento de forma assíncrona basta apenas implementar a interface `ShouldQueue` nos _listeners_ que assim se desejar (_commit_ [7b52b5b](https://github.com/brnocesar/alura/commit/7b52b5b2967af990cd939d8dc7975b5cd5d81f78)).
+
+## 18. Upload_ de arquivos<a name='18'></a>
+
+### 18.1. Carregando arquivo a partir do formulário
+
+O primeiro _upload_ de arquivo que vamos implementar é o da capa das séries. Primeiro precisamos criar um novo campo na tabela de séries, para armazenar o caminho da imagem, e adicionar este campo no _fillable_ do _model_ **Série** (_commit_ [4f50009](https://github.com/brnocesar/alura/commit/4f50009649ef33e27c3b5a984039727b5ad0752e)).
+
+Em seguida vamos alterar o formulário e o _controller_ de cadastro de séries. No formulário começamos adicionando um campo do tipo _file_ para a `capa` e depois precisamos adicionar o atributo `enctype="multipart/form-data"` pois agora também estamos trabalhando com arquivos, esse atributo sempre deve ser adicionado nessa situação. Note que foi feita outra alteração no `form`, o atributo `action` foi retirado, como estamos submetendo o formulário para a mesma rota (apenas mudando o verbo para POST) não é necessário especificar a rota em que p método `create()` está disponível (_commit_ [68232bf](https://github.com/brnocesar/alura/commit/68232bf8ad80171615ad32f23d72e3128671b1b2)).
+
+### 18.2. Configurando armazenamento
+
+Agora vamos cuidar do armazenamento desse arquivo em nossa aplicação. As configurações relativas a armazenamento são feitas no arquivo `config/filesystems.php` e se formos até ele veremos que o _default_ está com o valor `local`, que significa que os arquivos serão armazenados na pasta `storage/app`. Mas para que a aplicação tenha acesso aos arquivos é necessário que eles estejam na pasta `public` (raiz do projeto). O Laravel oferece um forma de "linkar" as pastas `storage/app/public` e `public`, rodando o comando abaixo será criado um _link_ simbólico entre essas pastas:
+
+```terminal
+php artisan storage:link
+```
+
+Em seguida vamos fazer com que os arquivos sejam salvos em `storage/app/public`. Começamos adicionando a váriavel de ambiente do "sistema de arquivos" com o valor `public` no `.env`:
+
+```env
+FILESYSTEM_DRIVER=public
+```
+
+e para de fato armazenar o arquivo devemos chamar o método `store()` para o campo da capa no _controller_ de séries. Este método recebe um argumento opcional que é o caminho relativo em que o arquivo será armazenado. Pode ser que você receba uma _exception_ ao tentar relaizar essa ação, nesse caso, provavelmente seja necessário habilitar/instalar a extensão `php_fileinfo`.
+
+Também é necessário modificar o _controller_ para verificar se existe um arquivo selecionado para _upload_ e atribui-lo. E note que no _service_ para criar séries foi adicionado um sinal de interrogação na tipagem da variável `$capa` e retirado o valor padrão, isso indica que a variável deixa de ser opcional mas que pode receber `null` (_commit_ [ed61847](https://github.com/brnocesar/alura/commit/ed6184774152f4aadbfcbea8c8284b0be5a9d0fd)).
+
+### 18.3. Apresentando as imagens
+
+Para começar vamos adicionar uma imagem padrão por que o envio de imagens não é obrigatório (_commit_ [f40a500](https://github.com/brnocesar/alura/commit/f40a5008faa737220cb45b54dd6305b1b3a6fa86)).
+
+Após isso adicionamos a tag `<img/>` nas _views_ de listagem e detalhes das séries e acessamos a URL da imagem através de um _mutator_ definido no _model_ **Série** (_commit_ [6792862](https://github.com/brnocesar/alura/commit/6792862fd579b1aa9930038caad3718245f5d663)).
+
+### 18.4. Excluindo o arquivo direto no _service_
+
+Para também excluir a imagem de capa da série, quando ela é deletada, basta realizar a chamada ao método `delete()` da _Facade_ `Storage` passando o caminho da imagem. No caso isso deve ser feito no _service_ responsável deletar uma série (_commit_ [c1b598f](https://github.com/brnocesar/alura/commit/c1b598f9612f396150ecbcd7af8c3f5199e79d36)).
+
+### 18.5. Excluindo o arquivo através de um evento
+
+Com o objetivo de desacoplar nosso código, deixando o _service_ que remove uma série apenas com esta responsabilidade, vamos criar um evento que será emitido neste _service_. A partir disso criamos um _listener_ síncrono com a reponsabilidade de remover o arquivo da imagem de capa da série, adicionamos o código que deve ser executado e registramos os _event-listener_ no _provider_ (_commit_ [f8aa9d5](https://github.com/brnocesar/alura/commit/f8aa9d5121d5342dec85434e63b81b2309b28dff)).
+
+Se quisermos tornar esse evento assíncrono, colocando-o na fila, precisamos realizar algumas alterações no código. Primeiro devemos fazer o _listener_ implementar a interface `ShouldQueue`. E também precisamos mudar o tipo de dado que estamos passando para o evento, pois quando passamos um _model_ (**Serie** no caso), o _job_ que vai pra fila armazena apenas o `ID` da série, mas como este registro é excluído, não será mais possível acessar o seu atributo `capa`. Então devemos alterar o tipo para um objeto genérico (_commit_ [8f37ac9](https://github.com/brnocesar/alura/commit/8f37ac9d26b25f78ccbce10cd74049a2b5cab462)).
+
+## 19. Usando _jobs_<a name='19'></a>
+
+Quando tivermos que executar um processo que é inerente a uma ação, o mais recomendável é usar _jobs_. Dessa forma deixamos explícita a execução do processo. Ao contrário dos _event-listener_ em que o código a ser processado fica em um arquivo e a execução desse processo é realizada de acordo com a "emissão" de outro, usando _jobs_ precisamos de apenas um arquivo para cada processo.
+
+Para criar um _job_ síncrono rodamos o seguinte comando artisan:
+
+```terminal
+php artisan make:job RemoveImagemCapaJob --sync
+```
+
+como resultado teremos o arquivo `app/Jobs/RemoveImagemCapaJob.php`. Para que o _job_ seja executado de forma assíncrona, basta fazer a classe implementar a interface `ShouldQueue` ou reodar o comando sem a flag `--sync`.
+
+No construtor do _job_ injetamos a dependência de um objeto genérico e no método `handle()` colocamos o código que deve ser executado. No _service_ que remove séries basta trocar a "emissão" do evento por um _dispatch_ do _job_ (_commit_ [3703b49](https://github.com/brnocesar/alura/commit/3703b4987740c98cd819c6c30b8eba31382376de)).
