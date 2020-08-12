@@ -722,7 +722,7 @@ O _artisan_ fornece comandos para criar tanto os eventos como os ouvintes:
 ```terminal
 php artisan make:event NovaSerieEvent
 php artisan make:listener NovaSerieEmailListener -e NovaSerieEvent
-```7
+```
 
 como resultado são criados os arquivos `app/Events/NovaSerieEvent.php` e `app/Listeners/NovaSerieEmailListener.php` (_commit_ [ac1c5a5](https://github.com/brnocesar/alura/commit/ac1c5a5599ce2ad58e092062a5b6771d846fc832)), note que no método `handle()` do _listener_ é feita uma injeção de dependência para a classe do evento de forma automática (ou isso não é injeção de dependência?).
 
