@@ -52,8 +52,7 @@ class MedicoController extends AbstractController
     {
         $medico = $this->medicoFactory->storeMedico($request->getContent());
 
-        $result = $this->entityManager->persist($medico);
-        dd($result);
+        $this->entityManager->persist($medico);
         $this->entityManager->flush();
         
         return new JsonResponse($medico);
