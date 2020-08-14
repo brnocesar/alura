@@ -14,12 +14,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class MedicoController extends AbstractController
 {
     protected $entityManager;
-    protected $medicoFactory;
+    protected $factory;
 
-    public function __construct(EntityManagerInterface $entityManager, MedicoFactory $medicoFactory)
+    public function __construct(EntityManagerInterface $entityManager, MedicoFactory $factory)
     {
         $this->entityManager = $entityManager;
-        $this->medicoFactory = $medicoFactory;
+        $this->factory = $factory;
     }
 
     /**
@@ -31,7 +31,7 @@ class MedicoController extends AbstractController
 
         $medicos = $repositorioDeMedicos->findAll();
         
-        return new JsonResponse($medicos);
+        return new JsonResponse($medicos, Response::HTTP_OK);
     }
 
     /**
@@ -50,12 +50,13 @@ class MedicoController extends AbstractController
      */
     public function store(Request $request): Response
     {
-        $medico = $this->medicoFactory->storeMedico($request->getContent());
-
+        $medico = $this->factory->storeMedico($request->getContent());
+        
         $this->entityManager->persist($medico);
         $this->entityManager->flush();
+        // dd($request->getContent(), $medico);
         
-        return new JsonResponse($medico);
+        return new JsonResponse($medico, Response::HTTP_CREATED);
     }
 
     /**
@@ -70,11 +71,10 @@ class MedicoController extends AbstractController
             return new Response('', Response::HTTP_NOT_FOUND);
         }
 
-        $medico->crm = $bodyRequest->crm;
-        $medico->nome = $bodyRequest->nome;
+        $medico->setCrm($bodyRequest->crm)->setNome($bodyRequest->nome);
         $this->entityManager->flush();
 
-        return new JsonResponse($medico);
+        return new JsonResponse($medico, Response::HTTP_OK);
     }
 
     /**
