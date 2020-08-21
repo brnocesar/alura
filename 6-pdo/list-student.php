@@ -4,8 +4,7 @@ use Alura\Pdo\Domain\Model\Student;
 
 require_once 'vendor/autoload.php';
 
-$dbPath = __DIR__ . '/db.sqlite';
-$pdo = new PDO('sqlite:' . $dbPath);
+$pdo = Alura\Pdo\Infrastructure\Persistence\ConnectionCreator::createConnection();
 
 
 // 1) Recurando todos os registros
@@ -27,20 +26,25 @@ foreach ($studentDataList as $studentData) {
     );
 }
 
+echo "\n=> Lista de estudantes\n";
 var_dump($studentList);
+echo "\n\n";
 
 // 2) Recuperando um unico registro do Banco
 $statement = $pdo->query('SELECT * FROM students WHERE id = 1');
 $studentData = $statement->fetch(PDO::FETCH_ASSOC);
 
+echo "\n=> Um (unico) registro\n";
 var_dump($studentData);
+echo "\n\n";
 
 
 // 3) Se for necessário recuperar "vários" registros do Banco, o ideal é fazer um por um
 // e conforme eles forem sendo recuperados, devem ser usados
 // quando não houver mais linhas para serem recuperadas, o fetch ira retornar FALSE
-$statement = $pdo->query('SELECT * FROM students WHERE id = 1');
+$statement = $pdo->query('SELECT * FROM students;');
 
+echo "\n=> Um registro por vez\n";
 while ($studentData = $statement->fetch(PDO::FETCH_ASSOC)) {
     $student = new Student(
         $studentData['id'],
@@ -48,8 +52,10 @@ while ($studentData = $statement->fetch(PDO::FETCH_ASSOC)) {
         new DateTimeImmutable($studentData['birth_date'])
     );
 
-    echo "{$student->age()}\n";
+    // echo "{$student->age()}\n";
+    echo "=> {$student->name()}\n";
 }
+echo "\n\n";
 
 
 // 4) Recuperando apenas uma coluna, basta passar o indice da coluna, sendo zero a primeira

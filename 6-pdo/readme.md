@@ -8,8 +8,15 @@
   - `query()`
 - Recuperando dados do Banco
   - `fetchAll()`, `fetch()`, `fetchColumn()`...
-  - _Fetch Modes_
+  - FETCH MODES_
 - SQL Injection
   - _prepared statements_
     - `bindValue()` x `bindParam()`
     - performance
+- Boas práticas
+  - Entity
+  - (_Static_) _Creation Method_
+  - Repository
+    - abstraindo sua implementação atráves de uma interface
+    - injeção de dependência
+- Transações
