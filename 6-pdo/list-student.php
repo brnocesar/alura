@@ -53,7 +53,7 @@ while ($studentData = $statement->fetch(PDO::FETCH_ASSOC)) {
     );
 
     // echo "{$student->age()}\n";
-    echo "=> {$student->name()}\n";
+    echo "{$student->id()}\t{$student->name()}\n";
 }
 echo "\n\n";
 

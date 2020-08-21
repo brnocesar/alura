@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use PDO;
 use PDOStatement;
+use RuntimeException;
 
 class PdoStudentRepository implements StudentRepository
 {
@@ -39,7 +40,7 @@ class PdoStudentRepository implements StudentRepository
     // public function hydrateStudentList(PDO $stmt): array
     public function hydrateStudentList(PDOStatement $stmt): array
     {
-        $studentDataList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $studentDataList = $stmt->fetchAll();
         $studentList = [];
 
         foreach ($studentDataList as $studentData) {

@@ -20,3 +20,5 @@
     - abstraindo sua implementação atráves de uma interface
     - injeção de dependência
 - Transações
+- Tratando erros
+  - Definindo atributos da conexão
