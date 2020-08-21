@@ -22,3 +22,4 @@
 - Transações
 - Tratando erros
   - Definindo atributos da conexão
+- Relacionamento entre tabelas
