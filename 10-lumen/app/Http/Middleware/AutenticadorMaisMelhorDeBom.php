@@ -32,7 +32,7 @@ class AutenticadorMaisMelhorDeBom
             $dadosAutenticacao = JWT::decode($token, env('JWT_KEY'), ['HS256']);
 
             $user = User::where('email', '=', $dadosAutenticacao->email)->first();
-            if ( !$user ) {
+            if ( is_null($user) ) {
                 throw new Exception();
             }
 

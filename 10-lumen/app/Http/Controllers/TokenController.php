@@ -12,12 +12,12 @@ class TokenController extends Controller
     public function generateToken(Request $request)
     {
         $this->validate($request, [
-            'email' => 'required|email',
+            'email'    => 'required|email',
             'password' => 'required'
         ]);
         $usuario = User::where('email', '=', $request->email)->first();
 
-        if ( !$usuario or !Hash::check($request->password, $usuario->password) ) {
+        if ( is_null($usuario) or !Hash::check($request->password, $usuario->password) ) {
             return response()->json(["Não autorizado" => "Usuário e/ou senha inválidos"], 401, [], JSON_UNESCAPED_SLASHES);
         }
 

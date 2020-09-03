@@ -81,7 +81,7 @@ $app->routeMiddleware([
 ]);
 
 $app->routeMiddleware([
-    'autenticador' => App\Http\Middleware\AutenticadorMaisMelhorDeBom::class,
+    'autenticador_melhor' => App\Http\Middleware\AutenticadorMaisMelhorDeBom::class,
 ]);
 
 /*
