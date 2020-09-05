@@ -2,7 +2,6 @@
 Esse repositório reúne guias, notas e projetos de estudos em PHP. A maior parte (se não for tudo mesmo) foi desenvolvida acompanhando cursos na Alura.
 
 1. [Introdução](https://github.com/brnocesar/learning-PHP/tree/main/1-intro)
-1. [Introdução](https://github.com/brnocesar/learning-PHP/tree/main/1-intro)
 2. [Orientação a Objetos](https://github.com/brnocesar/learning-PHP/tree/main/2-oo)
 3. [_Arrays_](https://github.com/brnocesar/learning-PHP/tree/main/3-arrays)
 4. [Exceptions](https://github.com/brnocesar/learning-PHP/tree/main/4-exceptions)
@@ -17,3 +16,4 @@ Esse repositório reúne guias, notas e projetos de estudos em PHP. A maior part
 13. [Symfony](https://github.com/brnocesar/learning-PHP/tree/main/13-symfony)
 14. [_Collections_](https://github.com/brnocesar/learning-PHP/tree/main/14-collections)
 15. [_Web scraping_](https://github.com/brnocesar/learning-PHP/tree/main/15-web_scraping)
+16. [Validação de dados nacionais](https://github.com/brnocesar/learning-PHP/tree/main/16-brasilidades)
