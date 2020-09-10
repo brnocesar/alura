@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Alura\Doctrine\Entity;
 
@@ -31,8 +31,9 @@ class Aluno
     private $cursos;
 
 
-    public function __construct()
+    public function __construct(string $nome)
     {
+        $this->setNome($nome);
         $this->telefones = new ArrayCollection();
         $this->cursos    = new ArrayCollection();
     }

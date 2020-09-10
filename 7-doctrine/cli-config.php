@@ -15,4 +15,4 @@ $entityManager = $entityManagerFactory->GetEntityManager();
 
 return ConsoleRunner::createHelperSet($entityManager);
 
-/* agora podemos rodar o comando: $ php vendor/bin/doctrine */
+/* agora podemos rodar o comando: $ php vendor/bin/doctrine ;) */

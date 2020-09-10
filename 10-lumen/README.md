@@ -2,6 +2,8 @@
 
 O Lumen é um _micro-framework_ PHP, é como se fosse um Laravel "enxuto".
 
+Neste outro [repositório](https://github.com/brnocesar/api-lumen-aulaqui) foi feita uma API mais completinha usando Lumen. Da uma olhada lá ;).
+
 ## 1. Rodando este projeto após clonar
 
 Vá até o diretório do projeto e execute os comandos abaixo para rodar a aplicação de forma local.
