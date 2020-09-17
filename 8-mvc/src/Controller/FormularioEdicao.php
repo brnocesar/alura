@@ -4,7 +4,7 @@ namespace Alura\Cursos\Controller;
 
 use Alura\Cursos\Entity\Curso;
 use Alura\Cursos\Helper\FlashMessageTrait;
-use Alura\Cursos\Helper\RenderizadorDeHtmlTrait;
+use Alura\Cursos\Helper\RenderizadorDeHtml;
 use Doctrine\ORM\EntityManagerInterface;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
@@ -13,7 +13,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class FormularioEdicao implements RequestHandlerInterface
 {
-    use RenderizadorDeHtmlTrait;
+    use RenderizadorDeHtml;
     use FlashMessageTrait;
 
     private $repositorioCursos;
@@ -31,7 +31,6 @@ class FormularioEdicao implements RequestHandlerInterface
         );
 
         if ( !$id ) {
-            
             $this->defineMensagem('danger', 'Curso não encontrado!');
             return new Response(302, ['Location' => '/listar-cursos']);
         }

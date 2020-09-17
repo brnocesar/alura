@@ -44,7 +44,7 @@ class Curso implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'id' => $this->id,
+            'id'        => $this->id,
             'cescricao' => $this->descricao
         ];
     }

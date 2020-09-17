@@ -28,7 +28,7 @@ $creator = new ServerRequestCreator(
     $psr17Factory, // ServerRequestFactory
     $psr17Factory, // UrlFactory
     $psr17Factory, // UploadedFileFactory
-    $psr17Factory // StreamFactory
+    $psr17Factory  // StreamFactory
 );
 $request = $creator->fromGlobals();
 

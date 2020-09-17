@@ -2,7 +2,7 @@
 
 namespace Alura\Cursos\Helper;
 
-trait RenderizadorDeHtmlTrait
+trait RenderizadorDeHtml
 {
     public function renderizaHtml(string $caminhoTemplate, array $dados): string
     {

@@ -3,7 +3,7 @@
 namespace Alura\Cursos\Controller;
 
 use Alura\Cursos\Entity\Curso;
-use Alura\Cursos\Helper\RenderizadorDeHtmlTrait;
+use Alura\Cursos\Helper\RenderizadorDeHtml;
 use Doctrine\ORM\EntityManagerInterface;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
@@ -12,7 +12,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class ListarCursos implements RequestHandlerInterface
 {
-    use RenderizadorDeHtmlTrait;
+    use RenderizadorDeHtml;
 
     private $repositorioDeCursos;
 

@@ -5,11 +5,21 @@
         }
     },
     "require": {
-        "doctrine/orm": "^2.6",
+        "doctrine/orm": "^2.6.2",
         "psr/http-message": "^1.0",
         "nyholm/psr7": "^1.2",
         "nyholm/psr7-server": "^0.4.1",
         "psr/http-server-handler": "^1.0",
-        "php-di/php-di": "^6.1"
+        "php-di/php-di": "^6.1",
+        "doctrine/migrations": "^2.2"
+    },
+    "scripts": {
+        "iniciar": [
+            "composer install",
+            "touch db.sqlite",
+            "vendor/bin/doctrine-migrations migrations:migrate",
+            "xdg-open http://localhost:8000/login",
+            "php -S localhost:8000 -t public"
+        ]
     }
 }

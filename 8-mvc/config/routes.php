@@ -23,3 +23,16 @@ return [
     '/buscarCursosEmJson' => CursosEmJson::class,
     '/buscarCursosEmXml' => CursosEmXml::class,
 ];
+
+// return [
+//     '/listar-cursos'    => [CursosController::class, 'index'],
+//     '/novo-curso'       => [CursosController::class, 'create'],
+//     '/salvar-curso'     => [CursosController::class, 'store'],
+//     '/excluir-curso'    => [CursosController::class, 'destroy'],
+//     '/editar-curso'     => [CursosController::class, 'edit'],
+//     '/login'            => FormularioLogin::class,
+//     '/realizar-login'   => RealizarLogin::class,
+//     '/logout'           => Deslogar::class,
+//     '/buscarCursosEmJson' => CursosEmJson::class,
+//     '/buscarCursosEmXml' => CursosEmXml::class,
+// ];
