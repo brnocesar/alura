@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class HelloWorldController
 {
     /**
-     * @Route("/hello")
+     * @Route("/hello", methods={"GET"})
     */
     public function helloWorldAction(Request $request): Response
     {

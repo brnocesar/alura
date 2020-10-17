@@ -14,19 +14,17 @@ class MedicoFactory
         $this->especialidadeRepository = $especialidadeRepository;
     }
 
-    public function storeMedico(string $json): Medico
+    public function createMedico(string $json): Medico
     {
         $request = json_decode($json);
 
         $especialidade = $this->especialidadeRepository->find($request->especialidadeId);
         
         $medico = new Medico();
-        $medico
-            ->setCrm($request->crm)
+        $medico->setCrm($request->crm)
             ->setNome($request->nome)
             ->setEspecialidade($especialidade);
 
         return $medico;
     }
 }
-

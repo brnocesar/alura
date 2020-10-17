@@ -23,7 +23,7 @@ class EspecialidadesController extends AbstractController
     }
 
     /**
-     * @Route("/especialidades", name="index_especialidades", methods={"GET"})
+     * @Route("/especialidades", name="index-especialidades", methods={"GET"})
      */
     public function index(): Response
     {
@@ -33,23 +33,23 @@ class EspecialidadesController extends AbstractController
     }
 
     /**
-     * @Route("/especialidades", name="store_especialidades", methods={"POST"})
+     * @Route("/especialidades", name="store-especialidades", methods={"POST"})
      */
     public function store(Request $request): Response
     {
         $body = json_decode($request->getContent());
 
         $especialidade = new Especialidade();
-        $especialidade->setDescricao($body->descricao);
-
         $this->entityManager->persist($especialidade);
+        
+        $especialidade->setDescricao($body->descricao);
         $this->entityManager->flush();
 
         return new JsonResponse($especialidade, Response::HTTP_CREATED);
     }
 
     /**
-     * @Route("/especialidades/{id}", name="show_especialidades", methods={"GET"})
+     * @Route("/especialidades/{id}", name="show-especialidades", methods={"GET"})
      */
     public function show($id): Response
     {
@@ -60,7 +60,7 @@ class EspecialidadesController extends AbstractController
     }
 
     /**
-     * @Route("/especialidades/{id}", name="update_especialidades", methods={"PUT"})
+     * @Route("/especialidades/{id}", name="update-especialidades", methods={"PUT"})
      */
     public function update($id, Request $request): Response
     {
@@ -75,7 +75,7 @@ class EspecialidadesController extends AbstractController
     }
 
     /**
-     * @Route("/especialidades/{id}", name="destroy_especialidades", methods={"DELETE"})
+     * @Route("/especialidades/{id}", name="destroy-especialidades", methods={"DELETE"})
      */
     public function destroy($id): Response
     {

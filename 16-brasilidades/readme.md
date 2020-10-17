@@ -12,18 +12,23 @@ A[Informação formatada]
 
 ## 2. Expressões regulares (regex)
 
+Permitem encontrar **padrões bem definidos** em textos.
+
 Testes: [regex101](https://regex101.com/)
 
 |Operador|Propósito|
 |:-:|-|
 | ^ | início da linha |
 | $ | fim da linha |
-| [A-Z] ou [a-z] | um caracter que esteja nesse intervalo |
-| [0-9] | um número desse intervalo |
+| [ ] | definem um intervalo ou conjunto de caracteres. Ex: `[a-z]`, `[0-9]` ou `[abc]` |
 | x{n} | n caracteres x |
 | x{m,n} | no mínimo m e no máximo n caracteres x |
-| \\ | caracter especial |
+| \\d | qualquer número de 0-9 |
+| \\w | qualquer número de 0-9, letra de A-Z ou _underline_ |
+| \\ | precede um caracter especial. Ex: `\.`, `\-`, `\/`, `\@` |
 | x* | caracter x pode ocorrer "infinitas" vezes ou nenhuma |
+| `a|b` | caracter `a` ou `b` |
+| () | captura o grupo |
 
 ### Exemplos
 

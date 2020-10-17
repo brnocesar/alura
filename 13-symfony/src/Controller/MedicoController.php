@@ -27,9 +27,7 @@ class MedicoController extends AbstractController
      */
     public function index(): Response
     {
-        $repositorioDeMedicos = $this->getDoctrine()->getRepository(Medico::class);
-
-        $medicos = $repositorioDeMedicos->findAll();
+        $medicos = $this->getDoctrine()->getRepository(Medico::class)->findAll();
         
         return new JsonResponse($medicos, Response::HTTP_OK);
     }
@@ -40,9 +38,10 @@ class MedicoController extends AbstractController
     public function show(int $id): Response
     {
         $medico = $this->searchMedico($id);
+
         $codigoRetorno = is_null($medico) ? Response::HTTP_NOT_FOUND : Response::HTTP_OK;
         
-        return new JsonResponse($medico, $codigoRetorno);
+        return new JsonResponse($medico, $codigoRetorno); // aqui da erro se nao existe, quando usa getReference
     }
 
     /**
@@ -50,11 +49,10 @@ class MedicoController extends AbstractController
      */
     public function store(Request $request): Response
     {
-        $medico = $this->factory->storeMedico($request->getContent());
+        $medico = $this->factory->createMedico($request->getContent());
         
         $this->entityManager->persist($medico);
         $this->entityManager->flush();
-        // dd($request->getContent(), $medico);
         
         return new JsonResponse($medico, Response::HTTP_CREATED);
     }
@@ -64,14 +62,14 @@ class MedicoController extends AbstractController
      */
     public function update(int $id, Request $request): Response
     {
-        $bodyRequest = json_decode($request->getContent());
-
         $medico = $this->searchMedico($id);
         if ( is_null($medico) ) {
             return new Response('', Response::HTTP_NOT_FOUND);
         }
-
-        $medico->setCrm($bodyRequest->crm)->setNome($bodyRequest->nome);
+        
+        $bodyRequest = json_decode($request->getContent());
+        
+        $medico->setCrm($bodyRequest->crm)->setNome($bodyRequest->nome); // aqui da erro se nao existe, quando usa getReference
         $this->entityManager->flush();
 
         return new JsonResponse($medico, Response::HTTP_OK);
@@ -87,16 +85,16 @@ class MedicoController extends AbstractController
             return new Response('', Response::HTTP_NOT_FOUND);
         }
         
-        $this->entityManager->remove($medico);
+        $this->entityManager->remove($medico); // aqui NAO da erro se nao existe, quando usa getReference
         $this->entityManager->flush();
 
         return new Response('', Response::HTTP_NO_CONTENT);
     }
 
-    private function searchMedico(int $id): Medico
+    private function searchMedico(int $id): ?Medico
     {
-        $repositorioDeMedicos = $this->getDoctrine()->getRepository(Medico::class);
-        $medico = $repositorioDeMedicos->find($id);
+        $medico = $this->getDoctrine()->getRepository(Medico::class)->find($id);
+        // $medico = $this->entityManager->getReference(Medico::class, $id); // como valida isso? se nao existe registro, da erro quando acessa o objeto
 
         return $medico;
     }
