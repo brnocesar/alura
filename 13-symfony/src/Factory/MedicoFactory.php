@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Helper;
+namespace App\Factory;
 
 use App\Entity\Medico;
 use App\Repository\EspecialidadeRepository;
 
-class MedicoFactory
+class MedicoFactory implements EntityFactory
 {
     private $especialidadeRepository;
 
@@ -14,7 +14,7 @@ class MedicoFactory
         $this->especialidadeRepository = $especialidadeRepository;
     }
 
-    public function createMedico(string $json): Medico
+    public function createEntity(string $json): Medico
     {
         $request = json_decode($json);
 

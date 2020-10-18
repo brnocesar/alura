@@ -34,30 +34,35 @@ php -S localhost:8080 -t public
 
 ### Índice
 
-1. [Configurando o ambiente](#1-configurando-o-ambiente)
-  1.1. Criando um projeto
-  1.2. Estrutura de arquivos
-  1.3. A primeira rota
-  1.4. Lendo dados da requisição
-2. [Entidades](#2-entidades)
-3. [Usando um ORM](#3-usando-um-orm)
-  3.1. CLI
-  3.2. Mapeando entidades e _migrations_
-  3.3. Criando um registro e _entity manager_
-  3.4. Recuperando registros e _repository_
-  3.4.1. Listando todos médicos
-  3.4.2. Recuperando um médico específico
-  3.4.3. Atualizando um médico
-  3.5. Factory
-  3.5.1. Abstraindo para um método
-4. [Configurando MySQL](#4-configurando-mysql)
-5. [Relacionamentos e uma nova entidade](#-relacionamentos-e-uma-nova-entidade)
-  5.1. Gerando código pela CLI
-  5.2. Criando uma nova entidade
-  5.3. Definindo o relacionamento entre entidades
-  5.4. CRUD de Especialidade
-  5.5. Interface `JsonSerializable`
-  5.6. Corrigindo CRUD de médicos
+1. [Configurando o ambiente](#1-configurando-o-ambiente)  
+  1.1. Criando um projeto  
+  1.2. Estrutura de arquivos  
+  1.3. A primeira rota  
+  1.4. Lendo dados da requisição  
+2. [Entidades](#2-entidades)  
+3. [Usando um ORM](#3-usando-um-orm)  
+  3.1. CLI  
+  3.2. Mapeando entidades e _migrations_  
+  3.3. Criando um registro e _entity manager_  
+  3.4. Recuperando registros e _repository_  
+  3.4.1. Listando todos médicos  
+  3.4.2. Recuperando um médico específico  
+  3.4.3. Atualizando um médico  
+  3.5. Factory  
+  3.5.1. Abstraindo para um método  
+4. [Configurando MySQL](#4-configurando-mysql)  
+5. [Relacionamentos e uma nova entidade](#5-relacionamentos-e-uma-nova-entidade)  
+  5.1. Gerando código pela CLI  
+  5.2. Criando uma nova entidade  
+  5.3. Definindo o relacionamento entre entidades  
+  5.4. CRUD de Especialidade  
+  5.5. Interface `JsonSerializable`  
+  5.6. Corrigindo CRUD de médicos  
+6. [Rotas com sub-recursos](#6-rotas-com-sub-recursos)  
+  6.1. Criando um _repository_ para médicos  
+7. [Aproveitando Código e `BaseController`](#7-aproveitando-código-e-`basecontroller`)  
+  7.1 Interface para _factory_  
+  7.2 Método abstrato  
 
 ## 1 Configurando o ambiente
 
@@ -756,5 +761,206 @@ class MedicoFactory
 ```
 
 As implementações do CRUD de Especialidade, adaptações às entidades e ao CRUD de médicos foram feitas no _commit_ [791775f](https://github.com/brnocesar/alura/commit/791775f4568f160e800143c2a38b710f445c510f).
+
+[↑ voltar ao topo](#índice)
+
+## 6 Rotas com sub-recursos
+
+Vamos iniciar a implementação de sub-recursos nas rotas que já existem. Por exemplo, digamos que queremos listar todos os médicos de uma especialidade, já temos a rota (recurso) para os detalhes de uma especialidade, então é natural apenas adicionar um sub-recurso a esta rota: `/especialidades/{especialidadeId}/medicos`. Como se trata de uma consulta que o resultado será uma lista de médicos, devemos implementar isso no _controller_ de médicos.
+
+Criamos o método público `indexByEspecialidade()` recebendo o ID da especialidade como mapeado na rota e filtramos os médicos pela especialidade usando o método `findBy()` do _repository_ (_commit_ [bd6e655](https://github.com/brnocesar/alura/commit/bd6e655e92d6f20efad9c7dfa96781bf1daf44d8)).
+
+```php
+<?php
+
+namespace App\Controller;
+...
+
+class MedicoController extends AbstractController
+{
+    ...
+    /**
+     * @Route("especialidades/{especialidadeId}/medicos", methods={"GET"})
+     */
+    public function indexByEspecialidede(int $especialidadeId): Response
+    {
+        $medicos = $this->getDoctrine()->getRepository(Medico::class)->findBy([
+            'especialidade' => $especialidadeId
+        ]);
+
+        return new JsonResponse($medicos, Response::HTTP_OK);
+    }
+    ...
+}
+```
+
+### 6.1 Criando um _repository_ para médicos
+
+Note que diferente do _controller_ de especialidades em que fizemos a injeção de depenêndia do _repository_ no construtor, no _controller_ de médicos acessamos o _repository_ através de `$this->getDoctrine()->getRepository(Medico::class)`. Não podemos receber um _repository_ no _controller_ de médicos dessa forma pois não existe uma classe _repository_ para médicos, a de especialidade foi criada junto com a entidade quando fizemos isso através da CLI. Então vamos criar um _repository_ para médicos seguindo a lógica implementada para especialidades.
+
+Primeiro criamos um arquivo chamada `MedicoRepository` em `src/Repository` e vamos adicionando os seguintes itens:
+
+- definimos o _namespace_
+- definimos a classe `MedicoRepository` e a fazemos herdar `ServiceEntityRepository` (classe da integração entre Symfony e Doctrine)
+- adicionamos um construtor que recebe um objeto da classe `RegistryInterface` (responsável pelo mapeamento entre entidades e tabelas)
+- dentro do construtor chamamos o construtor da classe pai passando como segundo parâmetro qual entidade o _repository_ controla
+
+```php
+<?php
+
+namespace App\Repository;
+
+use App\Entity\Medico;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+
+class MedicoRepository extends ServiceEntityRepository
+{
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Medico::class);
+    }
+}
+```
+
+Além disso precisamos informar na entidade qual é sua "classe de repositório":
+
+```php
+<?php
+
+namespace App\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
+
+/**
+ * @ORM\Entity(repositoryClass="MedicoRepository::class")
+ */
+class Medico implements JsonSerializable
+{
+    ...
+}
+```
+
+Agora basta alterar o _controller_ de médicos pedindo o _repository_ de médicos por injeção de depêndencia no construtor e substituir o método `getDoctrine()->getRepository(Medico::class)` (_commit_ [bd415aa](https://github.com/brnocesar/alura/commit/bd415aa48d955efb6ef482b062080e8a69ef19be)).
+
+[↑ voltar ao topo](#índice)
+
+## 7 Aproveitando Código e `BaseController`
+
+Olhando para nossos _controllers_ podemos perceber que existe muito código repetido neles, basicamente cada um deles faz a mesma coisa mas para entidades diferentes. Nesse caso podemos criar um `BaseController` com todo esse comportamento comum e fazer os atuais _controllers_ o extenderem. E como esse _controller_ não será instânciado, apenas herdado, podemos definir essa classe como abstrata.
+
+Precisamos definir os tipos dos objetos recebidos por injêção de dependência no construtor do `BaseController`. Começando pelo repositório, devemos pedir um objeto da classe `ObjectRepository`, que é uma interface e o tipo mais primitivo para essa finalidade. Assim, no construtor dos _controllers_ de entidades devemos chamar o construtor da classe pai passando o repositório da entidade.
+
+```php
+<?php
+
+namespace App\Controller;
+
+use Doctrine\Persistence\ObjectRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+abstract class BaseController extends AbstractController
+{
+    protected $repository;
+
+    public function __construct(ObjectRepository $repository)
+    {
+        $this->repository = $repository;
+    }
+}
+```
+
+```php
+<?php
+
+namespace App\Controller;
+...
+
+class MedicoController extends BaseController
+{
+    protected $entityManager;
+    protected $factory;
+
+    public function __construct(EntityManagerInterface $entityManager, MedicoFactory $factory, MedicoRepository $repository)
+    {
+        $this->entityManager = $entityManager;
+        $this->factory = $factory;
+        parent::__construct($repository);
+    }
+}
+```
+
+```php
+<?php
+
+namespace App\Controller;
+...
+
+class EspecialidadeController extends BaseController
+{
+    protected $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager, EspecialidadeRepository $repository)
+    {
+        $this->entityManager = $entityManager;
+        parent::__construct($repository);
+    }
+}
+
+```
+
+O primeiro método que podemos implementar no `BaseController` é o `index()`, que a não ser pela rota, é exatamente igual para os dois _controllers_. E agora precisamos definir as rotas em um arquivo externo aos _controllers_, em `config/routes.yaml`:
+
+```yaml
+medicos:
+  path: /medicos
+  controller: App\Controller\MedicoController::index
+  methods:
+    - GET
+
+especialidades:
+  path: /especialidades
+  controller: App\Controller\EspecialidadeController::index
+  methods:
+    - GET
+```
+
+Para o método `show()` o procedimento é o mesmo, basta definir o método no `BaseController` e as rotas.
+
+### 7.1 Interface para _factory_
+
+Passando para os métodos que realizam alguma modificação no Banco, precisamos de um gerenciador de entidades no `BaseController`, então vamos defini-lo no construtor e fazer a devida alteração nos _controllers_ de entidades. Para o método `destroy()` isso já basta.
+
+Para o método `store()` precisamos de uma _factory_. Até o momento apenas a entidade Medico possui uma _factory_, então precisamos criar uma para a entidade Especialidade. Além disso, devemos garantir que as duas _factories_ possuam o mesmo comportamento, criar um objeto a partir de uma _string_ em JSON e retorná-lo.
+
+Uma forma de garantir que mais de uma classe tenha o mesmo comportamento é fazendo-as implementar a mesma interface. Além disso, podemos passar essa interface no construtor do `BaseController`. Recapitulando por partes:
+
+- Criar a inteface `src/Entity/EntityFactory.php` (note que a pasta `Helper` foi renomeada para `Entity`):
+
+```php
+<?php
+
+namespace App\Factory;
+
+interface EntityFactory
+{
+    public function createEntity(string $json);
+}
+```
+
+- Fazer as _factories_ de Medico e Especialidade implementarem a interface criada
+
+- Adicionar a interface criada ao construtor de `BaseController` por injeção de dependêcia
+
+### 7.2 Método abstrato
+
+O método `update()` é um pouco diferente. Recuperamos um objeto através do _repository_ (registro que já existe) e criamos um outro objeto através da _factory_ (com os novos valores). Devemos atualizar o primeiro objeto com os valores do segundo, mas o código necessário para cada entidade vai ser diferente, pois cada entidade possui seus próprios atributos.
+
+Uma boa solução para isso é abstrair a atualização dos atributos para um método a parte. Vamos utilizar o _template method_, em que no `BaseController` definimos um método abstrato (o _template_) e nas classes filhas definimos a implementação concreta, de acordo com a entidade.
 
 [↑ voltar ao topo](#índice)
