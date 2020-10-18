@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Medico;
 use App\Helper\MedicoFactory;
+use App\Repository\MedicoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,11 +16,13 @@ class MedicoController extends AbstractController
 {
     protected $entityManager;
     protected $factory;
+    protected $repository;
 
-    public function __construct(EntityManagerInterface $entityManager, MedicoFactory $factory)
+    public function __construct(EntityManagerInterface $entityManager, MedicoFactory $factory, MedicoRepository $repository)
     {
         $this->entityManager = $entityManager;
         $this->factory = $factory;
+        $this->repository = $repository;
     }
 
     /**
@@ -27,7 +30,7 @@ class MedicoController extends AbstractController
      */
     public function index(): Response
     {
-        $medicos = $this->getDoctrine()->getRepository(Medico::class)->findAll();
+        $medicos = $this->repository->findAll();
         
         return new JsonResponse($medicos, Response::HTTP_OK);
     }
@@ -37,7 +40,7 @@ class MedicoController extends AbstractController
      */
     public function indexByEspecialidede(int $especialidadeId): Response
     {
-        $medicos = $this->getDoctrine()->getRepository(Medico::class)->findBy([
+        $medicos = $this->repository->findBy([
             'especialidade' => $especialidadeId
         ]);
 
@@ -105,7 +108,8 @@ class MedicoController extends AbstractController
 
     private function searchMedico(int $id): ?Medico
     {
-        $medico = $this->getDoctrine()->getRepository(Medico::class)->find($id);
+        // $medico = $this->getDoctrine()->getRepository(Medico::class)->find($id);
+        $medico = $this->repository->find($id);
         // $medico = $this->entityManager->getReference(Medico::class, $id); // como valida isso? se nao existe registro, da erro quando acessa o objeto
 
         return $medico;
