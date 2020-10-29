@@ -40,11 +40,13 @@ abstract class BaseController extends AbstractController
     
     public function index(Request $request): Response
     {
-        $sortParams = $this->extractor->getSortParams($request);
+        $sortParams   = $this->extractor->getSortParams($request);
         $filterParams = $this->extractor->getFilterParams($request);
+        $perPage      = $this->extractor->getItensPerPage($request);
+        $page         = $this->extractor->getCurrentPage($request);
 
-        $entityList = $this->repository->findBy($filterParams, $sortParams);
-        
+        $entityList = $this->repository->findBy($filterParams, $sortParams, $perPage, ($page - 1) * $perPage);
+
         return new JsonResponse($entityList, Response::HTTP_OK);
     }
 
