@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Factory\EntityFactory;
+use App\Helper\DataExtractorRequest;
 use Doctrine\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,17 +25,25 @@ abstract class BaseController extends AbstractController
      * @var EntityFactory
      */
     protected $factory;
+    /**
+     * @var DataExtractorRequest
+     */
+    protected $extractor;
     
-    public function __construct(ObjectRepository $repository, EntityManagerInterface $entityManager, EntityFactory $factory)
+    public function __construct(ObjectRepository $repository, EntityManagerInterface $entityManager, EntityFactory $factory, DataExtractorRequest $extractor)
     {
         $this->repository = $repository;
         $this->entityManager = $entityManager;
         $this->factory = $factory;
+        $this->extractor = $extractor;
     }
     
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $entityList = $this->repository->findAll();
+        $sortParams = $this->extractor->getSortParams($request);
+        $filterParams = $this->extractor->getFilterParams($request);
+
+        $entityList = $this->repository->findBy($filterParams, $sortParams);
         
         return new JsonResponse($entityList, Response::HTTP_OK);
     }
