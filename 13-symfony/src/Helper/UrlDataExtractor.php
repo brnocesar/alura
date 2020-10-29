@@ -4,7 +4,7 @@ namespace App\Helper;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class DataExtractorRequest
+class UrlDataExtractor
 {
     private function getRequestData(Request $request)
     {

@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Medico;
 use App\Factory\MedicoFactory;
-use App\Helper\DataExtractorRequest;
+use App\Helper\UrlDataExtractor;
 use App\Repository\MedicoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MedicoController extends BaseController
 {
-    public function __construct(EntityManagerInterface $entityManager, MedicoFactory $factory, MedicoRepository $repository, DataExtractorRequest $extractor)
+    public function __construct(EntityManagerInterface $entityManager, MedicoFactory $factory, MedicoRepository $repository, UrlDataExtractor $extractor)
     {
         parent::__construct($repository, $entityManager, $factory, $extractor);
     }

@@ -803,7 +803,7 @@ Primeiro criamos um arquivo chamada `MedicoRepository` em `src/Repository` e vam
 - definimos o _namespace_
 - definimos a classe `MedicoRepository` e a fazemos herdar `ServiceEntityRepository` (classe da integração entre Symfony e Doctrine)
 - adicionamos um construtor que recebe um objeto da classe `RegistryInterface` (responsável pelo mapeamento entre entidades e tabelas)
-- dentro do construtor chamamos o construtor da classe pai passando como segundo parâmetro qual entidade o _repository_ controla
+- dentro do construtor de  `MedicoRepository` chamamos o construtor da classe pai passando como segundo parâmetro qual entidade o _repository_ controla
 
 ```php
 <?php
@@ -850,7 +850,7 @@ Agora basta alterar o _controller_ de médicos pedindo o _repository_ de médico
 
 Olhando para nossos _controllers_ podemos perceber que existe muito código repetido neles, basicamente cada um deles faz a mesma coisa mas para entidades diferentes. Nesse caso podemos criar um `BaseController` com todo esse comportamento comum e fazer os atuais _controllers_ o extenderem. E como esse _controller_ não será instânciado, apenas herdado, podemos definir essa classe como abstrata.
 
-Precisamos definir os tipos dos objetos recebidos por injêção de dependência no construtor do `BaseController`. Começando pelo repositório, devemos pedir um objeto da classe `ObjectRepository`, que é uma interface e o tipo mais primitivo para essa finalidade. Assim, no construtor dos _controllers_ de entidades devemos chamar o construtor da classe pai passando o repositório da entidade.
+Precisamos definir os tipos dos objetos recebidos por injeção de dependência no construtor do `BaseController`. Começando pelo repositório, devemos pedir um objeto da classe `ObjectRepository`, que é uma interface e o tipo mais primitivo para essa finalidade. Assim, no construtor dos _controllers_ de entidades devemos chamar o construtor da classe pai passando o repositório da entidade.
 
 ```php
 <?php
@@ -938,9 +938,9 @@ Passando para os métodos que realizam alguma modificação no Banco, precisamos
 
 Para o método `store()` precisamos de uma _factory_. Até o momento apenas a entidade Medico possui uma _factory_, então precisamos criar uma para a entidade Especialidade. Além disso, devemos garantir que as duas _factories_ possuam o mesmo comportamento, criar um objeto a partir de uma _string_ em JSON e retorná-lo.
 
-Uma forma de garantir que mais de uma classe tenha o mesmo comportamento é fazendo-as implementar a mesma interface. Além disso, podemos passar essa interface no construtor do `BaseController`. Recapitulando por partes:
+Uma forma de garantir que mais de uma classe tenha o mesmo comportamento é fazendo-as implementar a mesma interface. Além disso, podemos passar essa interface no construtor do `BaseController`. Então recapitulando por partes:
 
-- Criar a inteface `src/Entity/EntityFactory.php` (note que a pasta `Helper` foi renomeada para `Entity`):
+- Criar a inteface `src/Factory/EntityFactory.php` (note que a pasta `Helper` foi renomeada para `Factory`):
 
 ```php
 <?php
@@ -959,8 +959,64 @@ interface EntityFactory
 
 ### 7.2 Método abstrato
 
-O método `update()` é um pouco diferente. Recuperamos um objeto através do _repository_ (registro que já existe) e criamos um outro objeto através da _factory_ (com os novos valores). Devemos atualizar o primeiro objeto com os valores do segundo, mas o código necessário para cada entidade vai ser diferente, pois cada entidade possui seus próprios atributos.
+O método `update()` é um pouco diferente. Recuperamos um objeto através do _repository_ (registro que já existe) e criamos um outro objeto através da _factory_ (com os novos valores). Devemos atualizar o primeiro objeto com os valores do segundo, mas o código necessário para cada entidade vai ser diferente, pois cada uma possui seus próprios atributos.
 
-Uma boa solução para isso é abstrair a atualização dos atributos para um método a parte. Vamos utilizar o _template method_, em que no `BaseController` definimos um método abstrato (o _template_) e nas classes filhas definimos a implementação concreta, de acordo com a entidade.
+Uma boa solução para esse problema é abstrair a atualização dos atributos para um método a parte. Vamos utilizar o _template method_, em que no `BaseController` definimos um método abstrato (o _template_) e nas classes filhas definimos a implementação concreta, de acordo com a entidade.
+
+A criação do `BaseController` e centralização das rotas está registrada no (_commit_ [ea14074](https://github.com/brnocesar/alura/commit/ea1407418dc0d720933b6faab5fe91e2e6cefaad)).
+
+[↑ voltar ao topo](#índice)
+
+### 8 Tratando as respostas
+
+### 8.1 Ordenação e filtro
+
+#### 8.1.1 Ordenando resultados
+
+Vamos implementar a funcionalidade de ordenação e filtro nas rotas de listagem da API. O primeiro passo é definir como o usuário irá informar que isso deve ser feito.
+
+Como as rotas de listagem são todas do tipo `GET`, essa informação deve chegar através da _query string_. E vamos utilizar o padrão do _array_ `sort[]` em que cada condição para ordenação é um elemento desse _array_, com o campo usado como base para ordenação sendo o índice e a ordem o valor, como no exemplo abaixo:
+
+```url
+http://localhost:8080/medicos?sort[nome]=asc&sort[crm]=desc
+```
+
+Dentro do _controller_ podemos usar o método `query->all()` na _request_ para obter todos os parâmetros passados na _query string_ ou o método `query->get('sort')` para recuperar apenas o campo `sort` da _query string_. Dessa forma teremos um _array_ associativo da ordem em que cada campo deve ser ordenado
+
+Agora podemos substituir o método `findAll()` do _repository_ pelo `findBy()` que recebe como um dos seus parâmetros um _array_ de ordenação exatamente no formato do _array_ `sort` que recebemos através da _query string_. Então basta passar o parâmetro `sort` como segundo parâmetro no método `findBy` (enquanto os "parâmetros nomeados" não chegam no PHP, tem que ser assim).
+
+#### 8.1.2 Filtrando resultados
+
+Para filtrar resultados de acordo com o valor de um campo, o processo é tão simples como a ordenação. Estabelecendo que o usuário deve enviar o nome do campo com o valor que deseja filtrar na _query string_, basta usar o método `query->all()` na _request_ e remover o campo `sort`. Assim teremos um _array_ associativo que é exatamente o formato do primeiro parâmetro que o método `findBy()` espera receber como "condição de busca".
+
+```url
+http://localhost:8080/especialidades?descricao=cardiologia
+```
+
+#### 8.1.3 Abstraindo a extração de dados da _request_
+
+Visando manter o método do _controller_ apenas com a reponsabilidade de receber a requisição e enviar a resposta, vamos abstrair toda a lógica de extração dos parâmetros vindos na _query string_ para uma classe que terá apenas essa responsabilidade.
+
+Criamos a classe `src/Helper/DataExtractorRequest.php`, definimos os métodos que devem retornar cada uma das informações (ordenação e filtro), no _controller_ base pedimos uma instância dessa classe por injeção de dependência no construtor e em cada um dos _controllers_ que extendem o base pedimos isso pelo construtor da classe mãe.
+
+Essa implementação para ordenar e filtrar os resultados está registrada no (_commit_ [ec6cd0c](https://github.com/brnocesar/alura/commit/ec6cd0cc92208ada6ffd913d9333db9d5d038629)).
+
+[↑ voltar ao topo](#índice)
+
+### 8.2 Paginando os resultados
+
+Agora vamos implementar a funcionalidade de paginação nas repostas. Isso é muito importante pois garante que o cliente vai receber a quantidade de itens que ele quiser, ou ao menos não fazer uso desnecessário de recursos retornando todos os itens da coleção.
+
+Primeiro definimos a forma como esperamos receber as informações de paginação do usuário:
+
+```url
+http://localhost:8080/medicos?page=1&perPage=3
+```
+
+Agora vamos modificar nossa classe dedicada a extrair dados da _request_, o processo é o mesmo da parte de ordenação e filtragem.
+
+Após isso recebemos estas informações no método `index()` do _controller_ e passamos para o método `findBy()`. O terceiro parâmetro recebido é a quantidade de itens que deve ser recuparada e o segundo é o item a partir do qual (este não incluso) deve ser recuperado (_commit_ [262071a](https://github.com/brnocesar/alura/commit/262071a363c63aa1f3912b728938b529816a7c0b)).
+
+Perceba que o nome da classe `DataExtractorRequest` foi alterado para `UrlDataExtractor` (_commit_ [](https://github.com/brnocesar/alura/commit/)).
 
 [↑ voltar ao topo](#índice)

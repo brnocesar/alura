@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Factory\EntityFactory;
-use App\Helper\DataExtractorRequest;
+use App\Helper\UrlDataExtractor;
 use Doctrine\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,26 +26,28 @@ abstract class BaseController extends AbstractController
      */
     protected $factory;
     /**
-     * @var DataExtractorRequest
+     * @var UrlDataExtractor
      */
     protected $extractor;
     
-    public function __construct(ObjectRepository $repository, EntityManagerInterface $entityManager, EntityFactory $factory, DataExtractorRequest $extractor)
+    public function __construct(ObjectRepository $repository, EntityManagerInterface $entityManager, EntityFactory $factory, UrlDataExtractor $extractor)
     {
-        $this->repository = $repository;
+        $this->repository    = $repository;
         $this->entityManager = $entityManager;
-        $this->factory = $factory;
-        $this->extractor = $extractor;
+        $this->factory       = $factory;
+        $this->extractor     = $extractor;
     }
     
     public function index(Request $request): Response
     {
-        $sortParams   = $this->extractor->getSortParams($request);
-        $filterParams = $this->extractor->getFilterParams($request);
         $perPage      = $this->extractor->getItensPerPage($request);
-        $page         = $this->extractor->getCurrentPage($request);
 
-        $entityList = $this->repository->findBy($filterParams, $sortParams, $perPage, ($page - 1) * $perPage);
+        $entityList = $this->repository->findBy(
+            $this->extractor->getFilterParams($request), 
+            $this->extractor->getSortParams($request), 
+            $perPage, 
+            ($this->extractor->getCurrentPage($request) - 1) * $perPage
+        );
 
         return new JsonResponse($entityList, Response::HTTP_OK);
     }
