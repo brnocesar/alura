@@ -37,7 +37,7 @@ class UrlDataExtractor
 
     public function getCurrentPage(Request $request)
     {
-        [, , $page] = $this->getRequestData($request);
+        [, , $page, ] = $this->getRequestData($request);
 
         return $page;
     }
@@ -47,5 +47,12 @@ class UrlDataExtractor
         [, , , $perPage] = $this->getRequestData($request);
 
         return $perPage;
+    }
+
+    public function getOffsetSearch(Request $request)
+    {
+        [, , $page, $perPage] = $this->getRequestData($request);
+
+        return ($page - 1) * $perPage;
     }
 }

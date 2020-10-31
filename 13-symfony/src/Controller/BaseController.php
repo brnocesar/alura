@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Factory\EntityFactory;
+use App\Factory\ResponseFactory;
 use App\Helper\UrlDataExtractor;
 use Doctrine\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -40,16 +41,22 @@ abstract class BaseController extends AbstractController
     
     public function index(Request $request): Response
     {
-        $perPage      = $this->extractor->getItensPerPage($request);
+        $currentPage  = $this->extractor->getCurrentPage($request);
+        $itensPerPage = $this->extractor->getItensPerPage($request); 
+        $offsetSearch = $this->extractor->getOffsetSearch($request); 
 
         $entityList = $this->repository->findBy(
             $this->extractor->getFilterParams($request), 
             $this->extractor->getSortParams($request), 
-            $perPage, 
-            ($this->extractor->getCurrentPage($request) - 1) * $perPage
+            $itensPerPage, 
+            $offsetSearch
         );
 
-        return new JsonResponse($entityList, Response::HTTP_OK);
+        $totalItens = count($this->repository->findAll()); // trocar isso
+
+        $response = new ResponseFactory($entityList, $currentPage, $itensPerPage, $totalItens);
+
+        return $response->getResponse();
     }
 
     public function store(Request $request): Response
