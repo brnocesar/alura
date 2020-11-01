@@ -26,6 +26,12 @@ Rodar as _migrations_:
 php bin/console doctrine:migrations:migrate
 ```
 
+Rodar as _fixtures_:
+
+```terminal
+php bin/console doctrine:fixtures:load
+```
+
 Levantar o servidor local:
 
 ```terminal
