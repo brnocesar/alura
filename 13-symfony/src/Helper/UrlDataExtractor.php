@@ -15,7 +15,7 @@ class UrlDataExtractor
         unset($filter['sort']);
         $currentPage = $request->query->get('page') ?? 1;
         unset($filter['page']);
-        $perPage = $request->query->get('perPage') ?? 10;
+        $perPage = $request->query->get('perPage') ?? $_ENV['PER_PAGE'];
         unset($filter['perPage']);
 
         return [$sort, $filter, $currentPage, $perPage];

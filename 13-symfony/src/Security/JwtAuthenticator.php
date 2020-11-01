@@ -85,10 +85,9 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
     public function getCredentials(Request $request)
     {
         $token = str_replace('Bearer ', '', $request->headers->get('Authorization'));
-        // dd(JWT::decode($token, 'chave1234', ['HS256']));
 
         try {
-            return JWT::decode($token, 'chave1234', ['HS256']);
+            return JWT::decode($token, $_ENV['JWT_KEY'], ['HS256']);
         } catch (Exception $e) {
             return false;
         }
@@ -137,22 +136,6 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
     {
         return is_object($credentials) and property_exists($credentials, 'username');
     }
-
-    /**
-     * Create an authenticated token for the given user.
-     *
-     * If you don't care about which token class is used or don't really
-     * understand what a "token" is, you can skip this method by extending
-     * the AbstractGuardAuthenticator class from your authenticator.
-     *
-     * @see AbstractGuardAuthenticator
-     *
-     * @return GuardTokenInterface
-     */
-    // public function createAuthenticatedToken(UserInterface $user, string $providerKey)
-    // {
-    //     // TODO: Implement createAuthenticatedToken() method
-    // }
 
     /**
      * Called when authentication executed, but failed (e.g. wrong username password).

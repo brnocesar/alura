@@ -63,6 +63,21 @@ php -S localhost:8080 -t public
 7. [Aproveitando Código e `BaseController`](#7-aproveitando-código-e-`basecontroller`)  
   7.1 Interface para _factory_  
   7.2 Método abstrato  
+8. [Melhorando as respostas](#8-melhorando-as-respostas)  
+  8.1 Ordenação e filtro de resultados  
+    8.1.1 Ordenando resultados  
+    8.1.2 Filtrando resultados  
+    8.1.3 Abstraindo a extração de dados da _request_  
+  8.2 Paginando os resultados  
+  8.3 Retornando informação extra e linkando recursos  
+9. [Autenticação e proteção de rotas](#9-autenticação-e-proteção-de-rotas)  
+  9.1 Pacotes necessários  
+  9.2 Entidade `User`  
+    9.2.1 _Fixtures_ do Doctrine  
+  9.3 _Login_  
+  9.4 Autenticador  
+10. [Tratando erros](#10-tratando-erros)  
+  10.1 Eventos do Symfony
 
 ## 1 Configurando o ambiente
 
@@ -967,9 +982,9 @@ A criação do `BaseController` e centralização das rotas está registrada no 
 
 [↑ voltar ao topo](#índice)
 
-### 8 Tratando as respostas
+### 8 Melhorando as respostas
 
-### 8.1 Ordenação e filtro
+### 8.1 Ordenação e filtro de resultados
 
 #### 8.1.1 Ordenando resultados
 
@@ -1001,8 +1016,6 @@ Criamos a classe `src/Helper/DataExtractorRequest.php`, definimos os métodos qu
 
 Essa implementação para ordenar e filtrar os resultados está registrada no (_commit_ [ec6cd0c](https://github.com/brnocesar/alura/commit/ec6cd0cc92208ada6ffd913d9333db9d5d038629)).
 
-[↑ voltar ao topo](#índice)
-
 ### 8.2 Paginando os resultados
 
 Agora vamos implementar a funcionalidade de paginação nas repostas. Isso é muito importante pois garante que o cliente vai receber a quantidade de itens que ele quiser, ou ao menos não fazer uso desnecessário de recursos retornando todos os itens da coleção.
@@ -1017,6 +1030,420 @@ Agora vamos modificar nossa classe dedicada a extrair dados da _request_, o proc
 
 Após isso recebemos estas informações no método `index()` do _controller_ e passamos para o método `findBy()`. O terceiro parâmetro recebido é a quantidade de itens que deve ser recuparada e o segundo é o item a partir do qual (este não incluso) deve ser recuperado (_commit_ [262071a](https://github.com/brnocesar/alura/commit/262071a363c63aa1f3912b728938b529816a7c0b)).
 
-Perceba que o nome da classe `DataExtractorRequest` foi alterado para `UrlDataExtractor` (_commit_ [](https://github.com/brnocesar/alura/commit/)).
+Perceba que o nome da classe `DataExtractorRequest` foi alterado para `UrlDataExtractor` (_commit_ [0bafa08](https://github.com/brnocesar/alura/commit/0bafa08515443708e2feb809e72e787ad4fb5d1b)).
+
+[↑ voltar ao topo](#índice)
+
+### 8.3 Retornando informação extra e linkando recursos
+
+Vamos passar a retornar algumas informações complementares nas respostas como por exemplo a página retornada, quantidade total de itens do recurso acessada e até mesmo links que permitam a navegação entre recursos.
+
+Começamos criando a _factory_ de respostas `src/Factory/ResponseFactory.php`. Em seu construtor devemos receber todas as informações que desejamos enviar na resposta e basta montar o _array_ que será enviado no método `getResponse()`.
+
+Por uma decisão minha, essa _factory_ será utilizada apenas nos métodos que retornam uma listagem de itens, pois nos outros métodos não necessidade alguma de retornar algo além do objeto (ou não) e do _status code_. Mas você pode implementar sua _factory_ de forma mais genérica como apresentada abaixo, de modo que ela possa usada para outros casos:
+
+```php
+<?php
+
+namespace App\Factory;
+
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+
+class ResponseFactory
+{
+    private $content;
+    private $currentPage;
+    private $itensPerPage;
+    private $statusCode;
+
+    public function __construct($content, int $statusCode=Response::HTTP_OK, int $currentPage=null, int $itensPerPage=null)
+    {
+        $this->content      = $content;
+        $this->statusCode   = $statusCode;
+        $this->currentPage  = $currentPage;
+        $this->itensPerPage = $itensPerPage;
+    }
+
+    public function getResponse(): Response
+    {
+        if ($this->statusCode >= 400) {
+            return new Response('', $this->statusCode);
+        }
+
+        $response = ['dados' => $this->content];
+
+        if ( !is_null($this->currentPage) ) {
+            $response['paginaAtual']    = $this->currentPage;
+            $response['itensPorPagina'] = $this->itensPerPage;
+        }
+
+        return new JsonResponse($response, $this->statusCode);
+    }
+}
+```
+
+A minha implementação da _factory_ pode ser vista no _commit_ [67caf2f](https://github.com/brnocesar/alura/commit/67caf2fafef647800bd8d11bd0c27001a8ead7ae).
+
+Agora vamos adicionar links para navegação entre recursos. Como já serializamos a representação das entidades, basta adicionar um elemento `_links` (adicionamos o _underline_ por convenção, para informar que é uma informação extra e não um atributo do objeto) e definir os recursos que queremos expor (_commit_ [4deea4e](https://github.com/brnocesar/alura/commit/4deea4e4fda43cc8253fcf4dd0fa9dfaf3645fea)).
+
+[↑ voltar ao topo](#índice)
+
+## 9 Autenticação e proteção de rotas
+
+### 9.1 Pacotes necessários
+
+Agora vamos começar a proteger nossa API para que usuários não autenticados sejam impedidos de acessar alguns recursos. Neste [link](https://symfony.com/doc/current/security.html) podem ser encontradas as instruções para implementações de segurança no Symfony.
+
+Primeiro devemos instalar alguns pacotes necessários para essa implementação, são eles:
+
+- o _plugin_ de segurança do Symfony (_commit_ [0eee001](https://github.com/brnocesar/alura/commit/0eee0017b9426de75f44d1b808986884c5834342)). Este pacote vai trazer tudo que é necessário para que o Symfony verifique quem pode ou não acessar as rotas da aplicação, de acordo com nossa implementação:
+
+```terminal
+composer require security
+```
+
+- um pacote para gerar os _tokens_ utilizados na autenticação por JWT que vamos implementar (_commit_ [177d521](https://github.com/brnocesar/alura/commit/177d521d3978ee90419bcfe9be7ecd0944807376)). Caso você queira um texto mais detalhado e com exemplo de implementação usando esse coiceito, isso foi feito no [projeto de Lumen](https://github.com/brnocesar/learning-PHP/tree/main/10-lumen) deste mesmo repositório.
+
+```terminal
+composer require firebase/php-jwt
+```
+
+### 9.2 Entidade `User`
+
+Vamos criar uma entidade para representar os usuários que vão acessar a API. Essa entidade deve seguir alguns se adequar aos requisitos do pacote de segurança, então vamos criar essa classe através da CLI para facilitar nosso trabalho:
+
+```terminal
+$ php bin\console make:user
+
+ The name of the security user class (e.g. User) [User]:
+ >
+
+ Do you want to store user data in the database (via Doctrine)? (yes/no) [yes]:
+ > yes
+
+ Enter a property name that will be the unique "display" name for the user (e.g. email, username, uuid) [email]:
+ > username
+
+ Will this app need to hash/check user passwords? Choose No if passwords are not needed or will be checked/hashed by some other system (e.g. a single sign-on server).
+
+ Does this app need to hash/check user passwords? (yes/no) [yes]:
+ > yes
+
+ created: src/Entity/User.php
+ created: src/Repository/UserRepository.php
+ updated: src/Entity/User.php
+ updated: config/packages/security.yaml
+
+  Success!
+
+ Next Steps:
+   - Review your new App\Entity\User class.
+   - Use make:entity to add more fields to your User entity and then run make:migration.
+   - Create a way to authenticate! See https://symfony.com/doc/current/security.html
+```
+
+Após isso você pode conferir a classe criada, criar a _migration_ para atualizar o banco de dados e rodá-la:
+
+```terminal
+php bin/console make:migration
+
+php bin/console doctrine:migrations:migrate
+```
+
+As alterações no projeto referentes a criação dessa classe estão registradas no _commit_ [98e5278](https://github.com/brnocesar/alura/commit/98e52788a2f3d61c8c957d62278278f1d8c9384b).
+
+[↑ voltar ao topo](#índice)
+
+#### 9.2.1 _Fixtures_ do Doctrine
+
+Vamos utilizar um recurso chamado _fixture_ para criar o registro de um usuário no banco de dados. Rodando o comando `php bin/console list` podemos procurar pelo comando `php bin/console make:fixtures` que terá a seguinte descrição: "Creates a new class to load Doctrine fixtures".
+
+Isso significa que vamos poder escrever código orientado a objetos para criar um (ou mais) registros no banco, da mesma forma que foi para os nossos CRUDs, mas não será um recurso que vai ficar disponível, é apenas para esses registros específicos.
+
+Podemos fazer um paralelo com os _seeders_ do Laravel, mas não são recursos análogos. De forma geral, as _fixtures_ são indicadas para testes e _dummy data_, ou seja, mais utilizadas durante o desenvolvimento.
+
+Apesar do parágrafo acima não vamos adicionar seu pacote apenas para desenvolvimento (`--dev`):
+
+```terminal
+composer require orm-fixtures
+```
+
+Após finalizar a adição dessa nova dependência ao projeto (_commit_ [a978c8b](https://github.com/brnocesar/alura/commit/a978c8b0aed4545b97c71b9cb4438722e16c95fd)) podemos rodar o comando mencionado acima para criar uma fixture (_commit_ [725601a](https://github.com/brnocesar/alura/commit/725601a5f2ba58b11cbf875189375e204486ccec)):
+
+```terminal
+$ php bin/console make:fixture
+
+ The class name of the fixtures to create (e.g. AppFixtures):
+ > UserFixtures
+
+ created: src/DataFixtures/UserFixtures.php
+
+  Success!
+
+ Next: Open your new fixtures class and start customizing it.
+ Load your fixtures by running: php bin/console doctrine:fixtures:load
+ Docs: https://symfony.com/doc/master/bundles/DoctrineFixturesBundle/index.html
+```
+
+Agora podemos criar o nosso usuário de teste na _fixture_ criada em `src/DataFixtures/UserFixtures.php`. Para isso basta criar um objeto do tipo `User` e definir seus atributos dentro do método `load()`, note que já recebemos um gerenciador de entidades, que permite usar o `persist()` e o `flush()`.
+
+Para não salvar a senha em texto puro ou não precisar chamar um método que criptografe a senha dentro da _fixture_ (ou só pra fazer diferente mesmo) vamos usar um outro recurso da CLI do Symfony que "encoda" uma senha:
+
+```terminal
+$ php bin/console security:encode-password
+
+Symfony Password Encoder Utility
+================================
+
+ Type in your password to be encoded:
+ > 123456
+
+ ------------------ ------------------------------------------------------------------
+  Key                Value
+ ------------------ ------------------------------------------------------------------
+  Encoder used       Symfony\Component\Security\Core\Encoder\MigratingPasswordEncoder
+  Encoded password   $argon2id$v=19$m=65536,t=4,p=1$6JiRycZUeQ93a/7IO(...)eQH5H/xxFbg  
+ ------------------ ------------------------------------------------------------------
+
+ ! [NOTE] Self-salting encoder used: the encoder generated its own built-in salt.
+
+ [OK] Password encoding succeeded
+```
+
+Para rodar a _fixture_ basta utilizar o comando abaixo. Mas isso também vai apagar todos os registros do banco de dados.
+
+```terminal
+php bin\console doctrine:fixtures:load
+```
+
+A alteração na _fixture_ pode ser observada no _commit_ [4a2c8be](https://github.com/brnocesar/alura/commit/4a2c8be27c7874a71184b9fc9f991d9e5d4bc030).
+
+[↑ voltar ao topo](#índice)
+
+### 9.3 _Login_
+
+Vamos criar um _controller_ para realizar a ação de fazer o _login_ de um usuário registrado (_commit_ [3fb4c4f](https://github.com/brnocesar/alura/commit/3fb4c4f3f541d38831cdf3fa8b843f4723184805)). No método mapeado para a rota `/login` devemos:
+
+- verificar se existem os campos `username` e `password` no body da requisição enviada e pegá-los
+- recuperar um registro da tabela de usuários de acordo com o valor do campo `username` passado na requisição
+- verificar se o usuário existe e se a senha confere
+- gerar o _token_ de acesso e retorná-lo
+
+### 9.4 Autenticador
+
+Agora devemos implementar a classe que vai ter a responsabilidade verificar se uma requisição está sendo feita por um usuário válido. Ou seja, devemos verificar se o _token_ está sendo enviado na requisição e se ele é válido.
+
+Criamos a classe `src/Security/JwtAuthenticator.php` e a fazemos herdar de `AbstractGuardAuthenticator`, isso nos trará várias facilidades mas para isso precisamos implementar alguns métodos da interface `AuthenticatorInterface`. Você pode ir dando `ctrl + click` até essa interface (que muito provavelmente estará em `vendor/symfony/security-guard/AuthenticatorInterface.php`), copiar seu conteúdo e ir implementando de acordo com as instruções. Os métodos que devem ser implementados obrigatóriamente são:
+
+- `supports()`: define se o autenticador "suporta" a requisição enviada, ou seja, em que requisicões o autenticador deve ser chamado e ele será chamado sempre que o retorno for `true`. Em nosso caso queremos que apenas a rota `/login` seja aberta
+
+```php
+/**
+ * Does the authenticator support the given Request?
+ *
+ * If this returns false, the authenticator will be skipped.
+ *
+ * @return bool
+ */
+public function supports(Request $request)
+{
+    return $request->getPathInfo() !== '/login';
+}
+```
+
+- `getCredentials()`: neste método devemos recuperar as credênciais de acesso do usuário a partir da requisição feita. No nosso caso a informação enviada no _payload_ do _token_ é um _array_ associativo do `username_ do usuário, e é essa informação que vamos retornar.
+
+```php
+/**
+ * Get the authentication credentials from the request and return them
+ * as any type (e.g. an associate array).
+ *
+ * Whatever value you return here will be passed to getUser() and checkCredentials()
+ *
+ * For example, for a form login, you might:
+ *
+ *      return [
+ *          'username' => $request->request->get('_username'),
+ *          'password' => $request->request->get('_password'),
+ *      ];
+ *
+ * Or for an API token that's on a header, you might use:
+ *
+ *      return ['api_key' => $request->headers->get('X-API-TOKEN')];
+ *
+ * @return mixed Any non-null value
+ *
+ * @throws \UnexpectedValueException If null is returned
+ */
+public function getCredentials(Request $request)
+{
+    $token = str_replace('Bearer ', '', $request->headers->get('Authorization'));
+
+    try {
+        return JWT::decode($token, 'chave1234', ['HS256']);
+    } catch (Exception $e) {
+        return false;
+    }
+}
+```
+
+- `getUser()`: utiliza o retorno de `getCredentials()` para recuperar um usuário e retorná-lo. Para isso podemos pedir o _repository_ de usuários no construtor. Se o retorno for `null` será lançada uma exceção apropriada.
+
+```php
+/**
+ * Return a UserInterface object based on the credentials.
+ *
+ * The *credentials* are the return value from getCredentials()
+ *
+ * You may throw an AuthenticationException if you wish. If you return
+ * null, then a UsernameNotFoundException is thrown for you.
+ *
+ * @param mixed $credentials
+ *
+ * @throws AuthenticationException
+ *
+ * @return UserInterface|null
+ */
+public function getUser($credentials, UserProviderInterface $userProvider)
+{
+    if (!is_object($credentials) or !property_exists($credentials, 'username')) {
+        return null;
+    }
+
+    return $this->repository->findOneBy([
+        'username' => $credentials->username
+    ]);
+}
+```
+
+[↑ voltar ao topo](#índice)
+
+- `checkCredentials()`: verifica se as credênciais retornadas por `getCredentials()` são válidas
+
+```php
+/**
+ * Returns true if the credentials are valid.
+ *
+ * If false is returned, authentication will fail. You may also throw
+ * an AuthenticationException if you wish to cause authentication to fail.
+ *
+ * The *credentials* are the return value from getCredentials()
+ *
+ * @param mixed $credentials
+ *
+ * @return bool
+ *
+ * @throws AuthenticationException
+ */
+public function checkCredentials($credentials, UserInterface $user)
+{
+    return is_object($credentials) and property_exists($credentials, 'username');
+}
+```
+
+- `onAuthenticationFailure()`: o que deve ser feito quando a autenticação falhar. No nosso caso queremos interromper/finalizar a requisição, então retornamos uma resposta em JSON com o conteúdo e código de _status_ HTTP adequados.
+
+```php
+/**
+ * Called when authentication executed, but failed (e.g. wrong username password).
+ *
+ * This should return the Response sent back to the user, like a
+ * RedirectResponse to the login page or a 401 response.
+ *
+ * If you return null, the request will continue, but the user will
+ * not be authenticated. This is probably not what you want to do.
+ *
+ * @return Response|null
+ */
+public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+{
+    return new JsonResponse(['error' => 'Authentication failure'], Response::HTTP_UNAUTHORIZED);
+}
+```
+
+- `onAuthenticationSuccess()`: o que deve ser feito quando a autenticação ocorrer com sucesso. Podemos seguir exatamente o que as instruções orientam para uma API, retornar `null`
+
+```php
+/**
+ * Called when authentication executed and was successful!
+ *
+ * This should return the Response sent back to the user, like a
+ * RedirectResponse to the last page they  visited.
+ *
+ * If you return null, the current request will continue, and the user
+ * will be authenticated. This makes sense, for example, with an API.
+ *
+ * @return Response|null
+ */
+public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey)
+{
+    return null;
+}
+```
+
+- `supportsRememberMe()`: especifica se a aplicação vai "lembrar do usuário autenticado". Como uma API não deve guardar estados, cada requisição é independete, vamos retornar `false`
+
+```php
+/**
+ * Does this method support remember me cookies?
+ *
+ * Remember me cookie will be set if *all* of the following are met:
+ *  A) This method returns true
+ *  B) The remember_me key under your firewall is configured
+ *  C) The "remember me" functionality is activated. This is usually
+ *      done by having a _remember_me checkbox in your form, but
+ *      can be configured by the "always_remember_me" and "remember_me_parameter"
+ *      parameters under the "remember_me" firewall key
+ *  D) The onAuthenticationSuccess method returns a Response object
+ *
+ * @return bool
+ */
+public function supportsRememberMe()
+{
+    return false;
+}
+```
+
+- `start()`: no nosso caso não teremos usuários anônimos, então podemos deixar em branco.
+
+```php
+/**
+ * Returns a response that directs the user to authenticate.
+ *
+ * This is called when an anonymous request accesses a resource that
+ * requires authentication. The job of this method is to return some
+ * response that "helps" the user start into the authentication process.
+ *
+ * Examples:
+ *
+ * - For a form login, you might redirect to the login page
+ *
+ *     return new RedirectResponse('/login');
+ *
+ * - For an API token authentication system, you return a 401 response
+ *
+ *     return new Response('Auth header required', 401);
+ *
+ * @return Response
+ */
+public function start(Request $request, AuthenticationException $authException = null){
+    // TODO: Implement start() method
+}
+```
+
+Após implementar todos os métodos necessários ainda devemos informar ao Symfony que agora existe um _guard file_, o autenticador. Essa informação é registrada no arquivo `config/packages/security.yaml`, em `firewalls` devemos adicionar e modificar algumas diretivas:
+
+- primeiro modificamos a diretiva `anonymous` para informar que não teremos usuários anônimos (com isso não precisamos implementar o método `start()` em nosso autenticador(?))
+- expecificamos que não temos uma rota de _logout_
+- e qual nosso arquivo de _guard_
+
+Nesse _commit_ [c171124](https://github.com/brnocesar/alura/commit/c171124004a90c1bbf7a48e7f5fbccf52e088907) você pode verificar o resultado com todos os métodos implementados.
+
+[↑ voltar ao topo](#índice)
+
+## 10 Tratando erros
+
+### Eventos do Symfony
 
 [↑ voltar ao topo](#índice)
