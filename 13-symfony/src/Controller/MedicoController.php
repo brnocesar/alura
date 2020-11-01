@@ -19,6 +19,8 @@ class MedicoController extends BaseController
 
     public function indexByEspecialidede(int $especialidadeId): Response
     {
+        // verificar se existe a especialidade
+        
         $medicos = $this->repository->findBy([
             'especialidade' => $especialidadeId
         ]);
