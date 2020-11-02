@@ -7,6 +7,7 @@ use App\Factory\ResponseFactory;
 use App\Helper\UrlDataExtractor;
 use Doctrine\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,13 +31,18 @@ abstract class BaseController extends AbstractController
      * @var UrlDataExtractor
      */
     protected $extractor;
+    /**
+     * @var CacheItemPoolInterface
+     */
+    protected $cache;
     
-    public function __construct(ObjectRepository $repository, EntityManagerInterface $entityManager, EntityFactory $factory, UrlDataExtractor $extractor)
+    public function __construct(ObjectRepository $repository, EntityManagerInterface $entityManager, EntityFactory $factory, UrlDataExtractor $extractor, CacheItemPoolInterface $cache)
     {
         $this->repository    = $repository;
         $this->entityManager = $entityManager;
         $this->factory       = $factory;
         $this->extractor     = $extractor;
+        $this->cache         = $cache;
     }
     
     public function index(Request $request): Response
@@ -64,6 +70,10 @@ abstract class BaseController extends AbstractController
 
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
+
+        $cacheItem = $this->cache->getItem($this->cachePrefix() . (string) $entity->getId());
+        $cacheItem->set($entity);
+        $this->cache->save($cacheItem);
 
         return new JsonResponse($entity, Response::HTTP_CREATED);
     }
@@ -105,4 +115,6 @@ abstract class BaseController extends AbstractController
     }
 
     abstract public function updateCurrentEntity($currentEntity, $newEntity);
+
+    abstract public function cachePrefix(): string;
 }
