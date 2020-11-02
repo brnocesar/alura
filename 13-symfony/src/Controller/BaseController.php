@@ -43,18 +43,17 @@ abstract class BaseController extends AbstractController
     {
         $currentPage  = $this->extractor->getCurrentPage($request);
         $itensPerPage = $this->extractor->getItensPerPage($request); 
-        $offsetSearch = $this->extractor->getOffsetSearch($request); 
 
         $entityList = $this->repository->findBy(
             $this->extractor->getFilterParams($request), 
             $this->extractor->getSortParams($request), 
             $itensPerPage, 
-            $offsetSearch
+            $this->extractor->getOffsetSearch($request)
         );
 
         $totalItens = count($this->repository->findAll()); // trocar isso
 
-        $response = new ResponseFactory($entityList, $currentPage, $itensPerPage, $totalItens);
+        $response = new ResponseFactory($entityList, Response::HTTP_OK, $currentPage, $itensPerPage, $totalItens);
 
         return $response->getResponse();
     }
