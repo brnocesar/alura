@@ -18,13 +18,7 @@ class MedicoFactory implements EntityFactory
     public function createEntity(string $json): Medico
     {
         $request = json_decode($json);
-
-        if ( !isset($request->nome) or !property_exists($request, 'crm') or !isset($request->especialidadeId) ) {
-            throw new EntityFactoryException(
-                'nome, crm e especialidadeId são campos obrigatórios para cadastrar Médico',
-                Response::HTTP_BAD_REQUEST
-            );
-        }
+        $this->checkAllProperties($request);
 
         $especialidade = $this->especialidadeRepository->find($request->especialidadeId);
         
@@ -34,5 +28,30 @@ class MedicoFactory implements EntityFactory
             ->setEspecialidade($especialidade);
 
         return $medico;
+    }
+
+    private function checkAllProperties(object $request): void
+    {
+        $statusCode = Response::HTTP_BAD_REQUEST;
+        if ( !isset($request->nome) ) {
+            throw new EntityFactoryException(
+                'Atributo nome é obrigatório',
+                $statusCode
+            );
+        }
+
+        if ( !property_exists($request, 'crm') ) {
+            throw new EntityFactoryException(
+                'Atributo crm é obrigatório',
+                $statusCode
+            );
+        }
+
+        if ( !isset($request->especialidadeId) ) {
+            throw new EntityFactoryException(
+                'Atributo especialidadeId é obrigatório',
+                $statusCode
+            );
+        }
     }
 }

@@ -10,17 +10,21 @@ class EspecialidadeFactory implements EntityFactory
     public function createEntity(string $json): Especialidade
     {
         $request = json_decode($json);
-
-        if ( !property_exists($request, 'descricao') ) {
-            throw new EntityFactoryException(
-                'campo descricao é obrigatório para cadastrar Especialidade',
-                Response::HTTP_BAD_REQUEST
-            );
-        }
+        $this->checkAllProperties($request);
         
         $especialidade = new Especialidade();
         $especialidade->setDescricao($request->descricao);
 
         return $especialidade;
+    }
+
+    private function checkAllProperties(object $request): void
+    {
+        if ( !property_exists($request, 'descricao') ) {
+            throw new EntityFactoryException(
+                'Atributo descricao é obrigatório',
+                Response::HTTP_BAD_REQUEST
+            );
+        }
     }
 }
