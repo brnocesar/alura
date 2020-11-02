@@ -80,7 +80,11 @@ abstract class BaseController extends AbstractController
     
     public function show(int $id): Response
     {
-        $entity = $this->repository->find($id);
+        $entity = $this->cache->hasItem($this->cachePrefix() . $id) 
+            ? $this->cache->getItem($this->cachePrefix() . $id)->get() 
+            : $this->repository->find($id);
+        // $entity = $this->cache->getItem($this->cachePrefix() . $id)->get() ?? $this->repository->find($id);
+        
         $codigoRetorno = is_null($entity) ? Response::HTTP_NOT_FOUND : Response::HTTP_OK;
         
         return new JsonResponse($entity, $codigoRetorno);
