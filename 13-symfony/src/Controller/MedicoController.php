@@ -8,14 +8,21 @@ use App\Helper\UrlDataExtractor;
 use App\Repository\MedicoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class MedicoController extends BaseController
 {
-    public function __construct(EntityManagerInterface $entityManager, MedicoFactory $factory, MedicoRepository $repository, UrlDataExtractor $extractor, CacheItemPoolInterface $cache)
-    {
-        parent::__construct($repository, $entityManager, $factory, $extractor, $cache);
+    public function __construct(
+        EntityManagerInterface $entityManager, 
+        MedicoFactory $factory, 
+        MedicoRepository $repository, 
+        UrlDataExtractor $extractor, 
+        CacheItemPoolInterface $cache,
+        LoggerInterface $logger
+    ) {
+        parent::__construct($repository, $entityManager, $factory, $extractor, $cache, $logger);
     }
 
     public function indexByEspecialidede(int $especialidadeId): Response

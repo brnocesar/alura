@@ -8,6 +8,7 @@ use App\Helper\UrlDataExtractor;
 use Doctrine\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,15 +36,27 @@ abstract class BaseController extends AbstractController
      * @var CacheItemPoolInterface
      */
     protected $cache;
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
     
-    public function __construct(ObjectRepository $repository, EntityManagerInterface $entityManager, EntityFactory $factory, UrlDataExtractor $extractor, CacheItemPoolInterface $cache)
-    {
+    public function __construct(
+        ObjectRepository $repository, 
+        EntityManagerInterface $entityManager, 
+        EntityFactory $factory, 
+        UrlDataExtractor $extractor, 
+        CacheItemPoolInterface $cache,
+        LoggerInterface $logger
+    ) {
         $this->repository    = $repository;
         $this->entityManager = $entityManager;
         $this->factory       = $factory;
         $this->extractor     = $extractor;
         $this->cache         = $cache;
+        $this->logger        = $logger;
     }
+
     
     public function index(Request $request): Response
     {
@@ -72,6 +85,13 @@ abstract class BaseController extends AbstractController
         $this->entityManager->flush();
 
         $this->createOrUpdateCache($entity);
+        $this->logger->notice(
+            'Novo registro de {entidade} adicionado com id = {id}.', 
+            [
+                'entidade' => get_class($entity),
+                'id'       => $entity->getId()
+            ]
+        );
 
         return new JsonResponse($entity, Response::HTTP_CREATED);
     }

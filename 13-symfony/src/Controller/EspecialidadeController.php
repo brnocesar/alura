@@ -8,12 +8,19 @@ use App\Helper\UrlDataExtractor;
 use App\Repository\EspecialidadeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 
 class EspecialidadeController extends BaseController
 {
-    public function __construct(EntityManagerInterface $entityManager, EspecialidadeRepository $repository, EspecialidadeFactory $factory, UrlDataExtractor $extractor, CacheItemPoolInterface $cache)
-    {
-        parent::__construct($repository, $entityManager, $factory, $extractor, $cache);
+    public function __construct(
+        EntityManagerInterface $entityManager, 
+        EspecialidadeRepository $repository, 
+        EspecialidadeFactory $factory, 
+        UrlDataExtractor $extractor, 
+        CacheItemPoolInterface $cache,
+        LoggerInterface $logger
+    ) {
+        parent::__construct($repository, $entityManager, $factory, $extractor, $cache, $logger);
     }
     
     /**
