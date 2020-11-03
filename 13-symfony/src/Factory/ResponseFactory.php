@@ -4,7 +4,6 @@ namespace App\Factory;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class ResponseFactory
@@ -64,7 +63,8 @@ class ResponseFactory
     {
         return new self(
             ['mensagem' => $erro->getMessage()], 
-            $erro->getCode() == 0 ? $erro->getStatusCode() : $erro->getCode()
+            Response::HTTP_INTERNAL_SERVER_ERROR
+            // $erro->getCode() == 0 ? $erro->getStatusCode() : $erro->getCode()
         );
     }
 }
