@@ -38,6 +38,15 @@ Levantar o servidor local:
 php -S localhost:8080 -t public
 ```
 
+Realizar autenticação na rota `/login`:
+
+```json
+{
+    "username":  "usuario",
+    "password": "123456"
+}
+```
+
 ### Índice
 
 1. [Configurando o ambiente](#1-configurando-o-ambiente)  
@@ -66,7 +75,7 @@ php -S localhost:8080 -t public
   5.6. Corrigindo CRUD de médicos  
 6. [Rotas com sub-recursos](#6-rotas-com-sub-recursos)  
   6.1. Criando um _repository_ para médicos  
-7. [Aproveitando Código e `BaseController`](#7-aproveitando-código-e-`basecontroller`)  
+7. [Aproveitando Código e `BaseController`](#7-aproveitando-código,-`basecontroller`-e-arquivo-de-rotas)  
   7.1 Interface para _factory_  
   7.2 Método abstrato  
 8. [Melhorando as respostas](#8-melhorando-as-respostas)  
@@ -82,8 +91,13 @@ php -S localhost:8080 -t public
     9.2.1 _Fixtures_ do Doctrine  
   9.3 _Login_  
   9.4 Autenticador  
-10. [Tratando erros](#10-tratando-erros)  
-  10.1 Eventos do Symfony
+10. [Eventos do Symfony](#10-eventos-do-symfony)  
+  10.1 Tratando erros  
+  10.2 Lançando exceções  
+11. [11 Utilizando cache](#11-utilizando-cache)  
+  11.3 Guardando no cache  
+  11.3 Recuperando do cache  
+  11.3 Invalidando o cache  
 
 ## 1 Configurando o ambiente
 
@@ -867,7 +881,7 @@ Agora basta alterar o _controller_ de médicos pedindo o _repository_ de médico
 
 [↑ voltar ao topo](#índice)
 
-## 7 Aproveitando Código e `BaseController`
+## 7 Aproveitando Código, `BaseController` e arquivo de rotas
 
 Olhando para nossos _controllers_ podemos perceber que existe muito código repetido neles, basicamente cada um deles faz a mesma coisa mas para entidades diferentes. Nesse caso podemos criar um `BaseController` com todo esse comportamento comum e fazer os atuais _controllers_ o extenderem. E como esse _controller_ não será instânciado, apenas herdado, podemos definir essa classe como abstrata.
 
@@ -985,6 +999,14 @@ O método `update()` é um pouco diferente. Recuperamos um objeto através do _r
 Uma boa solução para esse problema é abstrair a atualização dos atributos para um método a parte. Vamos utilizar o _template method_, em que no `BaseController` definimos um método abstrato (o _template_) e nas classes filhas definimos a implementação concreta, de acordo com a entidade.
 
 A criação do `BaseController` e centralização das rotas está registrada no (_commit_ [ea14074](https://github.com/brnocesar/alura/commit/ea1407418dc0d720933b6faab5fe91e2e6cefaad)).
+
+### 7.3 Arquivo de rotas em formato PHP
+
+Existem outras formas de escrever o arquivo de rotas além de **yaml**, como **XML** e **PHP**. No _commit_ [6b94e5c](https://github.com/brnocesar/alura/commit/6b94e5c04f888cc649fbca81dec852ccbcb6b911) as rotas foram passadas do arquivo `routes.yaml` para o arquivo `routes.php`. Uma dica interessante é que talvez seja necessário limpar o cache após fazer modificações no arquivo de rotas:
+
+```terminal
+php bin/console cache:clear
+```
 
 [↑ voltar ao topo](#índice)
 
@@ -1448,8 +1470,103 @@ Nesse _commit_ [c171124](https://github.com/brnocesar/alura/commit/c171124004a90
 
 [↑ voltar ao topo](#índice)
 
-## 10 Tratando erros
+## 10 Eventos do Symfony
 
-### Eventos do Symfony
+### 10.1 Tratando erros
+
+Vamos tentar acessar uma rota que não foi definida para nossa aplicação, como por exemplo a rota `/batatinha`. Se tentarmos acessar essa rota pelo navegador ou algum cliente que renderize HTML o resultado será uma página informando um erro de "rota/página não encontrada". Mas como estamos desenvolvendo uma API não queremos retornar código HTML, queremos que seja retornado uma resposta em JSON.
+
+Então precisamos de alguma forma capturar essa exceção que for lançada e retornar um JSON informando o erro. Uma forma de fazer isso é utilizando o recurso de **eventos** do Symfony.
+
+Quando uma exceção é lançada no Symfony (e não capturada) é feita a emissão de um evento, que pode ser "pego" por _listeners_ e _subscribers_. Nesse momento vamos usar a abordagem de _subscriber_, em que podemos mapear exatamente que método deve ser executado para um evento específico.
+
+Vamos criar a classe `src/EventListeners/ExceptionHandler.php` que irá escutar o evento de _exception_ do Symfony (emitido quando uma exceção é lançada e não capturada) e escrever um método que pega essa exceção e define a respota como um JSON.
+
+Após criar a classe `ExceptionHandler` devemos fazer ela implementar a interface `EventSubscriberInterface`, que pede a implementação do método `getSubscribedEvents()`. Esse método deve retornar um _array_ associativo do evento escutado e o método que deve ser executado. Cada evento pode ter mais de um método mapeado e é possível definir a prioridade de cada método. Para ver mais sobre isso acesse a [documentação](https://symfony.com/doc/current/event_dispatcher.html).
+
+No nosso caso o evento ouvido será o `KernelEvents::EXCEPTION` e vamos implementar o método `handleException()` para ser executado. O parâmetro que esses métodos devem receber vai depedender do tipo de evento escutado, aqui o método vai receber um objeto do tipo `ExceptionEvent`.
+
+O método `handleException()` deve definir a reposta para o evento através do método `setResponse()`. Aqui podemos modificar um pouco a `ResponseFactory` e utilizá-la para retornar uma respota adequada (_commit_ [6c2d10c](https://github.com/brnocesar/alura/commit/6c2d10c98f0f5b3128f2fd5b65232af73c5631f4)). Não é necessário retonar nada neste método pois o `setResponse()` é terminal, ele finaliza a requisição.
+
+### 10.2 Lançando exceções
+
+No tópico anterior capturamos exceções lançadas pelo _framework_, mas podemos lançar uma exceção personalizada para validar se a requisição possui todos os campos obrigatórios.
+
+Iniciamos criando a classe `src/Factory/EntityFactoryException.php` e fazendo-a extender a classe `Exception`. Nas _factories_ de cada entidade posso verificar se está faltando algum dos campos na _request_ e lançar a exceção com uma mensagem e _status code_ adequados.
+
+É possível definir mais de um método para ser executado em cada evento e estabelecer a prioridade de cada método (quanto maior o valor, maior a prioridade). Assim poderiamos ter métodos separados para lidar com cada tipo de exceção e o nosso _subscriber_ ficaria parecido com o bloco abaixo `ExceptionHandler`:
+
+```php
+...
+
+class ExceptionHandler implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        return [
+            KernelEvents::EXCEPTION => [
+                ['handleEntityException', 1],
+                ['handle404Exception', 0]
+            ]
+        ];
+    }
+
+    public function handleException(ExceptionEvent $event)
+    {
+        if ($event->getException() instanceof NotFoundHttpException) {
+            $response = ResponseFactory::fromError($event->getThrowable())->getResponse();
+            $reponse->setStatusCode(404);
+            $event->setResponse($response);
+        }
+    }
+
+    public function handleEntityException(ExceptionEvent $event)
+    {
+        if ($event->getException() instanceof EntityFactoryException) {
+            $response = ResponseFactory::fromError($event->getThrowable())->getResponse();
+            $reponse->setStatusCode(400);
+            $event->setResponse($response);
+        }
+    }
+}
+```
+
+Mas para esse projeto, até o momento, será mantido apenas um método para lidar com todas as exceções. Essas alterações estão registradas no _commit_ [b183529](https://github.com/brnocesar/alura/commit/b1835299630617bd20c657116b1d168fbf9dc4ce).
+
+Podemos refinar um pouco o código usando o conceito de _guard claused_, abstraindo o código de verificação dos parâmetros para um método, deixando assim o método que cria a entidade mais limpo (_commit_ [0489276](https://github.com/brnocesar/alura/commit/0489276fb2f45abc04d40d9a0318e6f209f37c10)).
+
+Nesta seção vimos apenas o evento relacionado ao lançamento de exceções, mas o Symfony emite diversos tipos de eventos, veja mais sobre isso na [documentação](https://symfony.com/doc/current/reference/events.html).
+
+[↑ voltar ao topo](#índice)
+
+## 11 Utilizando cache
+
+Na maior parte das aplicações web as funcionalidades de leitura são bem mais utilizadas do que as de escrita. Isso significa que poderiamos deixar as coleções de médicos e especialidades salvas na memória do servidor que está rodando a aplicação, assim quando esse recurso for solicitado não é necessário fazer uma consulta no banco de dados, o que pode economizar processamento e melhorar o desempenho da nossa aplicação.
+
+O Symfony possui um [componente de cache](https://symfony.com/doc/current/components/cache.html) que permite utilizar esse recurso de diferentes formas. Vamos começar adicionando uma interface como dependência no construtor do `BaseController`, a `CacheItemPoolInterface`, que é um repositório de itens de cache e vai lidar com o cache organizando itens que serão salvos e recuperados. A interface que será utilizada nesse momento segue a PSR-6.
+
+### 11.1 Guardando no cache
+
+Agora que temos um repositório de itens do cache, podemos começar utilizando-o no método `store()`, que armazena uma nova entidade. Nesse método vamos:
+
+- criar um novo item no cache tentando recuperá-lo
+- atribuir um valor para esse novo item
+- salvar o item
+
+```php
+$cacheItem = $this->cache->getItem('identificador_unico_do_item')
+$cacheItem->set('valor');
+$this->cache->save($cacheItem);
+```
+
+Note que no _controller_ definimos o identificador único como a junção de um prefixo que depende do _controller_/entidade e do ID do objeto que foi criado. O prefixo poderia ser apenas uma variável definida no `BaseController` que seria inicializada construtor dos _controllers_ filhos, mas aqui acabou sendo implementado como um método abstrato para fazer parte do "contrato" (_commit_ [774b5ac](https://github.com/brnocesar/alura/commit/774b5ac58ef19b9d8449e1cdfaaaf5294f921ac9)).
+
+### 11.2 Buscando do cache
+
+Agora quando precisarmos recuperar algum registro, podemos primeiro verificar se ele está no cache e então apenas se for necessário fazer a consulta no banco (_commit_ [840bc1f](https://github.com/brnocesar/alura/commit/840bc1f9fea4596dda147f5115d5b2bbf8108fd5)).
+
+### 11.3 Invalidando o cache
+
+Até o momento apenas guardamos e recuperamos itens do cache e agora vamos atualizar as informações cacheadas quando nencessário. São duas a ocasiões, quando um registro for excluído do banco de dados devemos invalidar seu respectivo item no cache , do contrário o recurso `show()` de um registro excluído ainda ficará disponível, e quando modificarmos um registro precisamos atualizar o que está em cache (_commit_ [789a68c](https://github.com/brnocesar/alura/commit/789a68cc94abc2ef93b4080357c6faf02ab583c9)).
 
 [↑ voltar ao topo](#índice)
