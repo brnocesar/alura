@@ -71,19 +71,17 @@ abstract class BaseController extends AbstractController
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
 
-        $cacheItem = $this->cache->getItem($this->cachePrefix() . (string) $entity->getId());
-        $cacheItem->set($entity);
-        $this->cache->save($cacheItem);
+        $this->createOrUpdateCache($entity);
 
         return new JsonResponse($entity, Response::HTTP_CREATED);
     }
     
     public function show(int $id): Response
     {
-        $entity = $this->cache->hasItem($this->cachePrefix() . $id) 
-            ? $this->cache->getItem($this->cachePrefix() . $id)->get() 
+        $entity = $this->cache->hasItem($this->cacheItemId($id)) 
+            ? $this->cache->getItem($this->cacheItemId($id))->get() 
             : $this->repository->find($id);
-        // $entity = $this->cache->getItem($this->cachePrefix() . $id)->get() ?? $this->repository->find($id);
+        // $entity = $this->cache->getItem($this->cacheItemId($id))->get() ?? $this->repository->find($id);
         
         $codigoRetorno = is_null($entity) ? Response::HTTP_NOT_FOUND : Response::HTTP_OK;
         
@@ -102,6 +100,8 @@ abstract class BaseController extends AbstractController
         $this->updateCurrentEntity($entity, $newEntity);
         $this->entityManager->flush();
 
+        $this->createOrUpdateCache($entity);
+
         return new JsonResponse($entity, Response::HTTP_OK);
     }
 
@@ -115,10 +115,19 @@ abstract class BaseController extends AbstractController
         $this->entityManager->remove($entity);
         $this->entityManager->flush();
 
+        $this->cache->deleteItem($this->cacheItemId($id));
+
         return new JsonResponse('', Response::HTTP_NO_CONTENT);
+    }
+
+    private function createOrUpdateCache($entity): void
+    {
+        $cacheItem = $this->cache->getItem($this->cacheItemId($entity->getId()));
+        $cacheItem->set($entity);
+        $this->cache->save($cacheItem);
     }
 
     abstract public function updateCurrentEntity($currentEntity, $newEntity);
 
-    abstract public function cachePrefix(): string;
+    abstract public function cacheItemId(string $item_id): string;
 }

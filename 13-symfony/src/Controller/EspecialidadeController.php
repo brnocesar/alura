@@ -25,8 +25,11 @@ class EspecialidadeController extends BaseController
         $currentEntity->setDescricao($newEntity->getDescricao());
     }
 
-    public function cachePrefix(): string
+    /**
+     * @param string $item_id
+     */
+    public function cacheItemId(string $item_id): string
     {
-        return "especialidade_";
+        return "especialidade_{$item_id}";
     }
 }

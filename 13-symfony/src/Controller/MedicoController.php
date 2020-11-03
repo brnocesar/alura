@@ -41,8 +41,11 @@ class MedicoController extends BaseController
             ->setEspecialidade($newEntity->getEspecialidade());
     }
 
-    public function cachePrefix(): string
+    /**
+     * @param string $item_id
+     */
+    public function cacheItemId(string $item_id): string
     {
-        return "medico_";
+        return "medico_{$item_id}";
     }
 }
