@@ -44,7 +44,7 @@ class MedicoWebTest extends WebTestCase
             json_encode([
                 'crm' => '123456',
                 'nome' => 'Medico de Teste',
-                'especialidadeId' => 177
+                'especialidadeId' => 1
             ])
         );
 
