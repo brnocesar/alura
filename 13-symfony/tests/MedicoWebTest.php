@@ -6,14 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class MedicoWebTest extends WebTestCase
 {
-    public function testPaginaAtualEhMaiorQueZero()
+    public function testRequisicaoFalhaSemAutenticacao()
     {
         $client = static::createClient();
         $client->request('GET', '/medicos');
 
-        $body = json_decode($client->getResponse()->getContent());
-        $currentPage = $body->paginaAtual ?? null;
-
-        $this->assertEquals(1, $currentPage);
+        $this->assertEquals(401, $client->getResponse()->getStatusCode());
     }
 }
