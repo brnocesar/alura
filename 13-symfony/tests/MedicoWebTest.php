@@ -15,7 +15,7 @@ class MedicoWebTest extends WebTestCase
         $this->assertEquals(401, $client->getResponse()->getStatusCode());
     }
 
-    public function testEspecialidadesSaoListadasAoAutenticar()
+    public function testMedicosSaoListados()
     {
         $client = static::createClient();
         $token = $this->login($client);
@@ -27,6 +27,28 @@ class MedicoWebTest extends WebTestCase
         $currentPage = $body->paginaAtual ?? null;
 
         $this->assertEquals(1, $currentPage);
+    }
+
+    public function testCadastraNovoMedico()
+    {
+        $client = static::createClient();
+        $token = $this->login($client);
+        $client->request(
+            'POST', '/medicos', 
+            [], 
+            [], 
+            [
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_AUTHORIZATION' => "Bearer $token"
+            ],
+            json_encode([
+                'crm' => '123456',
+                'nome' => 'Medico de Teste',
+                'especialidadeId' => 177
+            ])
+        );
+
+        $this->assertEquals(201, $client->getResponse()->getStatusCode());
     }
 
     private function login(KernelBrowser $client): string
