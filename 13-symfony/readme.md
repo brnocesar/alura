@@ -1,6 +1,65 @@
 # API com Symfony
 
-## Rodando a aplicação
+0. [Rodando a aplicação](#0-rodando-a-aplicação)  
+1. [Configurando o ambiente](#1-configurando-o-ambiente)  
+  1.1. Criando um projeto  
+  1.2. Estrutura de arquivos  
+  1.3. A primeira rota  
+  1.4. Lendo dados da requisição  
+2. [Entidades](#2-entidades)  
+3. [Usando um ORM](#3-usando-um-orm)  
+  3.1. CLI  
+  3.2. Mapeando entidades e _migrations_  
+  3.3. Criando um registro e _entity manager_  
+  3.4. Recuperando registros e _repository_  
+  3.4.1. Listando todos médicos  
+  3.4.2. Recuperando um médico específico  
+  3.4.3. Atualizando um médico  
+  3.5. Factory  
+  3.5.1. Abstraindo para um método  
+4. [Configurando MySQL](#4-configurando-mysql)  
+5. [Relacionamentos e uma nova entidade](#5-relacionamentos-e-uma-nova-entidade)  
+  5.1. Gerando código pela CLI  
+  5.2. Criando uma nova entidade  
+  5.3. Definindo o relacionamento entre entidades  
+  5.4. CRUD de Especialidade  
+  5.5. Interface `JsonSerializable`  
+  5.6. Corrigindo CRUD de médicos  
+6. [Rotas com sub-recursos](#6-rotas-com-sub-recursos)  
+  6.1. Criando um _repository_ para médicos  
+7. [Aproveitando Código e `BaseController`](#7-aproveitando-código,-`basecontroller`-e-arquivo-de-rotas)  
+  7.1 Interface para _factory_  
+  7.2 Método abstrato  
+8. [Melhorando as respostas](#8-melhorando-as-respostas)  
+  8.1 Ordenação e filtro de resultados  
+    8.1.1 Ordenando resultados  
+    8.1.2 Filtrando resultados  
+    8.1.3 Abstraindo a extração de dados da _request_  
+  8.2 Paginando os resultados  
+  8.3 Retornando informação extra e linkando recursos  
+9. [Autenticação e proteção de rotas](#9-autenticação-e-proteção-de-rotas)  
+  9.1 Pacotes necessários  
+  9.2 Entidade `User`  
+    9.2.1 _Fixtures_ do Doctrine  
+  9.3 _Login_  
+  9.4 Autenticador  
+10. [Eventos do Symfony](#10-eventos-do-symfony)  
+  10.1 Tratando erros  
+  10.2 Lançando exceções  
+11. [Utilizando cache](#11-utilizando-cache)  
+  11.1 Guardando no cache  
+  11.2 Recuperando do cache  
+  11.3 Invalidando o cache  
+12. [Trabalhando com logs](#12-trabalhando-com-logs)  
+  12.1 Gerando _logs_ de ações  
+  12.2 Gerando _logs_ de exceções  
+13. [Testes funcionais](#13-teste-funcionais)  
+  13.1 Pacotes necessários  
+  13.2 Primeiro teste  
+  13.3 Teste com autenticação  
+  13.4 Banco para testes  
+
+## 0 Rodando a aplicação
 
 Instalar as dependências do projeto:
 
@@ -47,57 +106,7 @@ Realizar autenticação na rota `/login`:
 }
 ```
 
-### Índice
-
-1. [Configurando o ambiente](#1-configurando-o-ambiente)  
-  1.1. Criando um projeto  
-  1.2. Estrutura de arquivos  
-  1.3. A primeira rota  
-  1.4. Lendo dados da requisição  
-2. [Entidades](#2-entidades)  
-3. [Usando um ORM](#3-usando-um-orm)  
-  3.1. CLI  
-  3.2. Mapeando entidades e _migrations_  
-  3.3. Criando um registro e _entity manager_  
-  3.4. Recuperando registros e _repository_  
-  3.4.1. Listando todos médicos  
-  3.4.2. Recuperando um médico específico  
-  3.4.3. Atualizando um médico  
-  3.5. Factory  
-  3.5.1. Abstraindo para um método  
-4. [Configurando MySQL](#4-configurando-mysql)  
-5. [Relacionamentos e uma nova entidade](#5-relacionamentos-e-uma-nova-entidade)  
-  5.1. Gerando código pela CLI  
-  5.2. Criando uma nova entidade  
-  5.3. Definindo o relacionamento entre entidades  
-  5.4. CRUD de Especialidade  
-  5.5. Interface `JsonSerializable`  
-  5.6. Corrigindo CRUD de médicos  
-6. [Rotas com sub-recursos](#6-rotas-com-sub-recursos)  
-  6.1. Criando um _repository_ para médicos  
-7. [Aproveitando Código e `BaseController`](#7-aproveitando-código,-`basecontroller`-e-arquivo-de-rotas)  
-  7.1 Interface para _factory_  
-  7.2 Método abstrato  
-8. [Melhorando as respostas](#8-melhorando-as-respostas)  
-  8.1 Ordenação e filtro de resultados  
-    8.1.1 Ordenando resultados  
-    8.1.2 Filtrando resultados  
-    8.1.3 Abstraindo a extração de dados da _request_  
-  8.2 Paginando os resultados  
-  8.3 Retornando informação extra e linkando recursos  
-9. [Autenticação e proteção de rotas](#9-autenticação-e-proteção-de-rotas)  
-  9.1 Pacotes necessários  
-  9.2 Entidade `User`  
-    9.2.1 _Fixtures_ do Doctrine  
-  9.3 _Login_  
-  9.4 Autenticador  
-10. [Eventos do Symfony](#10-eventos-do-symfony)  
-  10.1 Tratando erros  
-  10.2 Lançando exceções  
-11. [11 Utilizando cache](#11-utilizando-cache)  
-  11.3 Guardando no cache  
-  11.3 Recuperando do cache  
-  11.3 Invalidando o cache  
+[↑ voltar ao topo](#api-com-symfony)
 
 ## 1 Configurando o ambiente
 
@@ -124,7 +133,7 @@ Entrando no diretório do projeto podemos ver suas pastas:
 - `resources`: fica toda a parte visualizada pelo usuário
 - `routes`: armazena as rotas da aplicação
 
-### 1.3 A primeira rota
+### 1.3 A primeira rota[↑ voltar ao topo](#api-com-symfony)
 
 Diferente do Laravel ou Lumen, aqui não temos uma pasta `/routes` na raiz do projeto com arquivos específicos para definição de rotas. Então por hora vamos criar a rota de "olá Mundo!" através de _anottations_ diretamente nos métodos dos _controller_.
 
@@ -150,7 +159,7 @@ Para acessar dados da requisição dentro do método de um _controller_ podemos 
 
 Além disso, como estramos trabalhando com uma API, é uma boa prática (regra?) que os métodos mapeados para rotas retornem um objeto do tipo resposta (`use Symfony\Component\HttpFoundation\Response`).
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 ## 2 Entidades
 
@@ -189,7 +198,7 @@ class MedicoController
 }
 ```
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 ## 3 Usando um ORM
 
@@ -278,7 +287,7 @@ Uma outra opção é executar todas as _migrations_ de uma só vez, para isso te
 php bin/console doctrine:migrations:migrate
 ```
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 ### 3.3 Criando um registro e _entity manager_
 
@@ -395,7 +404,7 @@ class MedicoController extends AbstractController
 }
 ```
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 #### 3.4.3 Atualizando um médico
 
@@ -518,7 +527,7 @@ class MedicoController extends AbstractController
 
 Outro benefício que obtemos dessa refatoração é que uma responsabilidade que estava no _controller_ foi delegada para uma outra classe responsável apenas por isso.
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 #### 3.5.1 Abstraindo para um método
 
@@ -610,7 +619,7 @@ class MedicoController extends AbstractController
 
 A implementação do CRUD de médicos, com algumas diferenças do que é mostrado neste guia, pode ser encontrada no _commit_ [1c97a64](https://github.com/brnocesar/alura/commit/1c97a6473d4bef3ca2ca7fe9b302e9dc62238bf2).
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 ## 4 Configurando MySQL
 
@@ -671,7 +680,7 @@ No caso vamos apenas definir o nome da entidade como `Especialidade` e definir u
 php bin/console make:migration
 ```
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 ### 5.3 Definindo o relacionamento entre entidades
 
@@ -797,7 +806,7 @@ class MedicoFactory
 
 As implementações do CRUD de Especialidade, adaptações às entidades e ao CRUD de médicos foram feitas no _commit_ [791775f](https://github.com/brnocesar/alura/commit/791775f4568f160e800143c2a38b710f445c510f).
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 ## 6 Rotas com sub-recursos
 
@@ -879,7 +888,7 @@ class Medico implements JsonSerializable
 
 Agora basta alterar o _controller_ de médicos pedindo o _repository_ de médicos por injeção de depêndencia no construtor e substituir o método `getDoctrine()->getRepository(Medico::class)` (_commit_ [bd415aa](https://github.com/brnocesar/alura/commit/bd415aa48d955efb6ef482b062080e8a69ef19be)).
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 ## 7 Aproveitando Código, `BaseController` e arquivo de rotas
 
@@ -1008,7 +1017,7 @@ Existem outras formas de escrever o arquivo de rotas além de **yaml**, como **X
 php bin/console cache:clear
 ```
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 ### 8 Melhorando as respostas
 
@@ -1060,7 +1069,7 @@ Após isso recebemos estas informações no método `index()` do _controller_ e 
 
 Perceba que o nome da classe `DataExtractorRequest` foi alterado para `UrlDataExtractor` (_commit_ [0bafa08](https://github.com/brnocesar/alura/commit/0bafa08515443708e2feb809e72e787ad4fb5d1b)).
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 ### 8.3 Retornando informação extra e linkando recursos
 
@@ -1115,7 +1124,7 @@ A minha implementação da _factory_ pode ser vista no _commit_ [67caf2f](https:
 
 Agora vamos adicionar links para navegação entre recursos. Como já serializamos a representação das entidades, basta adicionar um elemento `_links` (adicionamos o _underline_ por convenção, para informar que é uma informação extra e não um atributo do objeto) e definir os recursos que queremos expor (_commit_ [4deea4e](https://github.com/brnocesar/alura/commit/4deea4e4fda43cc8253fcf4dd0fa9dfaf3645fea)).
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 ## 9 Autenticação e proteção de rotas
 
@@ -1181,7 +1190,7 @@ php bin/console doctrine:migrations:migrate
 
 As alterações no projeto referentes a criação dessa classe estão registradas no _commit_ [98e5278](https://github.com/brnocesar/alura/commit/98e52788a2f3d61c8c957d62278278f1d8c9384b).
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 #### 9.2.1 _Fixtures_ do Doctrine
 
@@ -1247,7 +1256,7 @@ php bin\console doctrine:fixtures:load
 
 A alteração na _fixture_ pode ser observada no _commit_ [4a2c8be](https://github.com/brnocesar/alura/commit/4a2c8be27c7874a71184b9fc9f991d9e5d4bc030).
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 ### 9.3 _Login_
 
@@ -1345,7 +1354,7 @@ public function getUser($credentials, UserProviderInterface $userProvider)
 }
 ```
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 - `checkCredentials()`: verifica se as credênciais retornadas por `getCredentials()` são válidas
 
@@ -1468,7 +1477,7 @@ Após implementar todos os métodos necessários ainda devemos informar ao Symfo
 
 Nesse _commit_ [c171124](https://github.com/brnocesar/alura/commit/c171124004a90c1bbf7a48e7f5fbccf52e088907) você pode verificar o resultado com todos os métodos implementados.
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 ## 10 Eventos do Symfony
 
@@ -1537,13 +1546,15 @@ Podemos refinar um pouco o código usando o conceito de _guard claused_, abstrai
 
 Nesta seção vimos apenas o evento relacionado ao lançamento de exceções, mas o Symfony emite diversos tipos de eventos, veja mais sobre isso na [documentação](https://symfony.com/doc/current/reference/events.html).
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
 
 ## 11 Utilizando cache
 
 Na maior parte das aplicações web as funcionalidades de leitura são bem mais utilizadas do que as de escrita. Isso significa que poderiamos deixar as coleções de médicos e especialidades salvas na memória do servidor que está rodando a aplicação, assim quando esse recurso for solicitado não é necessário fazer uma consulta no banco de dados, o que pode economizar processamento e melhorar o desempenho da nossa aplicação.
 
 O Symfony possui um [componente de cache](https://symfony.com/doc/current/components/cache.html) que permite utilizar esse recurso de diferentes formas. Vamos começar adicionando uma interface como dependência no construtor do `BaseController`, a `CacheItemPoolInterface`, que é um repositório de itens de cache e vai lidar com o cache organizando itens que serão salvos e recuperados. A interface que será utilizada nesse momento segue a PSR-6.
+
+Por padrão (?) o Symfony salva o cache em arquivos de texto no sistema que está rodando, mas existem vários [_adapters_](https://symfony.com/doc/current/components/cache.html#available-cache-adapters) disponíveis.
 
 ### 11.1 Guardando no cache
 
@@ -1569,4 +1580,102 @@ Agora quando precisarmos recuperar algum registro, podemos primeiro verificar se
 
 Até o momento apenas guardamos e recuperamos itens do cache e agora vamos atualizar as informações cacheadas quando nencessário. São duas a ocasiões, quando um registro for excluído do banco de dados devemos invalidar seu respectivo item no cache , do contrário o recurso `show()` de um registro excluído ainda ficará disponível, e quando modificarmos um registro precisamos atualizar o que está em cache (_commit_ [789a68c](https://github.com/brnocesar/alura/commit/789a68cc94abc2ef93b4080357c6faf02ab583c9)).
 
-[↑ voltar ao topo](#índice)
+[↑ voltar ao topo](#api-com-symfony)
+
+## 12 Trabalhando com _logs_
+
+O Symfony já vem uma [interface](https://symfony.com/doc/current/logging.html) de _logging_ que segue a [PSR-3](https://www.php-fig.org/psr/psr-3/#3-psrlogloggerinterface) e para começar a usá-la basta pedir um objeto dessa classa no construtor e pronto, não é necessário nenhuma configuração adicional.
+
+### 12.1 Gerando _logs_ de ações
+
+Essa interface já vem com vários níveis de _log_ já implementados (`notice()`, `info()`, `warning()`, `debug()`...), bastando escolher o que melhor se adequa ao evento que queremos registrar. Para definir um _log_ independente do nível, devemos passar uma mensagem que pode possuir parâmetros que serão interpolados de acordo com o que for passado no contexto (_commit_ [ec75ec6](https://github.com/brnocesar/alura/commit/ec75ec665dcf6103d5cfb8590a1ef21a03d06176)):
+
+```php
+$this->logger->notice(
+    'Novo registro de {entidade} adicionado com id = {id}.',
+    [
+        'entidade' => get_class($entity),
+        'id'       => $entity->getId()
+    ]
+);
+```
+
+```terminal
+[Tue Nov  3 19:45:55 2020] [notice] Novo registro de App\Entity\Medico adicionado com id = 106.
+```
+
+Outro detalhe interessante que podemos explorar é alterar o nível mínimo de _logs_ que serão apresentados na saída padrão de acordo com o valor da variável de ambiente `SHELL_VERBOSITY`. Ao colocar o sistema em produção você pode muito bem redirecionar os _logs_ da saída padrão para um arquivo por exemplo.
+
+A partir no nível `warning`, os _logs_ são enviados para a "stderr", saída padrão de erros, que também sai no terminal (hehe).
+
+### 12.2 Gerando _logs_ de exceções
+
+Como temos um _handler_ de exceções, o procedimento é bem similar ao que foi feito no `BaseController`. No caso desse projeto acabei refatorando a `ExceptionHandler` e definindo um método para exceções genéricas, ou seja, se a exceção for de algum tipo que não mapeamos. Ao gerar um log de exceção podemos passar toda _stack trace_ como contexto (_commit_ [df5515c](https://github.com/brnocesar/alura/commit/df5515c1aaf9501edae3e01998b3fd3b17b6fadf)).
+
+[↑ voltar ao topo](#api-com-symfony)
+
+## 13 Testes funcionais
+
+O foco desse tipo de teste é a funcionalidade da aplicação, se o resultado é de fato o que se espera e o funcionamento está correto. Diferente dos testes unitários que o foco é verificar se uma classe ou até mesmo apenas um método está se comportando como deveria. Com os testes funcionais vamos testar requisições e suas respostas, o preenchimento de formulários e outras ações que muito provavelmente (muito mesmo) o próprio usuário irá realizar.
+
+### 13.1 Pacotes necessários
+
+Para implementarmos os testes da nossa aplicação devemos instalar [alguns pacotes](https://symfony.com/doc/current/testing.html) antes. Note que os testes são (deveriam ser) realizados apenas em ambiente de desenvolvimento, então passamos a _flag_ `--dev` para os pacotes (_commit_ [f8e96fb](https://github.com/brnocesar/alura/commit/f8e96fbc7910d593f189d50a0396989c2266b707)):
+
+- o primeiro deve ser o `symfony/phpunit-bridge` que faz a integração com o PHPUnit e traz seu binário, e depois usamos esse binário para que ele faça a instalação do PHPUnit:
+
+```terminal
+composer require --dev symfony/phpunit-bridge
+
+php bin/phpunit
+```
+
+- após isso instalamos alguns pacotes que vão permitir a interação com a aplicação:
+
+```terminal
+composer require --dev symfony/browser-kit symfony/css-selector
+```
+
+### 13.2 Primeiro teste
+
+O primeiro teste que vamos implementar será para um dos _endpoints_ de listagem e vamos verificar se o atributo `paginaAtual` possui um valor maior que zero. Seguindo a [documentação](https://symfony.com/doc/current/testing.html#your-first-functional-test) vamos criar uma a classe `tests/MedicoWebTest.php` e fazer ela extender a classe `WebTestCase`. Dentro dessa classe criamos um método chamado `testPaginaAtualEhMaiorQueZero()` onde vamos colocar o código que realiza o teste.
+
+Dentro do método definimos um _client_ para que permite fazer requisições para nosso prórpio sistema e fazemos uma requisição do tipo `GET` para a rota `/medicos` sem passar nenhum parâmetro na _query string_. Podemos acessar o conteúdo da resposta e verificar se o atributo `paginaAtual` é igual a `1` (_commit_ [d564f55](https://github.com/brnocesar/alura/commit/d564f55ae43f964b7ce140f8d50458a093a77f0a)).
+
+Se rodarmos o teste (`php bin/phpunit`) veremos que ele falha, pelo motivo de que não estamos autenticando o cliente que faz a requisição. Então vamos modificar esse teste para testar se o _status code_ da resposta é `401` de "não autorizado" (_commit_ [0dc9055](https://github.com/brnocesar/alura/commit/0dc9055aafc801eae2ce9f28e7d7b4a15f892537)).
+
+### 13.3 Teste com autenticação
+
+Para realizar algum teste que precisa de autenticação devemos implementar um método que faça o _login_ para obtermos o _token de acesso_. A partir disso basta enviar o _token_ seguindo a especificação que definimos no cabeçalho _authorization_. Para enviar algum cabeçalho através do _client_ que estamos usando, devemos seguir o padrão `'HTTP_` + cabeçalho em letras maiúsculas (alguns cabeçalhos como o `Content-Type` não precisam seguir esse padrão) (_commit_ [ec67667](https://github.com/brnocesar/alura/commit/ec676671f8586a65a2ab2a896fdfbf7257a6d684)). Conforme nossa aplicação for crescendo e implementarmos mais classes de teste que também precisam realizar _login_, podemos abstrair essa lógica para uma classe específica para realizar a autenticação.
+
+Podemos implementar um teste que cadastra um novo médico também e verificar se a resposta é `201` (_commit_ [6821f00](https://github.com/brnocesar/alura/commit/6821f00fa04c15f97db018d573455b4f61a3dd33)).
+
+### 13.4 Banco para testes
+
+Se acessarmos a rota para listar médicos ou a tabela de no banco de dados após realizar o teste para cadastro de um novo médico, vamos ver que o médico do teste está presente em nossa base de dados. Isso ocorre porque em momento algum foi definido um banco específico para testes.
+
+Quando os pacotes para testes foram instalados, foi criado um arquivo `.env.test` na raiz do projeto. Este arquivo é carregado na inicialização do Symfony, mas utilizado apenas em ambiente de testes. Então podemos definir um banco específico para testes neste arquivo, no caso vamos copiar a definição de uma banco SQLite do `.env` (_commit_ [04ece8c](https://github.com/brnocesar/alura/commit/04ece8ca66d8c49892b67498ab9d13b450b91ef9)).
+
+Após isso podemos rodar o comando do **doctrine** que cria a base de dados para o ambiente de testes:
+
+```terminal
+php bin/console -e test doctrine:database:create
+```
+
+criar o _schema_ do zero, para o ambiente de testes:
+
+```terminal
+php bin/console -e test doctrine:schema:create
+```
+
+rodar as _fisturex_:
+
+```terminal
+php bin/console -e test doctrine:fixtures:load
+```
+
+Se você estiver preocupado em que um teste não influencie no próximo, podemos instalar o pacote abaixo e adicionar algumas _flags_ no (...).xml e isso vai resetar o banco de testes antes de cada teste (?).
+
+[↑ voltar ao topo](#api-com-symfony)
+
+(_commit_ [](https://github.com/brnocesar/alura/commit/))
