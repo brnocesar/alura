@@ -16,4 +16,4 @@ Esse repositório reúne guias, notas e projetos de estudos em PHP. A maior part
 13. [Symfony](https://github.com/brnocesar/learning-PHP/tree/main/13-symfony)
 14. [_Collections_](https://github.com/brnocesar/learning-PHP/tree/main/14-collections)
 15. [_Web scraping_](https://github.com/brnocesar/learning-PHP/tree/main/15-web_scraping)
-16. [Validação de dados nacionais](https://github.com/brnocesar/learning-PHP/tree/main/16-brasilidades)
+16. [Validação de dados nacionais (_regex_)](https://github.com/brnocesar/learning-PHP/tree/main/16-brasilidades)
