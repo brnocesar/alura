@@ -179,6 +179,16 @@ Se for passada uma váriavel para armazenar os resultados, está vai receber um 
 
 Também podemos passar _flags_ para obter informações extras, como o índice de cada padrão/grupo capturado.
 
+### 3.1 Substituindo
+
+O PHP posssui uma função muito interessante para substituição que faz uso das _regexes_, a `preg_replace()`. Essa função recebe como parâmetros a _regex_, o texto substituto e o alvo, nessa ordem. O texto substituto também pode ser uma _regex_ e podemos até referênciar grupos da primeira _regex_ usando a notação `$n`, onde `n` é o índice do grupo. No exemplo abaixo, o formato da data `2020-10-05` é alterado para `05/10/2020`:
+
+```php
+preg_replace("/(\d{4})-(\d{2})-(\d{2})/", "$3/$2/$1", "2020-10-05")
+```
+
+Outro detalhe que não foi mencionado é que devemos "rodear" a _string_ que representa a _regex_ com os caracteres `~` ou `/`.
+
 ## 4 Dados brasileiros
 
 ### 4.1 Validando CPF
