@@ -26,16 +26,20 @@ function totalMedalhas(int $medalhasAcumuladas, array $pais) {
 // // $dados = array_filter($dados, 'paisComEspacoNoNome');
 // echo array_reduce($dados, 'totalMedalhas', 0); // 36
 
-usort($dados, function (array $primeiro, array $segundo) {
-    $medalhasPrimeiro = $primeiro['medalhas'];
-    $medalhasSegundo  = $segundo['medalhas'];
+function comparaMedalhas(array $primeiroPais, array $segundoPais): callable
+{
+    return function (string $modalidade) use ($primeiroPais, $segundoPais): int {
+        return $segundoPais[$modalidade] <=> $primeiroPais[$modalidade]; // ordem descrescente
+    };
+}
 
-    $ouro = $medalhasSegundo['ouro'] <=> $medalhasPrimeiro['ouro'];
-    $prata = $medalhasSegundo['prata'] <=> $medalhasPrimeiro['prata'];
-    return $ouro !== 0 ? $ouro
-        : ($prata !== 0 ? $prata
-        : $medalhasSegundo['bronze'] <=> $medalhasPrimeiro['bronze']);
+usort($dados, function (array $primeiro, array $segundo) {
+    $comparador = comparaMedalhas($primeiro['medalhas'], $segundo['medalhas']);
+
+    return $comparador('ouro') !== 0 ? $comparador('ouro')
+        : ($comparador('prata') !== 0 ? $comparador('prata')
+        : $comparador('bronze'));
 });
 
 
-var_dump($dados);
+print_r($dados);
