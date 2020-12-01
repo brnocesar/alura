@@ -16,8 +16,11 @@ $medalhasPorPais = fn (int $medalhasAcumuladas, int $medalhas): int => $medalhas
 
 $totalMedalhas = fn (int $medalhasAcumuladas, array $pais) => $medalhasAcumuladas + array_reduce($pais['medalhas'], $medalhasPorPais, 0);
 
-// $dados = array_map('convertePaisParaMaiuscula', $dados);
-$dados = array_filter($dados, $paisComEspacoNoNome);
+$paisesEmLetraMaiuscula = fn ($dados) => array_map('convertePaisParaMaiuscula', $dados);
+$removePaisesSemEspacoNoNome = fn ($dados) => array_filter($dados, $paisComEspacoNoNome);
+
+$dados = $removePaisesSemEspacoNoNome($paisesEmLetraMaiuscula($dados));
+
 echo array_reduce($dados, $totalMedalhas, 0) . PHP_EOL; // 36
 
 function comparaMedalhas(array $primeiroPais, array $segundoPais): callable
