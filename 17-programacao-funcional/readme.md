@@ -405,3 +405,69 @@ var_dump($dados);
 ```
 
 [↑ voltar ao topo](#programação-funcional)
+
+## 3 Aplicações parciais
+
+Vamos partir do exemplo de uma função que executa uma operação matemática como a divisão entre dois número inteiros.
+
+```php
+function dividir(int $a, int $b) {
+    return $a / $b;
+}
+
+echo dividir(4, 2); // 2
+echo dividir(5, 2); // 2.5
+echo dividir(10, 2); // 5
+```
+
+Note que em todas as chamadas foi passado o mesmo divisor, portanto, para esse caso faz sentido definir uma função que sempre divide por 2, "fixando" esse parâmetro. O que queremos é parcializar uma função completa de forma que ela já tenha parte dos parâmetros informados, ficando parcialmente "pronta" para ser executada.
+
+Podemos fazer isso definindo uma função que não recebe nenhum parâmetro e retorna uma função anônima. Essa função retornada recebe o dividendo como único parâmetro e retorna a chamada da função `dividir()`, passando o divisor e o número 2 (parâmetro "fixo").
+
+```php
+function dividirPor2() {
+    return function ($dividendo) {
+        return dividir($dividendo, 2);
+    };
+}
+
+echo dividirPor2()(4); // 2
+echo dividirPor2()(5); // 2.5
+echo dividirPor2()(10); // 5
+```
+
+Lembre-se que o valor da chamada de uma função é seu retorno, então `dividirPor2()` "vale" a chamada da função anônima, que retona a chamada de `dividir()`. Assim, para finalizar a operação de divisão basta passar o único parâmetro que a função anônima recebe.
+
+Esse processo de transformar uma função que recebe vários parâmetros em uma cadeia de funções que podem ser chamadas de forma encadeada, cada uma recebendo um único parâmetro, é denominado de _**currying**_.
+
+O resurso que utilizamos para parcializar uma função completa foi o de _high-order function_ (HOF). As HOF são funções que recebem uma função por parâmetro ou retornam uma função. Ou seja, são funções que trabalham com outras funções, recebendo ou retornando.
+
+Podemos ainda tornar genérica essa nova função, fazendo com que a divisão não necessáriamente seja por 2:
+
+```php
+function dividirPor(int $divisor): callable {
+    return function ($dividendo) use ($divisor) {
+        return dividir($dividendo, $divisor);
+    };
+}
+
+echo dividirPor(2)(4); // 2
+echo dividirPor(2)(5); // 2.5
+echo dividirPor(2)(10); // 5
+```
+
+Observando o código repetido em todas as chamadas para realizar a divisão por 2, podemos abstrair isso para uma variável:
+
+```php
+$dividirPor2 = dividirPor(2);
+
+echo $dividirPor2(4); // 2
+echo $dividirPor2(5); // 2.5
+echo $dividirPor2(10); // 5
+```
+
+e quando utilizamos uma _**curried function**_ para fixar um dos parâmetros isso é chamado de aplicação parcial (_partial application_).
+
+O conceito de _partial application_ foi utilizado para refatorar a ordenação dos países de acordo com a quantidade de medalhas (_commit_ [571d3b6](https://github.com/brnocesar/alura/commit/571d3b65d4a9ed8646f6f9ed90c108b9a753a6cb)) e a funções anônimas foram reescritas como _short closures_ (_arrow functions_) no _commit_ [16a7c36](https://github.com/brnocesar/alura/commit/16a7c36d0328711cec7fd652aa20e83170871678).
+
+[↑ voltar ao topo](#programação-funcional)
