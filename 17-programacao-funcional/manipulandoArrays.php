@@ -10,27 +10,19 @@ function convertePaisParaMaiuscula(array $pais) {
     return $pais;
 }
 
-function paisComEspacoNoNome(array $pais): bool {
-    return strpos($pais['pais'], ' ') !== false;
-}
+$paisComEspacoNoNome = fn (array $pais): bool => strpos($pais['pais'], ' ') !== false;
 
-function medalhasPorPais(int $medalhasAcumuladas, int $medalhas) {
-    return $medalhasAcumuladas += $medalhas;
-}
+$medalhasPorPais = fn (int $medalhasAcumuladas, int $medalhas): int => $medalhasAcumuladas + $medalhas;
 
-function totalMedalhas(int $medalhasAcumuladas, array $pais) {
-    return $medalhasAcumuladas + array_reduce($pais['medalhas'], 'medalhasPorPais', 0);
-}
+$totalMedalhas = fn (int $medalhasAcumuladas, array $pais) => $medalhasAcumuladas + array_reduce($pais['medalhas'], $medalhasPorPais, 0);
 
 // $dados = array_map('convertePaisParaMaiuscula', $dados);
-// // $dados = array_filter($dados, 'paisComEspacoNoNome');
-// echo array_reduce($dados, 'totalMedalhas', 0); // 36
+$dados = array_filter($dados, $paisComEspacoNoNome);
+echo array_reduce($dados, $totalMedalhas, 0) . PHP_EOL; // 36
 
 function comparaMedalhas(array $primeiroPais, array $segundoPais): callable
 {
-    return function (string $modalidade) use ($primeiroPais, $segundoPais): int {
-        return $segundoPais[$modalidade] <=> $primeiroPais[$modalidade]; // ordem descrescente
-    };
+    return fn (string $modalidade): int => $segundoPais[$modalidade] <=> $primeiroPais[$modalidade]; // ordem descrescente
 }
 
 usort($dados, function (array $primeiro, array $segundo) {
