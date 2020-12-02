@@ -1,17 +1,29 @@
 # Programação funcional
 
+0. [Rodando os _scripts_](#0-rodando-os-_scripts_)
 1. [PHP e funções](#1-php-e-funções)  
   1.1. O tipo `callable`  
   1.2. _Closures_  
   1.3. Abordagem imperativa vs declarativa  
 2. [Manipulando _arrays_](#2-manipulando-_arrays_)  
-  2.1. Mapeando um _array_ com `array_map()`  
-  2.2. Filtrando um _array_ com `array_filter()`  
-  2.3. Reduzindo _arrays_ a um único valor com `array_reduce()`  
+  2.1. [Mapeando um _array_ com `array_map()`](#2.1-mapeando-um-_array_-com-`array_map()`)  
+  2.2. [Filtrando um _array_ com `array_filter()`](#2.2-filtrando-um-_array_-com-`array_filter()`)  
+  2.3. [Reduzindo _arrays_ a um único valor com `array_reduce()`](#2.3-reduzindo-_arrays_-a-um-único-valor-com-`array_reduce()`)  
     2.3.1. `array_map()` com `array_reduce()`  
-  2.4. Ordenando _arrays_ com `usort()`  
+  2.4. [Ordenando _arrays_ com `usort()`](#2.4-ordenando-_arrays_-com-`usort()`)  
+3. [Aplicações parciais](#3-aplicações-parciais)  
+4. [Composição de funções](#4-composição-de-funções)  
+  4.1. [Abordagem "manual"](#4.1-abordagem-"manual")  
+  4.2. [Abordagem "genérica"](#4.2-abordagem-"genérica")  
+  4.3. [Utilizando pacotes externos](#4.3-utilizando-pacotes-externos)  
+5. [Mônadas](#5-mônadas)  
 
 
+## 0 Rodando os _scripts_
+
+Após realizar o clone, certifique-se de ter o composer instalado e rode o comando `composer install` dentro do diretório `17-programacao-funcional` que se encontra na raiz do diretório clonado.
+
+Para rodar cada um dos _scripts_ (`teste.php`, `manipulandoArrays.php` e `partial.php`) basta executar `php nomeDoScript.php`.
 ## 1 PHP e funções
 
 ### 1.1 O tipo `callable`
@@ -411,6 +423,8 @@ var_dump($dados);
 Vamos partir do exemplo de uma função que executa uma operação matemática como a divisão entre dois número inteiros.
 
 ```php
+<?php
+
 function dividir(int $a, int $b) {
     return $a / $b;
 }
@@ -469,5 +483,169 @@ echo $dividirPor2(10); // 5
 e quando utilizamos uma _**curried function**_ para fixar um dos parâmetros isso é chamado de aplicação parcial (_partial application_).
 
 O conceito de _partial application_ foi utilizado para refatorar a ordenação dos países de acordo com a quantidade de medalhas (_commit_ [571d3b6](https://github.com/brnocesar/alura/commit/571d3b65d4a9ed8646f6f9ed90c108b9a753a6cb)) e a funções anônimas foram reescritas como _short closures_ (_arrow functions_) no _commit_ [16a7c36](https://github.com/brnocesar/alura/commit/16a7c36d0328711cec7fd652aa20e83170871678).
+
+[↑ voltar ao topo](#programação-funcional)
+
+## 4 Composição de funções
+
+### 4.1 Abordagem "manual"
+
+Até o momento, sempre que executamos alguma ação sobre os nossos dados (quando possível) retornamos um novo _array_ e sobreescrevemos o antigo. Isso é feito para evitar que nossas funções alterem estados externos a seus escopos.
+
+Dessa forma, a cada vez que chamamos uma função estamos passando o "atual" _array_ de dados e recebendo um novo, como ilustrado no fragmento abaixo: 
+
+```php
+$dados = array_map('convertePaisParaMaiuscula', $dados);
+$dados = array_filter($dados, $paisComEspacoNoNome);
+```
+
+Então o que estamos fazendo, através de uma váriavel, é: pegar o retorno de uma função e passar como parâmetro para outra. Poderíamos fazer isso diretamente passando a chamada de uma função como parâmetro de outra, e esse é o conceito de **composição de funções**.
+
+```php
+$dados = array_filter(array_map('convertePaisParaMaiuscula', $dados), $paisComEspacoNoNome);
+```
+
+Acima é apresentada a forma mais rudimentar de implementar a uma composição de funções, fazendo de forma manual. Para o nosso exemplo com apenas duas funções, não existe um problema grava de legibilidade. Mas considerando situações em que o número de funções pode crescer muito, faz sentido pensar em uma forma de mais configurável para compor as funções.
+
+O primeiro ponto que podemos melhorar é fazer com que cada função que venha a fazer parte da composição recebe apenas um parâmtro. No nosso exemplo cada uma das funções recebe dois parâmetros, os dados e uma função, então vamos reescrever essas chamadas utilizando _arrow functions_:
+
+```php
+$paisesEmLetraMaiuscula = fn ($dados) => array_map('convertePaisParaMaiuscula', $dados);
+$removePaisesSemEspacoNoNome = fn ($dados) => array_filter($dados, $paisComEspacoNoNome);
+
+$dados = $paisesEmLetraMaiuscula($dados);
+$dados = $removePaisesSemEspacoNoNome($dados);
+```
+
+Agora ambas as funções recebem apenas um parâmetro, o conjunto de dados, e podemos compor essas funções de forma mais legível que a anterior (_commit_ [ed81417](https://github.com/brnocesar/alura/commit/ed814176015dcbb8a86f55c4bbba17ba2f9d0e55)):
+
+```php
+$dados = $removePaisesSemEspacoNoNome($paisesEmLetraMaiuscula($dados));
+```
+
+[↑ voltar ao topo](#programação-funcional)
+
+### 4.2 Abordagem "genérica"
+
+Para implementar uma composição que seja mais genérica e nos permita alterar a configuração de funções de forma mais simples, vamos escrever uma função para "gerenciar" a composição. Esta função deve receber várias funções e fazer com que elas sejam executadas de forma encadeada, sempre passando o retorno de uma como parâmtro para a próxima, como um _pipeline_ de funções.
+
+Como não queremos limitar o número de funções passadas, vamos definir um número variável de argumentos usando o operador `...`, dessa forma os argumentos serão passados na forma de um _array_ de funções.
+
+Como estamos trabalhando com um _array_ de funções em que vamos executar cada uma delas para no final retonar os dados que foram processados, ou seja, vamos passar por todos os elementos de um _array_ para retornar um valor reduzido de todos esses elementos. Então faz sentido utilizarmos o `array_reduce()`, em que a função acumuladora vai passar o valor acumulado para a função atual, até que todas as funções sejam executadas.
+
+```php
+function pipe(callable ...$funcoes): callable 
+{
+    return fn ($dados) => array_reduce(
+        $funcoes, 
+        fn ($valorAcumulado, callable $funcaoAtual) => $funcaoAtual($valorAcumulado), 
+        $dados
+    );
+}
+
+$composicaoFuncoes = pipe($removePaisesSemEspacoNoNome, $paisesEmLetraMaiuscula);
+$dados = $composicaoFuncoes($dados);
+```
+
+O parâmetro de inicialização do `array_reduce()` são os dados originais, que passamos para a composição após atribuí-la para uma variável (_commit_ [d943bca](https://github.com/brnocesar/alura/commit/d943bca48b6922312880aada1a68f8dc13c15c14)).
+
+O nome `pipe()` (as vezes encontrado como `pipeline()` também) dado para a função é uma conveção e indica que as funções devem ser executadas da esquerda para a direita. Outro nome comum para esse tipo de função é `compose()`, nesse caso a ordem é contrária, da direita para esquerda.
+
+[↑ voltar ao topo](#programação-funcional)
+
+### 4.3 Utilizando pacotes externos
+
+Estabelecer um _pipeline_ de funções é uma ação muito comum, então é natural que as pessoas prefiram utilizar pacotes prontos para realizar essas tarefas. Existem vários pacotes bem conceituados na comunidade, então vamos utilizar apenas um como exemplo.
+
+Para instalar o pacote execute o comando:
+
+```terminal
+composer require igorw/compose
+```
+
+Crie um arquivo `.gitignore` para manter a pasta `vendor/` fora do versionamento. No arquivo em que vamos usar a função externa devemos importar o `autoload.php` para lidar com o `namespace` do pacote e então basta fazer a chamada da função do pacote (_commit_ [24d2555](https://github.com/brnocesar/alura/commit/24d255593b12c04460249c13896860a47f160a5d)):
+
+```php
+<?php
+
+require_once 'vendor/autoload.php';
+
+...
+
+$composicaoFuncoes = \igorw\pipeline($removePaisesSemEspacoNoNome, $paisesEmLetraMaiuscula);
+```
+
+[↑ voltar ao topo](#programação-funcional)
+
+## 5 Mônadas
+
+Quando vamos trabalhar com dados que vêm de alguma fonte externa, uma API ou um arquivo mesmo, devemos nos precaver com possíveis erros ou "formatos" indesejados desses arquivos. Por exemplo, se a fonte dos nossos dados retornar um valor numérico, uma _string_ ou `null` ao invés de um _array_, obteremos vários erros na saída padrão ao executar nosso código.
+
+Como o PHP não é uma linguagem puramente funcional, vamos utilizar uma abordagem multiparadigma para contornar esse problema. Vamos criar um novo tipo de dado que nos permita lidar com a possibilidade de que **talvez** tenha um _array_ e **talvez** não tenha. Esse novo tipo, chamado de "tipo monádico", será uma classe que vai atuar como um _wrapper_ para nossos dados e que entregará sempre um dado válido e consistente para ser manipulado pelas nossas funções.
+
+Na pasta `src` criamos a classe `Maybe` (ou `Optional`, são nomes bastante comuns para esses _wrappers_) com o construtor padrão apenas recebendo e atribuíndo esse valor e também definimos um "construtor" estático. Também devemos implementar um método que retorne o valor encapsulado (passado no construtor) ou, em caso de o valor ser inválido para o que queremos, retornar algum valor padrão:
+
+```php
+<?php
+
+namespace Programacao\Funcional;
+
+class Maybe
+{
+    private $valor;
+
+    public function __construct($valor)
+    {
+        $this->valor = $valor;
+    }
+
+    public static function of($valor)
+    {
+        return new self($valor);
+    }
+
+    public function isNothing(): bool
+    {
+        return is_null($this->value) or !is_array($this->value);
+    }
+
+    public function getOrElse($default)
+    {
+        return $this->isNothing() ? $default : $this->value;
+    }
+}
+```
+
+Já podemos criar objetos do tipo `Maybe` e acessar seu valor válido:
+
+```php
+Maybe::of(10)->getOrElse([]); // []
+Maybe::of(null)->getOrElse([1, 2, 3]); // [1, 2, 3]
+Maybe::of([1, 2, 3])->getOrElse([]); // [1, 2, 3]
+```
+
+### 5.1 _Functors_
+
+Algo interessante que podemos implementar em nossa classe é o conceito de _functors_. Em linguagem de programação um _functor_ é qualquer coisa em que pode ser realizado um _map_. Assim, em Orientação a Objetos é qualquer objeto que possui o método `map()` e em programação funcional é qualquer coisa em que o `map` pode ser aplicado.
+
+Então vamos modificar nossa classe `Maybe` para que ela se adeque a condição de ser um _functor_. Começamos definindo um método `map()` que recebe um `callable` e dentro desse método avalio se seu valor é válido ou não para retornar uma instância de `Maybe` com o valor processado pela função recebida como parâmetro.
+
+```php
+public function map(callable $fn)
+{
+    if ($this->isNothing()) {
+        return Maybe::of($this->value);
+    }
+    $value = $fn($this->value);
+
+    return Maybe::of($value);
+}
+```
+
+### 5.2 Adequando as funções ao tipo `Maybe`
+
+Para adequar as funções que escrevemos a esse novo tipo de dado precisamos utilizar o método `getOrElse()` para acessar os dados, definir o tipo `Maybe` para os argumentos de funções que recebem os dados e retornar sempre uma instância de `Maybe` recebendo o _array_ manipulado (_commit_ [7acead2](https://github.com/brnocesar/alura/commit/7acead28de8bd398f8afef725f16fcf09ad296ef)).
+
+Note que para a função de ordenação não acusar erro devemos passar uma cópia do _array_ que acessamos de `Maybe`, pois essa função recebe o _array_ de argumento por referência e não por valor.
 
 [↑ voltar ao topo](#programação-funcional)
