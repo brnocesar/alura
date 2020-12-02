@@ -18,3 +18,4 @@ Esse repositório reúne guias, notas e projetos de estudos em PHP. A maior part
 15. [_Web scraping_](https://github.com/brnocesar/learning-PHP/tree/main/15-web_scraping)
 16. [Validação de dados nacionais (_regex_)](https://github.com/brnocesar/learning-PHP/tree/main/16-brasilidades)
 17. [Programação Funcional](https://github.com/brnocesar/learning-PHP/tree/main/17-programacao-funcional)
+18. [SOLID - Boas práticas de OO](https://github.com/brnocesar/learning-PHP/tree/main/18-solid)

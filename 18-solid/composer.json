@@ -1,0 +1,8 @@
+{
+    "name": "brnocesar/learning-php-solid",
+    "autoload": {
+        "psr-4": {
+        "Learning\\Solid\\": "src/"
+        }
+    }
+}
