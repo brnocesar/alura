@@ -1,6 +1,8 @@
 <?php
 
-return [
+use Programacao\Funcional\Maybe;
+
+return Maybe::of([
     [
         "pais" => "Brasil",
         "medalhas" => [
@@ -33,4 +35,4 @@ return [
             "bronze" => 5
         ]
     ]
-];
+]);
