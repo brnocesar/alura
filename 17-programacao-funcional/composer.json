@@ -1,0 +1,11 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Programacao\\Funcional\\": "src/"
+        }
+    },
+    "require": {
+        "ext-mbstring": "*",
+        "igorw/compose": "^1.0"
+    }
+}

@@ -1,5 +1,7 @@
 <?php
 
+require_once 'vendor/autoload.php';
+
 $dados = require 'dados.php';
 
 // $numeroPaises = count($dados);
@@ -28,7 +30,8 @@ function pipe(callable ...$funcoes): callable
     );
 }
 
-$composicaoFuncoes = pipe($removePaisesSemEspacoNoNome, $paisesEmLetraMaiuscula);
+// $composicaoFuncoes = pipe($removePaisesSemEspacoNoNome, $paisesEmLetraMaiuscula);
+$composicaoFuncoes = \igorw\pipeline($removePaisesSemEspacoNoNome, $paisesEmLetraMaiuscula);
 $dados = $composicaoFuncoes($dados);
 echo array_reduce($dados, $totalMedalhas, 0) . PHP_EOL; // 36
 
